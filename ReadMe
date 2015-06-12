@@ -1,0 +1,45 @@
+Description: This is a software for viewing 3D objects. The central widget of the mainwindow is a glivewer widget, which is developed from libqglviewer.
+             This software can be used a basic framework for developing other complex GUIs by adding some fucntions.
+
+Author: Sway
+Time: 11/05/2014
+Organization: Institute of Automation, Chinese Academy of Sciences
+
+
+==========================================================================================================================================================
+GLViewer.h: defines the GLViewer class;
+GLViewer.cpp: implement class members related to GLViewer class.
+
+Mainwindow.h: defines the Mainwindow class
+Mainwindow.cpp: implement class members related to Mainwindow class.
+
+main.cpp: run the mainwindow classs 
+
+
+GLViewer.cpp:  add <QGLFunctions> will undefine some functions in "glew.h", such as  glGenBuffers, glBindBuffer and glBufferData. I have found that, Qt has it's own version of 
+              functions for buffer object, however it contains no functions about vertex array. And hence we have to inlcude "glew.h" for vertex array functions and include 
+              <QGLFunctions> for buffer object fucntions. 
+
+              Our Qt Version is 4.8.1, and only version >= 5.3 QTGLFunctions will contain complete functions such as glDrawElements....
+
+
+
+Third Party: Linux   
+             $  sudo apt-cache search libqglviewer
+             $  sudo pat-get install libqglviewer-qt4-dev
+
+
+             $ sudo apt-cache search libglew
+             $ sudo apt-get install libglew1.5-dev
+
+http://www.ntu.edu.sg/home/ehchua/programming/opengl/cg_basicstheory.html
+
+
+
+
+
+
+
+
+
+
