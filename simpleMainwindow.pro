@@ -8,18 +8,36 @@ QMAKE_CXXFLAGS += -frounding-math
 SOURCES += \
     src/main.cpp \
     src/GLViewer.cpp \
-    src/MainWidow.cpp
+    src/MainWidow.cpp \
+    src/Vertex.cpp \
+    src/Vector.cpp \
+    src/MeshIO.cpp \
+    src/Mesh.cpp \
+    src/HalfEdge.cpp \
+    src/Face.cpp \
+    src/Edge.cpp
 
 HEADERS += \
     include/MainWindow.h \
-    include/GLViewer.h
+    include/GLViewer.h \
+    include/Vertex.h \
+    include/Vector.h \
+    include/Variable.h \
+    include/Types.h \
+    include/MeshIO.h \
+    include/Mesh.h \
+    include/HalfEdge.h \
+    include/Face.h \
+    include/Edge.h \
+    include/BoundingBox.h
 
 INCLUDEPATH +=   /usr/include/qt4/QtCore     \
                  /usr/include/qt4/QtGui      \
                  /usr/include/qt4/QtOpenGL    \
                  /usr/include/qt4             \
                  /usr/include/qt3/          \
-                 /usr/include/qt4/QtXml/
+                 /usr/include/qt4/QtXml/    \
+                 include/
 
 LIBS  +=     -L/usr/X11R6/lib64 -lQtOpenGL -lQtGui -lQtCore  -lpthread\
              -lQGLViewer  -lGLEW -lglut  -lGL  -lGLU

@@ -10,14 +10,6 @@
 SW::MainWindow::MainWindow()
 {
     setupUi(this);
-  //  gv = new GLViewer(fFrame,"GLViewer");
-  //  horizonlayout1->addWidget(gv, 1);
-
-   // gv->setCursor(Qt::ArrowCursor);
-   // updateWidgets();
-
-   // connect(gv, SIGNAL(sigUpdateGL()), this, SLOT(updateWidgets()));//?????????????????
-
 }
 ///////////////////////////////////////////////////////////////////////////////////
 SW::MainWindow::~MainWindow()
