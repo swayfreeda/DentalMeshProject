@@ -2,6 +2,8 @@
 #define SW_GLVIEWER_H
 
 #include"QGLViewer/qglviewer.h"
+#include"Shader.h"
+#include"Types.h"
 
 #include<list>
 #include<vector>
@@ -33,8 +35,9 @@ class  GLViewer : public QGLViewer
 
 public:
 
-   // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
-     GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
+    enum DispalyType{VERTICES, WIREFRAME, FLAT};
+    // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
+    GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
     ~GLViewer();
 
     virtual void init();
@@ -49,9 +52,12 @@ public:
 
     virtual void keyPressEvent(QKeyEvent *e);
 
-
     void viewAll();
 
+    static void setGL( void );
+    static void setLighting( void );
+    static void setMeshMaterial( void );
+    static void initGLSL( void );
 
 public:
     //draw world coordinates
@@ -59,10 +65,28 @@ public:
 
 public slots:
     virtual void drawText(){}
+    void toggleDisplayVertices(){
+     displayType = VERTICES;
+     updateGL();
+    }
+    void toggleDisplayWireFrame(){
+        displayType = WIREFRAME;
+        updateGL();
+    }
+
+    void toggleDisplayFlat(){
+        displayType = FLAT;
+        updateGL();
+    }
 
 
 
 signals:
+public:
+     std::vector<SW::Mesh> meshes;
+private:
+      static Shader shader;
+      DispalyType displayType;
 
 };
 

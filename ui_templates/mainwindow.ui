@@ -20,33 +20,7 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget {
-	background-color: rgb(200,200,200);
-}
-
-QMenu
-{
-	background: rgb(200,200,200);
-}
-
-QMenu::separator 
-{
-     height: 2px;
-     background: rgb(100,100,100);
-     margin-left: 10px;
-     margin-right: 5px;
- }
-
-QMenuBar 
-{
-	background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 rgb(255,255,255), stop:1 rgb(200,200,200));
- }
-
-QStatusBar
-{
-	background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 rgb(200,200,200), stop:1 rgb(255,255,255));
-}
-</string>
+   <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="sizePolicy">
@@ -57,12 +31,10 @@ QStatusBar
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="SW::GLViewer" name="viewer">
+     <widget class="SW::GLViewer" name="gv">
       <property name="styleSheet">
        <string notr="true">QFrame{
-	border: 2px solid white;
-	border-radius: 10px;
-	background: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 rgb(10,102,151), stop:1 rgb(0,0,0));
+	background:rgb(194, 194, 194);
  }
 
 </string>
@@ -90,13 +62,19 @@ QStatusBar
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="actionOpen"/>
    </widget>
    <widget class="QMenu" name="editMenu">
     <property name="title">
      <string>&amp;Edit</string>
     </property>
+    <addaction name="actionLaplacianDeformation"/>
+    <addaction name="actionUnion"/>
    </widget>
    <widget class="QMenu" name="settingMenu">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>&amp;Setting</string>
     </property>
@@ -105,6 +83,9 @@ QStatusBar
     <property name="title">
      <string>&amp;Display</string>
     </property>
+    <addaction name="actionDisplayVertices"/>
+    <addaction name="actionDisplayWireFrame"/>
+    <addaction name="actionDisplayFlat"/>
    </widget>
    <widget class="QMenu" name="helpMenu">
     <property name="title">
@@ -582,12 +563,42 @@ QStatusBar
     <string>Save Texture Model</string>
    </property>
   </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actionLaplacianDeformation">
+   <property name="text">
+    <string>LaplacianDeformation</string>
+   </property>
+  </action>
+  <action name="actionUnion">
+   <property name="text">
+    <string>Union</string>
+   </property>
+  </action>
+  <action name="actionDisplayVertices">
+   <property name="text">
+    <string>Vertices</string>
+   </property>
+  </action>
+  <action name="actionDisplayWireFrame">
+   <property name="text">
+    <string>WireFrame</string>
+   </property>
+  </action>
+  <action name="actionDisplayFlat">
+   <property name="text">
+    <string>FlatLine</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>SW::GLViewer</class>
    <extends>QFrame</extends>
-   <header>GLViewer.h</header>
+   <header location="global">GLViewer.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

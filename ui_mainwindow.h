@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Fri Jun 12 20:46:59 2015
+** Created: Sat Jun 13 06:23:16 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -10,6 +10,7 @@
 #ifndef UI_MAINWINDOW_H
 #define UI_MAINWINDOW_H
 
+#include <GLViewer.h>
 #include <QtCore/QVariant>
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -22,7 +23,6 @@
 #include <QtGui/QToolBar>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
-#include "include/GLViewer.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -76,9 +76,15 @@ public:
     QAction *actionDisplay_Texture_Model;
     QAction *actionLoad_Texure_Model;
     QAction *actionSave_Texture_Model;
+    QAction *actionOpen;
+    QAction *actionLaplacianDeformation;
+    QAction *actionUnion;
+    QAction *actionDisplayVertices;
+    QAction *actionDisplayWireFrame;
+    QAction *actionDisplayFlat;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout_2;
-    SW::GLViewer *viewer;
+    SW::GLViewer *gv;
     QMenuBar *menubar;
     QMenu *fileMenu;
     QMenu *editMenu;
@@ -98,33 +104,7 @@ public:
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
         MainWindow->setSizePolicy(sizePolicy);
-        MainWindow->setStyleSheet(QString::fromUtf8("QWidget {\n"
-"	background-color: rgb(200,200,200);\n"
-"}\n"
-"\n"
-"QMenu\n"
-"{\n"
-"	background: rgb(200,200,200);\n"
-"}\n"
-"\n"
-"QMenu::separator \n"
-"{\n"
-"     height: 2px;\n"
-"     background: rgb(100,100,100);\n"
-"     margin-left: 10px;\n"
-"     margin-right: 5px;\n"
-" }\n"
-"\n"
-"QMenuBar \n"
-"{\n"
-"	background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 rgb(255,255,255), stop:1 rgb(200,200,200));\n"
-" }\n"
-"\n"
-"QStatusBar\n"
-"{\n"
-"	background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 rgb(200,200,200), stop:1 rgb(255,255,255));\n"
-"}\n"
-""));
+        MainWindow->setStyleSheet(QString::fromUtf8(""));
         fileOpenAction = new QAction(MainWindow);
         fileOpenAction->setObjectName(QString::fromUtf8("fileOpenAction"));
         QIcon icon;
@@ -299,6 +279,18 @@ public:
         actionLoad_Texure_Model->setObjectName(QString::fromUtf8("actionLoad_Texure_Model"));
         actionSave_Texture_Model = new QAction(MainWindow);
         actionSave_Texture_Model->setObjectName(QString::fromUtf8("actionSave_Texture_Model"));
+        actionOpen = new QAction(MainWindow);
+        actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
+        actionLaplacianDeformation = new QAction(MainWindow);
+        actionLaplacianDeformation->setObjectName(QString::fromUtf8("actionLaplacianDeformation"));
+        actionUnion = new QAction(MainWindow);
+        actionUnion->setObjectName(QString::fromUtf8("actionUnion"));
+        actionDisplayVertices = new QAction(MainWindow);
+        actionDisplayVertices->setObjectName(QString::fromUtf8("actionDisplayVertices"));
+        actionDisplayWireFrame = new QAction(MainWindow);
+        actionDisplayWireFrame->setObjectName(QString::fromUtf8("actionDisplayWireFrame"));
+        actionDisplayFlat = new QAction(MainWindow);
+        actionDisplayFlat->setObjectName(QString::fromUtf8("actionDisplayFlat"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -308,19 +300,17 @@ public:
         centralwidget->setSizePolicy(sizePolicy1);
         verticalLayout_2 = new QVBoxLayout(centralwidget);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
-        viewer = new SW::GLViewer(centralwidget);
-        viewer->setObjectName(QString::fromUtf8("viewer"));
-        viewer->setStyleSheet(QString::fromUtf8("QFrame{\n"
-"	border: 2px solid white;\n"
-"	border-radius: 10px;\n"
-"	background: qlineargradient(x1:0, y1:0, x2:0, y2:1,stop:0 rgb(10,102,151), stop:1 rgb(0,0,0));\n"
+        gv = new SW::GLViewer(centralwidget);
+        gv->setObjectName(QString::fromUtf8("gv"));
+        gv->setStyleSheet(QString::fromUtf8("QFrame{\n"
+"	background:rgb(194, 194, 194);\n"
 " }\n"
 "\n"
 ""));
-        //viewer->setFrameShape(QFrame::NoFrame);
-        //viewer->setFrameShadow(QFrame::Plain);
+        //gv->setFrameShape(QFrame::NoFrame);
+        //gv->setFrameShadow(QFrame::Plain);
 
-        verticalLayout_2->addWidget(viewer);
+        verticalLayout_2->addWidget(gv);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -332,6 +322,7 @@ public:
         editMenu->setObjectName(QString::fromUtf8("editMenu"));
         settingMenu = new QMenu(menubar);
         settingMenu->setObjectName(QString::fromUtf8("settingMenu"));
+        settingMenu->setEnabled(false);
         displayMenu = new QMenu(menubar);
         displayMenu->setObjectName(QString::fromUtf8("displayMenu"));
         helpMenu = new QMenu(menubar);
@@ -350,6 +341,12 @@ public:
         menubar->addAction(settingMenu->menuAction());
         menubar->addAction(displayMenu->menuAction());
         menubar->addAction(helpMenu->menuAction());
+        fileMenu->addAction(actionOpen);
+        editMenu->addAction(actionLaplacianDeformation);
+        editMenu->addAction(actionUnion);
+        displayMenu->addAction(actionDisplayVertices);
+        displayMenu->addAction(actionDisplayWireFrame);
+        displayMenu->addAction(actionDisplayFlat);
         toolBar->addSeparator();
         toolBar->addSeparator();
         toolBar->addSeparator();
@@ -470,6 +467,12 @@ public:
         actionDisplay_Texture_Model->setText(QApplication::translate("MainWindow", "Display Texture Model", 0, QApplication::UnicodeUTF8));
         actionLoad_Texure_Model->setText(QApplication::translate("MainWindow", "Load Texure Model", 0, QApplication::UnicodeUTF8));
         actionSave_Texture_Model->setText(QApplication::translate("MainWindow", "Save Texture Model", 0, QApplication::UnicodeUTF8));
+        actionOpen->setText(QApplication::translate("MainWindow", "Open", 0, QApplication::UnicodeUTF8));
+        actionLaplacianDeformation->setText(QApplication::translate("MainWindow", "LaplacianDeformation", 0, QApplication::UnicodeUTF8));
+        actionUnion->setText(QApplication::translate("MainWindow", "Union", 0, QApplication::UnicodeUTF8));
+        actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0, QApplication::UnicodeUTF8));
+        actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0, QApplication::UnicodeUTF8));
+        actionDisplayFlat->setText(QApplication::translate("MainWindow", "FlatLine", 0, QApplication::UnicodeUTF8));
         fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0, QApplication::UnicodeUTF8));

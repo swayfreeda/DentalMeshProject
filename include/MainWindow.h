@@ -59,6 +59,10 @@ namespace SW
 
     public slots:
 
+         void doActionOpen();
+         void doActionLaplacianDeformation();
+         void doActionUion();
+
 
     public:
 

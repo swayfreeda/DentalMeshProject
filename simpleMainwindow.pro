@@ -15,7 +15,8 @@ SOURCES += \
     src/Mesh.cpp \
     src/HalfEdge.cpp \
     src/Face.cpp \
-    src/Edge.cpp
+    src/Edge.cpp \
+    src/Shader.cpp
 
 HEADERS += \
     include/MainWindow.h \
