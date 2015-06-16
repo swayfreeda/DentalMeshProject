@@ -3,3 +3,5 @@
 moc_*
 *.exe
 ui_*.h
+*.pro
+*.pro.user

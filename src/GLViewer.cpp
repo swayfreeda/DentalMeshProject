@@ -26,7 +26,7 @@
 #include<QObject> // tr was not declare
 #include<QApplication> // qaApp
 #include<QTextStream>
-
+#include<QDebug>
 
 #include<time.h>
 #include<sstream>
@@ -44,10 +44,18 @@ GLuint numElement;
 //    setAutoFillBackground(true);// painter auto clear the background
 //}
 
-SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1,  QGLWidget*f):
+
+SW::Shader SW::GLViewer::m_shader;
+
+
+
+SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1, QGLWidget*f):
     QGLViewer(parent0, parent1, f)
 {
-   // setAutoFillBackground(true);
+    //setAutoFillBackground(true);
+    displayType = FLATLINE;
+
+    m_length = 0.1;
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////
 SW::GLViewer::~GLViewer()
@@ -86,13 +94,17 @@ void SW::GLViewer::viewAll()
 void SW::GLViewer::init()
 {
 
+    setGL();
+    initGLSL();
+
+#if BUFFER_
     //glClearColor(0.0, 0.0, 0.0, 0.0);
 
-    glDisable(GL_DITHER);
+    //glDisable(GL_DITHER);
 
     glShadeModel(GL_FLAT);
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
 
     enum{Vertices, Color, Elements, NumVBOs};
     GLuint buffers[NumVBOs];
@@ -109,7 +121,7 @@ void SW::GLViewer::init()
 
     // 3D world coordinate of points
 #ifdef QT_BUFFER
-      QVector<QVector3D> Verts;
+    QVector<QVector3D> Verts;
     Verts.append(QVector3D(-1.0, -1.0, -1.0));
     Verts.append(QVector3D(-1.0, -1.0, 1.0));
     Verts.append(QVector3D(-1.0, 1.0, -1.0));
@@ -134,7 +146,7 @@ void SW::GLViewer::init()
 
     // colors of points
 #ifdef QT_BUFFER
-     QVector<QVector3D> Colors;
+    QVector<QVector3D> Colors;
     Colors.append(QVector3D(0, 0.0, 0.0));
     Colors.append(QVector3D(0, 0.0, 1.0));
     Colors.append(QVector3D(0, 1.0, 0.0));
@@ -240,12 +252,26 @@ void SW::GLViewer::init()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(Indices), Indices, GL_STATIC_DRAW);
 #endif
 
-
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SW::GLViewer::draw()
 {
+    // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+    //m_shader.enable();
+    //drawAxises(0.1, m_length);
+    glPushAttrib( GL_ALL_ATTRIB_BITS );
+    setMeshMaterial();
+    foreach(SW::Mesh mesh, meshes){
+        glPushMatrix();
+          mesh.draw(displayType);
+        glPopMatrix();
+    }
+    glPopAttrib();
+
+    //m_shader.disable();
+#if BUFFER_
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glDisable(GL_LIGHTING);
 
@@ -264,6 +290,8 @@ void SW::GLViewer::draw()
     glDrawElements(GL_QUADS, numElement,  GL_UNSIGNED_BYTE, BUFFER_OFFSET(0));
 #endif
 
+
+#endif
     glFlush();
 }
 
@@ -310,15 +338,15 @@ void SW::GLViewer::drawAxises(double width, double length)
 
     //qglColor(Qt::red);
     glColor3f(1.0, 0.0, 0.0);
-    //renderText(axisLength, 0.0, 0.0, "X", QFont("helvetica", 12, QFont::Bold, TRUE));
+    renderText(axisLength, 0.0, 0.0, "X", QFont("helvetica", 12, QFont::Bold, TRUE));
 
     //qglColor(Qt::green);
     glColor3f(0.0, 1.0, 0.0);
-    // renderText(0.0, axisLength, 0.0, "Y", QFont("helvetica", 12, QFont::Bold, TRUE));
+    renderText(0.0, axisLength, 0.0, "Y", QFont("helvetica", 12, QFont::Bold, TRUE));
 
     //qglColor(Qt::blue);
     glColor3f(0.0, 0.0, 1.0);
-    // renderText(0.0, 0.0, axisLength, "Z", QFont("helvetica", 12, QFont::Bold, TRUE));
+    renderText(0.0, 0.0, axisLength, "Z", QFont("helvetica", 12, QFont::Bold, TRUE));
 
 }
 
@@ -336,9 +364,56 @@ void SW::GLViewer::mouseMoveEvent(QMouseEvent *e)
 }
 void SW::GLViewer::wheelEvent(QWheelEvent *e)
 {
+    int numDegrees = e->delta() / 8;
+    int numSteps = numDegrees / 15;
+    //    if(numSteps >0)
+    //    m_length = 0.1/(float)numSteps;
+    //    else
+    //    m_length = -0.1*(float)numSteps;
+
+
+
+    //    //imageScale();
+    e->accept();
+    update();
     QGLViewer::wheelEvent(e);
 }
 void SW::GLViewer::keyPressEvent(QKeyEvent *e)
 {
+
     QGLViewer::keyPressEvent(e);
 }
+
+
+void SW::GLViewer::setGL(void){
+    glClearColor( .5, .5, .5, 1. );
+    setLighting();
+}
+
+
+void SW::GLViewer::setLighting(void){
+    GLfloat position[4] = { 20., 30., 40., 0. };
+    glLightfv( GL_LIGHT0, GL_POSITION, position );
+    glEnable( GL_LIGHT0 );
+    glEnable( GL_NORMALIZE );
+
+}
+
+void SW::GLViewer::initGLSL(){
+    m_shader.loadVertex( "shaders/vertex.glsl" );
+    m_shader.loadFragment( "shaders/fragment.glsl" );
+}
+
+void SW::GLViewer::setMeshMaterial(){
+
+    GLfloat  diffuse[4] = { .8, .5, .3, 1. };
+    GLfloat specular[4] = { .3, .3, .3, 1. };
+    GLfloat  ambient[4] = { .2, .2, .5, 1. };
+
+    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE,   diffuse  );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR,  specular );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT,   ambient  );
+    glMaterialf ( GL_FRONT_AND_BACK, GL_SHININESS, 16.      );
+}
+
+

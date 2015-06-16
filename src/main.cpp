@@ -8,14 +8,12 @@ int main(int argc, char**argv)
     QApplication app(argc,argv);
 
     MainWindow mainwindow;
-
-    mainwindow.resize(400,600);
     mainwindow.setWindowState(mainwindow.windowState()^Qt::WindowMaximized);
 
     app.setMainWidget(&mainwindow);
-
-
+    mainwindow.showMaximized();
     mainwindow.show();
+
 
     return app.exec();
 

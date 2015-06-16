@@ -1,8 +1,18 @@
 #ifndef SW_MAINWINDOW_H
 #define SW_MAINWINDOW_H
 
+//
+//  BoundingBox.h
+//  Reconstructor
+//
+//  Created by sway on 6/13/15.
+//  Copyright (c) 2015 None. All rights reserved.
+//
+
+
 #include"GLViewer.h"
 #include"ui_mainwindow.h"
+#include"include/Mesh.h"
 
 #include <QMainWindow>
 #include"qlayout.h"
@@ -57,12 +67,16 @@ namespace SW
 
         virtual void keyPressEvent(QKeyEvent *){}
 
-    public slots:
+    protected slots:
+         void doActionOpen();
+         void doActionLaplacianDeformation();
+         void doActionUnion();
+
 
 
     public:
          //////////////////////定义窗口部件/////////////////////////////////////
-         GLViewer *gv;
+
 
   signals:
 

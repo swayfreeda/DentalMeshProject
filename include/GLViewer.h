@@ -1,7 +1,18 @@
 #ifndef SW_GLVIEWER_H
 #define SW_GLVIEWER_H
 
+//
+//  BoundingBox.h
+//  Reconstructor
+//
+//  Created by sway on 6/13/15.
+//  Copyright (c) 2015 None. All rights reserved.
+//
+
+
+#include"include/Mesh.h"
 #include"QGLViewer/qglviewer.h"
+
 
 #include<list>
 #include<vector>
@@ -20,9 +31,9 @@
 
 #include<QVector2D>
 #include<QVector3D>
-#include"opencv2/opencv.hpp"
 #include<QThread>
 
+#include"include/Shader.h"
 
 namespace SW{
 
@@ -32,8 +43,8 @@ class  GLViewer : public QGLViewer
     Q_OBJECT
 
 public:
-
-   // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
+     enum DispalyType{VERTICES, WIREFRAME, FLATLINE};
+     // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
      GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
     ~GLViewer();
 
@@ -49,20 +60,51 @@ public:
 
     virtual void keyPressEvent(QKeyEvent *e);
 
-
     void viewAll();
 
+    void addMesh(const Mesh & mesh){meshes.append(mesh);}
 
-public:
+protected:
     //draw world coordinates
     void drawAxises(double width, double length);
+    void setGL(void);
+    void setLighting(void);
+    void initGLSL();
+    void setMeshMaterial();
 
 public slots:
     virtual void drawText(){}
 
+    void toggleDisplayVertices(){
+        displayType = VERTICES;
+        updateGL();
+    }
+
+    void toggleDisplayWireFrame(){
+        displayType = WIREFRAME;
+        updateGL();
+    }
+
+    void toggleDisplayFlatLine(){
+        displayType = FLATLINE;
+        updateGL();
+    }
 
 
 signals:
+
+
+
+private:
+    static SW::Shader m_shader;
+    float m_length;
+    QVector<Mesh> meshes;
+
+    bool displayVertices;
+    bool displayWireFrame;
+    bool displayFlatLine;
+
+    DispalyType displayType;
 
 };
 
