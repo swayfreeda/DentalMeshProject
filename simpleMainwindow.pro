@@ -11,15 +11,16 @@ SOURCES += \
     src/main.cpp \
     src/GLViewer.cpp \
     src/MainWidow.cpp \
-    src/Shader.cpp \
-    src/Mesh.cpp
+    src/Mesh.cpp \ 
+    src/Shader.cpp
 
 HEADERS += \
     include/MainWindow.h \
     include/GLViewer.h \
     include/Shader.h \
-    include/BoundingBox.h \
     include/Mesh.h
+
+
 
 INCLUDEPATH +=   /usr/include/qt4/QtCore     \
                  /usr/include/qt4/QtGui      \
@@ -27,12 +28,11 @@ INCLUDEPATH +=   /usr/include/qt4/QtCore     \
                  /usr/include/qt4             \
                  /usr/include/qt3/          \
                  /usr/include/qt4/QtXml/    \
-                 /home/sway/DentalMeshProject/lib/openMesh3.3/inlcude
-
+                 include/
 
 LIBS  +=     -L/usr/X11R6/lib64 -lQtOpenGL -lQtGui -lQtCore  -lpthread\
              -lQGLViewer  -lGLEW -lglut  -lGL  -lGLU  \
-             -L//home/sway/DentalMeshProject/lib/openMesh3.3/lib/ -lOpenMeshCore -lOpenMeshTools
+             -L/home/sway/DentalMeshProject/lib/openMesh3.3/lib/ -lOpenMeshCore -lOpenMeshTools
 
 FORMS += \
     ui_templates/mainwindow.ui

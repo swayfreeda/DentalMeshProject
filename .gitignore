@@ -1,4 +1,4 @@
-
+*.zip
 *.o
 moc_*
 *.exe
