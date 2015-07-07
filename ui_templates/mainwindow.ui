@@ -53,7 +53,7 @@ background:rgb(207, 207, 207)
      <x>0</x>
      <y>0</y>
      <width>830</width>
-     <height>25</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
@@ -61,6 +61,7 @@ background:rgb(207, 207, 207)
      <string>&amp;File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="actionCloseAll"/>
    </widget>
    <widget class="QMenu" name="editMenu">
     <property name="title">
@@ -68,6 +69,7 @@ background:rgb(207, 207, 207)
     </property>
     <addaction name="actionLaplacianDeformation"/>
     <addaction name="actionUnion"/>
+    <addaction name="actionSegmentation"/>
    </widget>
    <widget class="QMenu" name="settingMenu">
     <property name="enabled">
@@ -594,6 +596,16 @@ background: rgb(95, 95, 95);
   <action name="actionDisplayFlatLine">
    <property name="text">
     <string>FlatLine</string>
+   </property>
+  </action>
+  <action name="actionSegmentation">
+   <property name="text">
+    <string>Segmentation</string>
+   </property>
+  </action>
+  <action name="actionCloseAll">
+   <property name="text">
+    <string>Close All</string>
    </property>
   </action>
  </widget>

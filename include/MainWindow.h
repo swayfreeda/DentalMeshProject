@@ -35,7 +35,7 @@
 #include<QListWidget>
 
 
-#include<opencv2/opencv.hpp>
+//#include<opencv2/opencv.hpp>
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -69,10 +69,11 @@ namespace SW
 
     protected slots:
          void doActionOpen();
+         void doActionCloseAll();
          void doActionLaplacianDeformation();
          void doActionUnion();
 
-
+         void doActionSegmentation();
 
     public:
          //////////////////////定义窗口部件/////////////////////////////////////

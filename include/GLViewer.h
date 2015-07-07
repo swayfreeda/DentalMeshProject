@@ -64,6 +64,12 @@ public:
 
     void addMesh(const Mesh & mesh){meshes.append(mesh);}
 
+    int getMeshNum(){return meshes.size();}
+
+    Mesh getMesh(int index){return meshes[index];}
+
+    void removeAllMeshes(){meshes.clear();}
+
 protected:
     //draw world coordinates
     void drawAxises(double width, double length);
