@@ -1,6 +1,6 @@
 
 
-#include<GL/glew.h>
+//#include<GL/glew.h>
 #include<GL/gl.h>
 #include<GL/glu.h>
 #include<GL/freeglut.h>
@@ -9,6 +9,7 @@
 #include<QGLFunctions>
 #endif
 
+#include"include/Mesh.h"
 #include"include/GLViewer.h"
 #include <string>
 
@@ -85,8 +86,46 @@ QString SW::GLViewer::helpString()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void SW::GLViewer::viewAll()
 {
-    showEntireScene();
+    //计算所有Mesh的整体BoundingBox
+    Mesh::Point tempVertex = meshes[0].point(*(meshes[0].vertices_begin()));
+    float maxX = tempVertex[0], minX = tempVertex[0];
+    float maxY = tempVertex[1], minY = tempVertex[1];
+    float maxZ = tempVertex[2], minZ = tempVertex[2];
+    int meshNum = meshes.size();
+    for(int meshIndex = 0; meshIndex < meshNum; meshIndex++)
+    {
+        for(Mesh::VertexIter vertexIter = meshes[meshIndex].vertices_begin(); vertexIter != meshes[meshIndex].vertices_end(); vertexIter++)
+        {
+            tempVertex = meshes[meshIndex].point(*vertexIter);
+            if(tempVertex[0] > maxX)
+            {
+                maxX = tempVertex[0];
+            }
+            else if(tempVertex[0] < minX)
+            {
+                minX = tempVertex[0];
+            }
+            if(tempVertex[1] > maxY)
+            {
+                maxY = tempVertex[1];
+            }
+            else if(tempVertex[1] < minY)
+            {
+                minY = tempVertex[1];
+            }
+            if(tempVertex[2] > maxZ)
+            {
+                maxZ = tempVertex[2];
+            }
+            else if(tempVertex[2] < minZ)
+            {
+                minZ = tempVertex[2];
+            }
+        }
+    }
 
+    setSceneBoundingBox(qglviewer::Vec(minX, minY, minZ), qglviewer::Vec(maxX, maxY, maxZ));
+    showEntireScene();
     updateGL();
 }
 
@@ -352,18 +391,34 @@ void SW::GLViewer::drawAxises(double width, double length)
 
 void SW::GLViewer::mousePressEvent(QMouseEvent *e)
 {
+    if(meshes.empty())
+    {
+        return;
+    }
     QGLViewer::mousePressEvent(e);
 }
 void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e)
 {
+    if(meshes.empty())
+    {
+        return;
+    }
     QGLViewer::mouseReleaseEvent(e);
 }
 void SW::GLViewer::mouseMoveEvent(QMouseEvent *e)
 {
+    if(meshes.empty())
+    {
+        return;
+    }
     QGLViewer::mouseMoveEvent(e);
 }
 void SW::GLViewer::wheelEvent(QWheelEvent *e)
 {
+    if(meshes.empty())
+    {
+        return;
+    }
     int numDegrees = e->delta() / 8;
     int numSteps = numDegrees / 15;
     //    if(numSteps >0)
@@ -380,7 +435,10 @@ void SW::GLViewer::wheelEvent(QWheelEvent *e)
 }
 void SW::GLViewer::keyPressEvent(QKeyEvent *e)
 {
-
+    if(meshes.empty())
+    {
+        return;
+    }
     QGLViewer::keyPressEvent(e);
 }
 

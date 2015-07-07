@@ -3,5 +3,8 @@
 moc_*
 *.exe
 ui_*.h
-simpleMainwindow.pro
 simpleMainwindow*.pro.user
+
+# mesh data files
+*.obj
+

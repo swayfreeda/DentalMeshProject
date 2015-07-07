@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Jun 16 19:38:13 2015
+** Created: Tue Jul 7 19:28:14 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -82,6 +82,8 @@ public:
     QAction *actionDisplayVertices;
     QAction *actionDisplayWireFrame;
     QAction *actionDisplayFlatLine;
+    QAction *actionSegmentation;
+    QAction *actionCloseAll;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     SW::GLViewer *gv;
@@ -291,6 +293,10 @@ public:
         actionDisplayWireFrame->setObjectName(QString::fromUtf8("actionDisplayWireFrame"));
         actionDisplayFlatLine = new QAction(MainWindow);
         actionDisplayFlatLine->setObjectName(QString::fromUtf8("actionDisplayFlatLine"));
+        actionSegmentation = new QAction(MainWindow);
+        actionSegmentation->setObjectName(QString::fromUtf8("actionSegmentation"));
+        actionCloseAll = new QAction(MainWindow);
+        actionCloseAll->setObjectName(QString::fromUtf8("actionCloseAll"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -313,7 +319,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 830, 25));
+        menubar->setGeometry(QRect(0, 0, 830, 26));
         fileMenu = new QMenu(menubar);
         fileMenu->setObjectName(QString::fromUtf8("fileMenu"));
         editMenu = new QMenu(menubar);
@@ -343,8 +349,10 @@ public:
         menubar->addAction(displayMenu->menuAction());
         menubar->addAction(helpMenu->menuAction());
         fileMenu->addAction(actionOpen);
+        fileMenu->addAction(actionCloseAll);
         editMenu->addAction(actionLaplacianDeformation);
         editMenu->addAction(actionUnion);
+        editMenu->addAction(actionSegmentation);
         displayMenu->addAction(actionDisplayVertices);
         displayMenu->addAction(actionDisplayWireFrame);
         displayMenu->addAction(actionDisplayFlatLine);
@@ -474,6 +482,8 @@ public:
         actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0, QApplication::UnicodeUTF8));
         actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0, QApplication::UnicodeUTF8));
         actionDisplayFlatLine->setText(QApplication::translate("MainWindow", "FlatLine", 0, QApplication::UnicodeUTF8));
+        actionSegmentation->setText(QApplication::translate("MainWindow", "Segmentation", 0, QApplication::UnicodeUTF8));
+        actionCloseAll->setText(QApplication::translate("MainWindow", "Close All", 0, QApplication::UnicodeUTF8));
         fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0, QApplication::UnicodeUTF8));

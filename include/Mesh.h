@@ -23,6 +23,9 @@ class Mesh:public OpenMesh::TriMesh_ArrayKernelT<>
 
     void getBoundingBox();
 
+    //计算BoundingBox
+    void computeBoundingBox();
+
     // 0--vertices 1-- wireframe 2-- flatLine
     void draw(int flag);
 
