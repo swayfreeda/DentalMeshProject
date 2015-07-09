@@ -16,7 +16,7 @@
 #include <igl/cotmatrix.h>
 #include <igl/writeOFF.h>
 
-
+#include <QProgressDialog>
 
 namespace igl
 {
@@ -59,6 +59,27 @@ IGL_INLINE void principal_curvature(
   Eigen::PlainObjectBase<DerivedPV2>& PV2,
   unsigned radius = 5,
   bool useKring = true);
+
+//带QProgressDialog的principal_curvature
+template <
+  typename DerivedV,
+  typename DerivedF,
+  typename DerivedPD1,
+  typename DerivedPD2,
+  typename DerivedPV1,
+  typename DerivedPV2>
+IGL_INLINE void principal_curvature(
+  const Eigen::PlainObjectBase<DerivedV>& V,
+  const Eigen::PlainObjectBase<DerivedF>& F,
+  Eigen::PlainObjectBase<DerivedPD1>& PD1,
+  Eigen::PlainObjectBase<DerivedPD2>& PD2,
+  Eigen::PlainObjectBase<DerivedPV1>& PV1,
+  Eigen::PlainObjectBase<DerivedPV2>& PV2,
+  std::vector<bool>& currentCurvatureComputed,
+  QProgressDialog &progress,
+  unsigned radius = 5,
+  bool useKring = true);
+
 }
 
 

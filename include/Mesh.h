@@ -26,10 +26,14 @@ class Mesh:public OpenMesh::TriMesh_ArrayKernelT<>
     //计算BoundingBox
     void computeBoundingBox();
 
+    //计算顶点数、面片数、边数
+    void computeEntityNumbers();
+
     // 0--vertices 1-- wireframe 2-- flatLine
     void draw(int flag);
 
    public:
+    int mVertexNum, mFaceNum, mEdgeNum;
     BoundingBox BBox;
     QString MeshName;
 

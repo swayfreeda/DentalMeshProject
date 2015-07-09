@@ -1,6 +1,4 @@
 
-
-//#include<GL/glew.h>
 #include<GL/gl.h>
 #include<GL/glu.h>
 #include<GL/freeglut.h>
@@ -33,6 +31,8 @@
 #include<sstream>
 #include<cassert>
 
+#include <math.h>
+
 GLuint arrayId;
 GLuint numElement;
 
@@ -45,10 +45,7 @@ GLuint numElement;
 //    setAutoFillBackground(true);// painter auto clear the background
 //}
 
-
 SW::Shader SW::GLViewer::m_shader;
-
-
 
 SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1, QGLWidget*f):
     QGLViewer(parent0, parent1, f)
@@ -58,13 +55,13 @@ SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1, QGLWidget*f):
 
     m_length = 0.1;
 }
-/////////////////////////////////////////////////////////////////////////////////////////////////
+
 SW::GLViewer::~GLViewer()
 {
 
 }
 
-////////////////////////////////////NON CLASS METHOD///////////////////////////////////////////
+//NON CLASS METHOD
 QString SW::GLViewer::helpString()
 {
     QString text("<h2> MeshLive 1.0 [2006.10.18.1]<p></h2>");
@@ -83,7 +80,6 @@ QString SW::GLViewer::helpString()
     return text;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void SW::GLViewer::viewAll()
 {
     //计算所有Mesh的整体BoundingBox
@@ -129,7 +125,6 @@ void SW::GLViewer::viewAll()
     updateGL();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void SW::GLViewer::init()
 {
 
@@ -170,6 +165,7 @@ void SW::GLViewer::init()
     Verts.append(QVector3D(1.0, 1.0, -1.0));
     Verts.append(QVector3D(1.0, 1.0, 1.0));
 #else
+
 
     GLfloat Verts[][3] = {
         {-1.0, -1.0, -1.0},
@@ -294,7 +290,6 @@ void SW::GLViewer::init()
 #endif
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void SW::GLViewer::draw()
 {
     // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -334,7 +329,6 @@ void SW::GLViewer::draw()
     glFlush();
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 void SW::GLViewer::drawAxises(double width, double length)
 {
     glEnable(GL_LINE_SMOOTH);
@@ -389,14 +383,90 @@ void SW::GLViewer::drawAxises(double width, double length)
 
 }
 
+//计算两个点之间的距离
+float distance(SW::Mesh::Point vertex1, SW::Mesh::Point vertex2)
+{
+    float x_ = vertex1[0] - vertex2[0];
+    float y_ = vertex1[1] - vertex2[1];
+    float z_ = vertex1[2] - vertex2[2];
+    return sqrt(x_ * x_ + y_ * y_ + z_ * z_);
+}
+
 void SW::GLViewer::mousePressEvent(QMouseEvent *e)
 {
     if(meshes.empty())
     {
         return;
     }
+
+    //////如果模型（只考虑meshes[0]）中存在曲率信息，则显示鼠标右键点击处的曲率值//////
+    if(e->button() != Qt::RightButton)
+    {
+        QGLViewer::mousePressEvent(e);
+        return;
+    }
+
+    OpenMesh::VPropHandleT<double> vPropHandleCurvature;
+    std::string mVPropHandleCurvatureName = "vprop_curvature";
+    OpenMesh::VPropHandleT<bool> vPropHandleCurvatureComputed;
+    std::string mVPropHandleCurvatureComputedName = "vprop_curvature_computed";
+    if(!meshes[0].get_property_handle(vPropHandleCurvature, mVPropHandleCurvatureName) || !meshes[0].get_property_handle(vPropHandleCurvatureComputed, mVPropHandleCurvatureComputedName))
+    {
+        return;
+    }
+
+    int x = e->x();
+    int y = e->y();
+
+    //计算对应的三维坐标
+    GLint viewport[4];
+    GLdouble modelview[16];
+    GLdouble projection[16];
+    GLfloat winX, winY, winZ;
+    GLdouble posX, posY, posZ; //对应的三维坐标
+    glPushMatrix();
+    GLfloat originalMatrix[16] = { 0 };
+    glGetFloatv(GL_MODELVIEW_MATRIX, originalMatrix);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(originalMatrix);
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    glGetDoublev(GL_MODELVIEW_MATRIX, modelview);
+    glGetDoublev(GL_PROJECTION_MATRIX, projection);
+    glPopMatrix();
+    winX = x;
+    winY = viewport[3] - (float)y;
+    glReadPixels((int)winX, (int)winY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &winZ);
+    gluUnProject(winX, winY, winZ, modelview, projection, viewport, &posX, &posY, &posZ);
+    Mesh::Point clickedVertex((float)posX, (float)posY, (float)posZ);
+
+    //判断点击的是模型上的哪个点（通过遍历所有模型上的所有点，找到距离点击位置最近的点，如果该点到点击位置的距离小于某个阈值，则认为该点即为点击位置）
+    Mesh::Point tempVertex = meshes[0].point(*(meshes[0].vertices_begin()));
+    float tempDistance, minDistance = distance(tempVertex, clickedVertex);
+    double curvatureValue; //点击位置的曲率
+    bool curvatureComputed; //是否被正确计算得到曲率
+    for(Mesh::VertexIter vertexIter = meshes[0].vertices_begin(); vertexIter != meshes[0].vertices_end(); vertexIter++)
+    {
+        tempVertex = meshes[0].point(*vertexIter);
+        tempDistance = distance(tempVertex, clickedVertex);
+        if(tempDistance < minDistance)
+        {
+            minDistance = tempDistance;
+            curvatureValue = meshes[0].property(vPropHandleCurvature, *vertexIter);
+            curvatureComputed = meshes[0].property(vPropHandleCurvatureComputed, *vertexIter);
+        }
+    }
+    if(minDistance > meshes[0].BBox.size.x / 100)
+    {
+        QMessageBox::information(this, "Error", "Clicked vertex not found!");
+    }
+    else
+    {
+        QMessageBox::information(this, "Info", QString("Clicked vertex found!\nx: %1\ny: %2\nz: %3\ncurvature: %4\ncurvatureComputed: %5").arg(clickedVertex[0]).arg(clickedVertex[1]).arg(clickedVertex[2]).arg(curvatureValue).arg(curvatureComputed));
+    }
+
     QGLViewer::mousePressEvent(e);
 }
+
 void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e)
 {
     if(meshes.empty())
@@ -405,6 +475,7 @@ void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e)
     }
     QGLViewer::mouseReleaseEvent(e);
 }
+
 void SW::GLViewer::mouseMoveEvent(QMouseEvent *e)
 {
     if(meshes.empty())
@@ -413,6 +484,7 @@ void SW::GLViewer::mouseMoveEvent(QMouseEvent *e)
     }
     QGLViewer::mouseMoveEvent(e);
 }
+
 void SW::GLViewer::wheelEvent(QWheelEvent *e)
 {
     if(meshes.empty())
@@ -433,6 +505,7 @@ void SW::GLViewer::wheelEvent(QWheelEvent *e)
     update();
     QGLViewer::wheelEvent(e);
 }
+
 void SW::GLViewer::keyPressEvent(QKeyEvent *e)
 {
     if(meshes.empty())
@@ -442,12 +515,10 @@ void SW::GLViewer::keyPressEvent(QKeyEvent *e)
     QGLViewer::keyPressEvent(e);
 }
 
-
 void SW::GLViewer::setGL(void){
     glClearColor( .5, .5, .5, 1. );
     setLighting();
 }
-
 
 void SW::GLViewer::setLighting(void){
     GLfloat position[4] = { 20., 30., 40., 0. };
@@ -473,5 +544,3 @@ void SW::GLViewer::setMeshMaterial(){
     glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT,   ambient  );
     glMaterialf ( GL_FRONT_AND_BACK, GL_SHININESS, 16.      );
 }
-
-

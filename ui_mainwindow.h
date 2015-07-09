@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Jul 7 19:28:14 2015
+** Created: Wed Jul 8 21:11:17 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -311,8 +311,8 @@ public:
         gv->setStyleSheet(QString::fromUtf8("QFrame{\n"
 "background:rgb(207, 207, 207)\n"
 "}"));
-        //gv->setFrameShape(QFrame::StyledPanel);
-        //gv->setFrameShadow(QFrame::Raised);
+        gv->setFrameShape(QFrame::StyledPanel);
+        gv->setFrameShadow(QFrame::Raised);
 
         horizontalLayout->addWidget(gv);
 

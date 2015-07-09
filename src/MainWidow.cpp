@@ -50,28 +50,17 @@ void SW::MainWindow::doActionOpen()
         {
             QMessageBox::information(this, "Error","Error to load " + filePath);
         }
-        int vNum =0;
-        int fNum = 0;
-        int eNum = 0;
-        for(Mesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); vit++)
-        {
-            vNum++;
-        }
-        for(Mesh::FaceIter fit = mesh.faces_begin(); fit != mesh.faces_end(); fit++)
-        {
-            fNum++;
-        }
-        for(Mesh::EdgeIter eit = mesh.edges_begin(); eit != mesh.edges_end(); eit++)
-        {
-            eNum++;
-        }
 
         // If the file did not provide vertex normals, then calculate them
         if (mesh.has_face_normals() && mesh.has_vertex_normals())
         {
             mesh.update_normals(); // let the mesh update the normals
         }
-        QMessageBox::information(this, "Info", QString("Vertices: %1 \n Faces: %2 \n Edges: %2").arg(vNum).arg(fNum).arg(eNum));
+
+        //计算顶点数、面片数、边数
+        mesh.computeEntityNumbers();
+
+        QMessageBox::information(this, "Info", QString("Vertices: %1 \n Faces: %2 \n Edges: %3").arg(mesh.mVertexNum).arg(mesh.mFaceNum).arg(mesh.mEdgeNum));
         statusBar()->showMessage("Load Successed!");
 
         //计算BoundingBox
@@ -93,6 +82,7 @@ void SW::MainWindow::doActionCloseAll()
 {
     gv->removeAllMeshes();
     gv->updateGL();
+    statusBar()->showMessage("All mesh closed!");
 }
 
 void SW::MainWindow::doActionLaplacianDeformation()
@@ -113,9 +103,9 @@ void SW::MainWindow::doActionSegmentation()
         return;
     }
     ToothSegmentation toothSegmentation(gv->getMesh(0));
-    toothSegmentation.identifyingPotentialToothBoundary();
+    toothSegmentation.identifyPotentialToothBoundary(this);
     gv->removeAllMeshes();
     gv->addMesh(toothSegmentation.getToothMesh());
     gv->updateGL();
-    QMessageBox::information(this,"Segmentation","Added mesh from toothSegmentation.");
+    QMessageBox::information(this, "Info", "Added mesh from toothSegmentation.");
 }

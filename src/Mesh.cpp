@@ -50,6 +50,25 @@ void Mesh::computeBoundingBox()
     BBox.size.z = maxZ - minZ;
 }
 
+void Mesh::computeEntityNumbers()
+{
+    mVertexNum =0;
+    mFaceNum = 0;
+    mEdgeNum = 0;
+    for(VertexIter vit = this->vertices_begin(); vit != this->vertices_end(); vit++)
+    {
+        mVertexNum++;
+    }
+    for(FaceIter fit = this->faces_begin(); fit != this->faces_end(); fit++)
+    {
+        mFaceNum++;
+    }
+    for(EdgeIter eit = this->edges_begin(); eit != this->edges_end(); eit++)
+    {
+        mEdgeNum++;
+    }
+}
+
 // 0--vertices 1-- wireframe 2-- flatLine
 void Mesh::draw(int flag)
 {
@@ -164,6 +183,9 @@ void Mesh::draw(int flag)
     glPopMatrix();
 
     //int featureVertexNum = 0; //牙齿分割初始边界点个数
+    Mesh::Point tempVertex;
+    Mesh::Color tempColor;
+    Mesh::Normal tempNormal;
 
     switch (flag)
     {
@@ -174,32 +196,25 @@ void Mesh::draw(int flag)
         for(Mesh::HalfedgeIter hit = this->halfedges_begin(); hit != this->halfedges_end(); hit++)
         {
             Mesh::VertexHandle vertexHandle = to_vertex_handle(hit);
-            Mesh::Point vertex = this->point(vertexHandle);
+            tempVertex = this->point(vertexHandle);
 
             //设置颜色
-            OpenMesh::VPropHandleT<double> curvature;
-            if(this->get_property_handle(curvature, "curvature"))
+            if(!this->has_vertex_colors()) //如果Mesh中没有顶点颜色这个属性，则将所有顶点设置成白色，否则按该点颜色属性设置实际颜色
             {
-                double curvatureValue = this->property(curvature, vertexHandle);
-                if(curvatureValue < -1)
-                {
-                    //featureVertexNum++;
-                    //std::cout << "Detected " << featureVertexNum << " feature vertex: " << vertex << std::endl;
-                    glColor3f(1.0f, 0.0f, 0.0f);
-                }
-                else
-                {
-                    glColor3f(1.0f, 1.0f, 1.0f);
-                }
+                glColor3f(1.0, 1.0, 1.0);
+            }
+            else
+            {
+                tempColor = this->color(vertexHandle);
+                glColor3f(tempColor[0], tempColor[1], tempColor[2]);
             }
 
             //设置法向量
-            Mesh::Normal normal;
-            calc_vertex_normal_loop(vertexHandle, normal);
-            glNormal3f(normal[0], normal[1], normal[2]);
+            calc_vertex_normal_loop(vertexHandle, tempNormal);
+            glNormal3f(tempNormal[0], tempNormal[1], tempNormal[2]);
 
             //设置坐标
-            glVertex3f(vertex[0], vertex[1], vertex[2]);
+            glVertex3f(tempVertex[0], tempVertex[1], tempVertex[2]);
         }
         glEnd();
         glPopMatrix();
@@ -228,6 +243,21 @@ void Mesh::draw(int flag)
         //request_vertex_normals();
         for(Mesh::FaceIter fit = faces_begin(); fit != faces_end(); fit++)
         {
+            //如果存在顶点颜色，则计算该面片所有顶点颜色的平均值，显示在该面片上
+            if(!this->has_vertex_colors())
+            {
+                glColor3f(1.0, 1.0, 1.0);
+            }
+            else
+            {
+                tempColor[0] = 0; tempColor[1] = 0; tempColor[2] = 0;
+                for(Mesh::FaceVertexIter faceVertexIter = this->fv_iter(*fit); faceVertexIter.is_valid(); faceVertexIter++)
+                {
+                    tempColor += this->color(faceVertexIter);
+                }
+                tempColor /= 3.0;
+                glColor3f(tempColor[0], tempColor[1], tempColor[2]);
+            }
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glBegin(GL_POLYGON);

@@ -24,6 +24,8 @@
 #include <igl/avg_edge_length.h>
 #include <igl/vertex_triangle_adjacency.h>
 
+#include <QProgressDialog>
+
 typedef enum
 {
   SPHERE_SEARCH,
@@ -47,6 +49,7 @@ public:
    */
   std::vector< std::vector<double> > curv;
   std::vector< std::vector<Eigen::Vector3d> > curvDir;
+  std::vector<bool> currentCurvatureComputed; //whether current vertex's curvature has been correctly computed
   bool curvatureComputed;
   class Quadric
   {
@@ -190,8 +193,10 @@ public:
   IGL_INLINE void getProjPlane(int, std::vector<int>, Eigen::Vector3d&);
   IGL_INLINE void applyMontecarlo(std::vector<int>&,std::vector<int>*);
   IGL_INLINE void computeCurvature();
+  IGL_INLINE void computeCurvature(QProgressDialog &progress);
   IGL_INLINE void printCurvature(std::string outpath);
   IGL_INLINE double getAverageEdge();
+  IGL_INLINE double getAverageEdge(QProgressDialog &progress);
 
   IGL_INLINE static int rotateForward (float *v0, float *v1, float *v2)
   {
@@ -622,6 +627,45 @@ IGL_INLINE double CurvatureCalculator::getAverageEdge()
   return (sum/(double)count);
 }
 
+IGL_INLINE double CurvatureCalculator::getAverageEdge(QProgressDialog &progress)
+{
+  double sum = 0;
+  int count = 0;
+
+  //set QProgressDialog parameters
+  progress.setLabelText("Computing curvature(compute average edge)...");
+  progress.setMinimum(0);
+  progress.setMaximum(faces.rows());
+  progress.setValue(0);
+
+  for (int i = 0; i<faces.rows(); i++)
+  {
+    //update QProgressDialog
+    progress.setValue(i);
+    //TODO deal with cancel event
+//    if(progress.wasCanceled())
+//    {
+//      break;
+//    }
+
+    for (short unsigned j=0; j<3; j++)
+    {
+      Eigen::Vector3d p1=vertices.row(faces.row(i)[j]);
+      Eigen::Vector3d p2=vertices.row(faces.row(i)[(j+1)%3]);
+
+      double l = (p1-p2).norm();
+
+      sum+=l;
+      ++count;
+    }
+  }
+
+  //end QProgressDialog
+  //progress.setValue(faces.rows());
+
+  return (sum/(double)count);
+}
+
 
 IGL_INLINE void CurvatureCalculator::applyProjOnPlane(Eigen::Vector3d ppn, std::vector<int> vin, std::vector<int> &vout)
 {
@@ -748,6 +792,127 @@ IGL_INLINE void CurvatureCalculator::computeCurvature()
   curvatureComputed=true;
 }
 
+IGL_INLINE void CurvatureCalculator::computeCurvature(QProgressDialog &progress)
+{
+  using namespace std;
+
+  //CHECK che esista la mesh
+  size_t vertices_count=vertices.rows();
+
+  if (vertices_count <=0)
+    return;
+
+  curvDir=std::vector< std::vector<Eigen::Vector3d> >(vertices_count);
+  curv=std::vector<std::vector<double> >(vertices_count);
+  currentCurvatureComputed = std::vector<bool>(vertices_count);
+
+  scaledRadius=getAverageEdge(progress)*sphereRadius;
+
+  std::vector<int> vv;
+  std::vector<int> vvtmp;
+  Eigen::Vector3d normal;
+
+  //double time_spent;
+  //double searchtime=0, ref_time=0, fit_time=0, final_time=0;
+
+  //set QProgressDialog parameters
+  progress.setLabelText("Computing curvature(compute)...");
+  progress.setMinimum(0);
+  progress.setMaximum(vertices.rows());
+  progress.setValue(0);
+
+  for (size_t i=0; i<vertices_count; ++i)
+  {
+    //update QProgressDialog
+    progress.setValue(i);
+    //TODO deal with cancel event
+//    if(progress.wasCanceled())
+//    {
+//        break;
+//    }
+
+    vv.clear();
+    vvtmp.clear();
+    Eigen::Vector3d me=vertices.row(i);
+    switch (st)
+    {
+      case SPHERE_SEARCH:
+        getSphere(i,scaledRadius,vv,6);
+        break;
+      case K_RING_SEARCH:
+        getKRing(i,kRing,vv);
+        break;
+      default:
+        fprintf(stderr,"Error: search type not recognized");
+        return;
+    }
+
+    std::vector<Eigen::Vector3d> ref(3);
+    if (vv.size()<6)
+    {
+      std::cerr << "Could not compute curvature of radius " << scaledRadius << endl;
+      //return;
+      currentCurvatureComputed[i] = false; //current vertex's curvature could not be correctly computed
+      continue;
+    }
+
+
+    if (projectionPlaneCheck)
+    {
+      vvtmp.reserve (vv.size ());
+      applyProjOnPlane (vertex_normals.row(i), vv, vvtmp);
+      if (vvtmp.size() >= 6 && vvtmp.size()<vv.size())
+      vv = vvtmp;
+
+    }
+
+
+    switch (nt)
+    {
+      case AVERAGE:
+        getAverageNormal(i,vv,normal);
+        break;
+      case PROJ_PLANE:
+        getProjPlane(i,vv,normal);
+        break;
+      default:
+        fprintf(stderr,"Error: normal type not recognized");
+        return;
+    }
+    if (vv.size()<6)
+    {
+      std::cerr << "Could not compute curvature of radius " << scaledRadius << endl;
+      //return;
+      currentCurvatureComputed[i] = false; //current vertex's curvature could not be correctly computed
+      continue;
+    }
+    if (montecarlo)
+    {
+      if(montecarloN<6)
+        break;
+      vvtmp.reserve(vv.size());
+      applyMontecarlo(vv,&vvtmp);
+      vv=vvtmp;
+    }
+
+    if (vv.size()<6)
+      return;
+    computeReferenceFrame(i,normal,ref);
+
+    Quadric q;
+    fitQuadric (me, ref, vv, &q);
+    finalEigenStuff(i,ref,q);
+
+    currentCurvatureComputed[i] = true; //current vertex's curvature has been correctly computed
+  }
+
+  //end QProgressDialog
+  //progress.setValue(vertices_count);
+
+  lastRadius=sphereRadius;
+  curvatureComputed=true;
+}
+
 IGL_INLINE void CurvatureCalculator::printCurvature(std::string outpath)
 {
   using namespace std;
@@ -848,6 +1013,104 @@ IGL_INLINE void igl::principal_curvature(
       PD2.row(i) *= 0;
     }
   }
+
+}
+
+template <
+  typename DerivedV,
+  typename DerivedF,
+  typename DerivedPD1,
+  typename DerivedPD2,
+  typename DerivedPV1,
+  typename DerivedPV2>
+IGL_INLINE void igl::principal_curvature(
+  const Eigen::PlainObjectBase<DerivedV>& V,
+  const Eigen::PlainObjectBase<DerivedF>& F,
+  Eigen::PlainObjectBase<DerivedPD1>& PD1,
+  Eigen::PlainObjectBase<DerivedPD2>& PD2,
+  Eigen::PlainObjectBase<DerivedPV1>& PV1,
+  Eigen::PlainObjectBase<DerivedPV2>& PV2,
+  std::vector<bool>& currentCurvatureComputed,
+  QProgressDialog &progress,
+  unsigned radius,
+  bool useKring)
+{
+  using namespace std;
+
+  if (radius < 2)
+  {
+    radius = 2;
+    cout << "WARNING: igl::principal_curvature needs a radius >= 2, fixing it to 2." << endl;
+  }
+
+  // Preallocate memory
+  PD1.resize(V.rows(),3);
+  PD2.resize(V.rows(),3);
+
+  // Preallocate memory
+  PV1.resize(V.rows(),1);
+  PV2.resize(V.rows(),1);
+
+  // Precomputation
+  CurvatureCalculator cc;
+  cc.init(V.template cast<double>(),F.template cast<int>());
+  cc.sphereRadius = radius;
+
+  if (useKring)
+  {
+    cc.kRing = radius;
+    cc.st = K_RING_SEARCH;
+  }
+
+  // Compute
+  cc.computeCurvature(progress);
+
+  //return cc.currentCurvatureComputed
+  currentCurvatureComputed.swap(cc.currentCurvatureComputed);
+
+  //set QProgressDialog parameters
+  progress.setLabelText("Computing curvature(copy to matrix)...");
+  progress.setMinimum(0);
+  progress.setMaximum(V.rows());
+  progress.setValue(0);
+
+  // Copy it back
+  for (unsigned i=0; i<V.rows() && currentCurvatureComputed[i]; i++)
+  {
+    //update QProgressDialog
+    progress.setValue(i);
+    //TODO deal with cancel event
+//    if(progress.wasCanceled())
+//    {
+//        break;
+//    }
+
+    Eigen::Vector3d d1;
+    Eigen::Vector3d d2;
+    PD1.row(i) << cc.curvDir[i][0][0], cc.curvDir[i][0][1], cc.curvDir[i][0][2];
+    PD2.row(i) << cc.curvDir[i][1][0], cc.curvDir[i][1][1], cc.curvDir[i][1][2];
+    PD1.row(i).normalize();
+    PD2.row(i).normalize();
+
+    if (std::isnan(PD1(i,0)) || std::isnan(PD1(i,1)) || std::isnan(PD1(i,2)) || std::isnan(PD2(i,0)) || std::isnan(PD2(i,1)) || std::isnan(PD2(i,2)))
+    {
+      PD1.row(i) << 0,0,0;
+      PD2.row(i) << 0,0,0;
+    }
+
+    PV1(i) = cc.curv[i][0];
+    PV2(i) = cc.curv[i][1];
+
+    if (PD1.row(i) * PD2.row(i).transpose() > 10e-6)
+    {
+      cerr << "PRINCIPAL_CURVATURE: Something is wrong with vertex: i" << endl;
+      PD1.row(i) *= 0;
+      PD2.row(i) *= 0;
+    }
+  }
+
+  //end QProgressDialog
+  //progress.setValue(V.rows());
 
 }
 
