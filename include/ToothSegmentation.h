@@ -13,7 +13,7 @@ class ToothSegmentation
 
 private:
     Mesh mToothMesh; //牙齿模型网格
-    //bool mCurvatureComputed; //是否已经计算得到顶点处曲率信息
+    Mesh mExtraMesh; //附加信息网格，用来显示牙龈分割平面等附加信息
 
     //Mesh自定义属性
     OpenMesh::VPropHandleT<double> mVPropHandleCurvature; //顶点处曲率
@@ -23,19 +23,27 @@ private:
     OpenMesh::VPropHandleT<bool> mVPropHandleIsToothBoundary; //该顶点是否是牙齿边界点
     static const string mVPropHandleIsToothBoundaryName;
 
+    int mBoundaryVertexNum; //牙齿边界点数量
+
     Mesh::Point mGingivaCuttingPlanePoint; //牙龈分割平面点
     Mesh::Normal mGingivaCuttingPlaneNormal; //牙龈分割平面法向量
 
 public:
-    ToothSegmentation(Mesh toothMesh);
+    ToothSegmentation(const Mesh &toothMesh);
 
-    Mesh getToothMesh();
+    ToothSegmentation();
 
-    //4.1. Identifying potential tooth boundary
+    void setToothMesh(const Mesh &toothMesh);
+
+    Mesh getToothMesh() const;
+
+    Mesh getExtraMesh() const;
+
+    //4.1. Identify potential tooth boundary
     void identifyPotentialToothBoundary(QWidget *parentWidget);
 
     //4.2. Automatic cutting of gingiva
-    void automaticCuttingOfGingiva();
+    void automaticCuttingOfGingiva(QWidget *parentWidget);
 
 private:
     //计算曲率

@@ -239,7 +239,7 @@ void Mesh::draw(int flag)
         glPopMatrix();
         break;
     case 2:
-        glColor3f(1.0f, 1.0f, 1.0f);
+        //glColor3f(1.0f, 1.0f, 1.0f);
         //request_vertex_normals();
         for(Mesh::FaceIter fit = faces_begin(); fit != faces_end(); fit++)
         {

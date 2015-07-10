@@ -67,9 +67,16 @@ background:rgb(207, 207, 207)
     <property name="title">
      <string>&amp;Edit</string>
     </property>
+    <widget class="QMenu" name="toothSegmentationMenu">
+     <property name="title">
+      <string>Tooth Segmentation</string>
+     </property>
+     <addaction name="actionToothSegmentationIdentifyPotentialToothBoundary"/>
+     <addaction name="actionToothSegmentationAutomaticCuttingOfGingiva"/>
+    </widget>
     <addaction name="actionLaplacianDeformation"/>
     <addaction name="actionUnion"/>
-    <addaction name="actionSegmentation"/>
+    <addaction name="toothSegmentationMenu"/>
    </widget>
    <widget class="QMenu" name="settingMenu">
     <property name="enabled">
@@ -598,14 +605,19 @@ background: rgb(95, 95, 95);
     <string>FlatLine</string>
    </property>
   </action>
-  <action name="actionSegmentation">
-   <property name="text">
-    <string>Segmentation</string>
-   </property>
-  </action>
   <action name="actionCloseAll">
    <property name="text">
     <string>Close All</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationIdentifyPotentialToothBoundary">
+   <property name="text">
+    <string>Identify potential tooth boundary</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingiva">
+   <property name="text">
+    <string>Automatic cutting of gingiva</string>
    </property>
   </action>
  </widget>

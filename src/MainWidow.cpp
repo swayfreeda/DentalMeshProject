@@ -21,7 +21,8 @@ SW::MainWindow::MainWindow()
     connect(actionDisplayWireFrame, SIGNAL(triggered()), gv, SLOT(toggleDisplayWireFrame()));
     connect(actionDisplayFlatLine, SIGNAL(triggered()), gv, SLOT(toggleDisplayFlatLine()));
 
-    connect(actionSegmentation, SIGNAL(triggered()), this, SLOT(doActionSegmentation()));
+    connect(actionToothSegmentationIdentifyPotentialToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationIdentifyPotentialToothBoundary()));
+    connect(actionToothSegmentationAutomaticCuttingOfGingiva, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingiva()));
 
     update();
 }
@@ -95,17 +96,29 @@ void SW::MainWindow::doActionUnion()
     /*TODO*/
 }
 
-void SW::MainWindow::doActionSegmentation()
+void SW::MainWindow::doActionToothSegmentationIdentifyPotentialToothBoundary()
 {
-    //QMessageBox::information(this,"Segmentation","Segmentation start.");
     if(gv->getMeshNum() <= 0)
     {
         return;
     }
-    ToothSegmentation toothSegmentation(gv->getMesh(0));
-    toothSegmentation.identifyPotentialToothBoundary(this);
+    mToothSegmentation.setToothMesh(gv->getMesh(0));
+    mToothSegmentation.identifyPotentialToothBoundary(this);
     gv->removeAllMeshes();
-    gv->addMesh(toothSegmentation.getToothMesh());
+    gv->addMesh(mToothSegmentation.getToothMesh());
     gv->updateGL();
-    QMessageBox::information(this, "Info", "Added mesh from toothSegmentation.");
+    QMessageBox::information(this, "Info", "Identify potential tooth boundary done!");
+}
+
+void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingiva()
+{
+    if(gv->getMeshNum() <= 0)
+    {
+        return;
+    }
+    mToothSegmentation.automaticCuttingOfGingiva(this);
+    gv->addMesh(mToothSegmentation.getExtraMesh());
+    gv->updateGL();
+    gv->viewAll();
+    QMessageBox::information(this, "Info", "Automatic cutting of gingiva done!");
 }

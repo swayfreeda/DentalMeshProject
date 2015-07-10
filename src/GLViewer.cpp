@@ -544,3 +544,41 @@ void SW::GLViewer::setMeshMaterial(){
     glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT,   ambient  );
     glMaterialf ( GL_FRONT_AND_BACK, GL_SHININESS, 16.      );
 }
+
+void SW::GLViewer::toggleDisplayVertices()
+{
+    displayType = VERTICES;
+    updateGL();
+}
+
+void SW::GLViewer::toggleDisplayWireFrame()
+{
+    displayType = WIREFRAME;
+    updateGL();
+}
+
+void SW::GLViewer::toggleDisplayFlatLine()
+{
+    displayType = FLATLINE;
+    updateGL();
+}
+
+void SW::GLViewer::addMesh(const Mesh &mesh)
+{
+    meshes.append(mesh);
+}
+
+int SW::GLViewer::getMeshNum()
+{
+    return meshes.size();
+}
+
+SW::Mesh SW::GLViewer::getMesh(int index)
+{
+    return meshes[index];
+}
+
+void SW::GLViewer::removeAllMeshes()
+{
+    meshes.clear();
+}

@@ -2,6 +2,8 @@
 #include "Mesh.h"
 
 #include <Eigen/Dense>
+#include <Eigen/Eigenvalues>
+
 #include <igl/read_triangle_mesh.h>
 #include <igl/cotmatrix.h>
 #include <igl/massmatrix.h>
@@ -13,6 +15,8 @@
 #include <QMessageBox>
 #include <QFile>
 
+#include <math.h>
+
 using namespace SW;
 using namespace std;
 using namespace Eigen;
@@ -21,51 +25,24 @@ const string ToothSegmentation::mVPropHandleCurvatureName = "vprop_curvature";
 const string ToothSegmentation::mVPropHandleCurvatureComputedName = "vprop_curvature_computed";
 const string ToothSegmentation::mVPropHandleIsToothBoundaryName = "vprop_is_tooth_boundary";
 
-ToothSegmentation::ToothSegmentation(Mesh toothMesh)
+ToothSegmentation::ToothSegmentation(const Mesh &toothMesh)
 {
-    //首先判断是否存在保存了曲率信息的mesh文件（后缀名为.om），如果存在则读取之，如果不存在或读取出错，则直接将输入参数toothMesh复制到成员变量mToothMesh
-    /*string meshWithCurvatureFileName = toothMesh.MeshName.toStdString() + ".with_curvature.om";
-    try
-    {
-        if(!OpenMesh::IO::read_mesh(mToothMesh, meshWithCurvatureFileName))
-        {
-            cout << "Failed to read Mesh(with curvature) from file: " + meshWithCurvatureFileName << endl;
-            mToothMesh = toothMesh;
-            mCurvatureComputed = false;
-        }
-        else
-        {
-            //测试，是否存在曲率信息（TODO 经测试，并没有，还未找到原因）
-//            if(!mToothMesh.get_property_handle(mVPropHandleCurvature, mVPropHandleCurvatureName))
-//            {
-//                cerr << "没有曲率信息" << endl;
-//            }
+    setToothMesh(toothMesh);
+}
 
-            mCurvatureComputed = true;
-            mToothMesh.MeshName = toothMesh.MeshName;
-            mToothMesh.computeEntityNumbers();
-            mToothMesh.computeBoundingBox();
-        }
-    }
-    catch(std::exception &x)
-    {
-        cout << "Failed to read Mesh(with curvature) from file: " + meshWithCurvatureFileName << endl;
-        mToothMesh = toothMesh;
-        mCurvatureComputed = false;
-    }*/
+ToothSegmentation::ToothSegmentation()
+{
 
-    //初始化成员变量
+}
+
+void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
+{
     mToothMesh = toothMesh;
 
     //在Mesh添加自定义属性
     if(!mToothMesh.get_property_handle(mVPropHandleCurvature, mVPropHandleCurvatureName))
     {
         mToothMesh.add_property(mVPropHandleCurvature, mVPropHandleCurvatureName);
-        /*mToothMesh.property(mVPropHandleCurvature).set_persistent(true); //为了在将Mesh保存到文件时可以同时保存curvature属性，需要调用set_persistent(true)，并且在上一行添加curvature属性时传入一个字符串参数作为参数名
-        if(!mToothMesh.property(mVPropHandleCurvature).persistent())
-        {
-            cerr << "mToothMesh.property(mVPropHandleCurvature).set_persistent(true) failed." << endl;
-        }*/
     }
     if(!mToothMesh.get_property_handle(mVPropHandleCurvatureComputed, mVPropHandleCurvatureComputedName))
     {
@@ -77,9 +54,14 @@ ToothSegmentation::ToothSegmentation(Mesh toothMesh)
     }
 }
 
-Mesh ToothSegmentation::getToothMesh()
+Mesh ToothSegmentation::getToothMesh() const
 {
     return mToothMesh;
+}
+
+Mesh ToothSegmentation::getExtraMesh() const
+{
+    return mExtraMesh;
 }
 
 void ToothSegmentation::identifyPotentialToothBoundary(QWidget *parentWidget)
@@ -120,6 +102,8 @@ void ToothSegmentation::identifyPotentialToothBoundary(QWidget *parentWidget)
         progress.setValue(vertexIndex);
         if(!mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter)) //跳过未被正确计算出曲率的顶点
         {
+            mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter) = false;
+            mToothMesh.set_color(*vertexIter, colorWhite);
             continue;
         }
         if(mToothMesh.property(mVPropHandleCurvature, *vertexIter) < curvatureThreshold) //如果该顶点处的曲率小于某个阈值，则确定为初始边界点
@@ -141,21 +125,18 @@ void ToothSegmentation::identifyPotentialToothBoundary(QWidget *parentWidget)
     //连通性滤波
     vertexIndex = 0;
     int neighborBoundaryVertexNum; //邻域中边界点的个数
+    int boundaryVertexIndex = 0;
     progress.setLabelText("Fining boundary by connectivity filtering...");
     progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
+    progress.setMaximum(boundaryVertexNum);
     progress.setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
-        if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
+        if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点（包括未被正确计算出曲率的点，因为在上一步根据曲率阈值确定初始边界的过程中，未被正确计算出曲率的点全部被标记为非初始边界点）
         {
             continue;
         }
-        if(!mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter)) //跳过未被正确计算出曲率的顶点
-        {
-            continue;
-        }
+        progress.setValue(boundaryVertexIndex);
         //计算邻域中边界点的个数
         neighborBoundaryVertexNum = 0;
         for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(*vertexIter); vertexVertexIter.is_valid(); vertexVertexIter++)
@@ -172,16 +153,18 @@ void ToothSegmentation::identifyPotentialToothBoundary(QWidget *parentWidget)
             mToothMesh.set_color(*vertexIter, colorWhite);
             boundaryVertexNum--;
         }
-        vertexIndex++;
+        boundaryVertexIndex++;
     }
     progress.setValue(mToothMesh.mVertexNum);
 
     QMessageBox::information(parentWidget, "Info", QString("Boundary vertices: %1\nAll vertices: %2").arg(boundaryVertexNum).arg(mToothMesh.mVertexNum));
 
+    //记录牙齿边界点个数，方便以后使用
+    mBoundaryVertexNum = boundaryVertexNum;
+
     //测试，将曲率值转换成伪彩色
     //curvature2PseudoColor();
 
-    QMessageBox::information(parentWidget, "Info", "Identify potential tooth boundary done!");
 }
 
 void ToothSegmentation::computeCurvature(QWidget *parentWidget, QProgressDialog &progress)
@@ -310,24 +293,6 @@ void ToothSegmentation::computeCurvature(QWidget *parentWidget, QProgressDialog 
     }
     //progress.setValue(mToothMesh.mVertexNum);
     cout << "Time elapsed " << time.elapsed() / 1000 << "s. " << "将曲率信息写入到Mesh" << " ended." << endl;
-
-    //将Mesh（包括curvature属性）保存到文件
-    /*string meshWithCurvatureFileName = mToothMesh.MeshName.toStdString() + ".with_curvature.om";
-    if(!OpenMesh::IO::write_mesh(mToothMesh, meshWithCurvatureFileName))
-    {
-        QMessageBox::information(parentWidget, "Error", "Failed to save Mesh(with curvature) to file: " + QString(meshWithCurvatureFileName.c_str()));
-    }*/
-
-    //测试，读取保存的包含curvature属性的文件，检查是否有curvature属性（TODO 经测试，并没有，还未找到原因）
-    /*Mesh testMesh;
-    if(!OpenMesh::IO::read_mesh(testMesh, meshWithCurvatureFileName))
-    {
-        cout << "Failed to read Mesh(with curvature) from file: " + meshWithCurvatureFileName << endl;
-    }
-    else
-    {
-        double testCurvature = testMesh.property(mVPropHandleCurvature, *(testMesh.vertices_begin()));
-    }*/
 }
 
 void ToothSegmentation::curvature2PseudoColor()
@@ -421,6 +386,200 @@ void ToothSegmentation::checkCustomMeshPropertiesExistence()
                             + mVPropHandleCurvatureComputedName + "\n"
                             + mVPropHandleIsToothBoundaryName);
     }
+}
+
+void ToothSegmentation::automaticCuttingOfGingiva(QWidget *parentWidget)
+{
+    QProgressDialog progress(parentWidget);
+    progress.setWindowTitle("Automatic cutting Of gingiva...");
+    progress.setMinimumSize(400, 120);
+    progress.setCancelButtonText("cancel");
+    progress.setMinimumDuration(0);
+    progress.setWindowModality(Qt::WindowModal);
+
+    //计算初始边界点质心
+    Mesh::Point boundaryVerticesCenter(0.0, 0.0, 0.0); //质心点
+    int boundaryVertexIndex = 0;
+    float tempCurvature, curvatureSum = 0;
+    progress.setLabelText("Computing center of boundary vertices...");
+    progress.setMinimum(0);
+    progress.setMaximum(mBoundaryVertexNum);
+    progress.setValue(0);
+    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    {
+        if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
+        {
+            continue;
+        }
+        progress.setValue(boundaryVertexIndex);
+        tempCurvature = mToothMesh.property(mVPropHandleCurvature, *vertexIter);
+        boundaryVerticesCenter += mToothMesh.point(*vertexIter) * tempCurvature; //将该点曲率作为加权
+        curvatureSum += tempCurvature;
+        boundaryVertexIndex++;
+    }
+    //progress.setValue(mBoundaryVertexNum);
+    boundaryVerticesCenter /= curvatureSum;
+
+    //计算协方差矩阵
+    Matrix3f covarMat;
+    covarMat << 0, 0, 0,
+            0, 0, 0,
+            0, 0, 0;
+    Matrix3f tempMat;
+    Mesh::Point tempVertex;
+    boundaryVertexIndex = 0;
+    progress.setLabelText("Computing covariance matrix...");
+    progress.setMinimum(0);
+    progress.setMaximum(mBoundaryVertexNum);
+    progress.setValue(0);
+    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    {
+        if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
+        {
+            continue;
+        }
+        progress.setValue(boundaryVertexIndex);
+        tempVertex = mToothMesh.point(*vertexIter);
+        tempVertex -= boundaryVerticesCenter;
+        tempMat << tempVertex[0] * tempVertex[0], tempVertex[0] * tempVertex[1], tempVertex[0] * tempVertex[2],
+                tempVertex[1] * tempVertex[0], tempVertex[1] * tempVertex[1], tempVertex[1] * tempVertex[2],
+                tempVertex[2] * tempVertex[0], tempVertex[2] * tempVertex[1], tempVertex[2] * tempVertex[2];
+        covarMat += tempMat;
+        boundaryVertexIndex++;
+    }
+    covarMat /= mBoundaryVertexNum;
+
+    //测试，输出协方差矩阵
+    cout << covarMat << endl;
+
+    //计算分割平面法向量（即协方差矩阵对应最小特征值的特征向量）
+    /*EigenSolver<Matrix3f> eigenSolver(covarMat, true);
+    EigenSolver<Matrix3f>::EigenvalueType eigenvalues = eigenSolver.eigenvalues();
+    EigenSolver<Matrix3f>::EigenvectorsType eigenvectors = eigenSolver.eigenvectors();
+    float eigenvalueMin = eigenvalues(0).real();
+    int eigenvalueMinIndex = 0;
+    for(int i = 1; i < 3; i++)
+    {
+        if(eigenvalues(i).real() < eigenvalueMin)
+        {
+            eigenvalueMin = eigenvalues(i).real();
+            eigenvalueMinIndex = i;
+        }
+    }
+    Mesh::Normal gingivaCutPlaneNormal(eigenvectors(eigenvalueMinIndex, 0).real(), eigenvectors(eigenvalueMinIndex, 1).real(), eigenvectors(eigenvalueMinIndex, 2).real());*/
+    Mesh::Normal gingivaCutPlaneNormal(0.0, 1.0, 0.0); //假设的值
+
+    //计算牙龈分割平面（正方形）的4个顶点
+    mToothMesh.computeBoundingBox();
+    double boundingBoxMaxEdgeLength = mToothMesh.BBox.size.x; //BoundingBox的最大边长
+    if(mToothMesh.BBox.size.y > boundingBoxMaxEdgeLength)
+    {
+        boundingBoxMaxEdgeLength = mToothMesh.BBox.size.y;
+    }
+    if(mToothMesh.BBox.size.z > boundingBoxMaxEdgeLength)
+    {
+        boundingBoxMaxEdgeLength = mToothMesh.BBox.size.z;
+    }
+    float gingivaCutPlaneSize = boundingBoxMaxEdgeLength * 1.5 / 1.414; //正方形中心到4个顶点的距离
+    float x0, y0, z0; //质心点（牙龈分割平面正方形中心点(记为点O)）
+    x0 = boundaryVerticesCenter[0];
+    y0 = boundaryVerticesCenter[1];
+    z0 = boundaryVerticesCenter[2];
+    float x1, y1, z1; //法向量
+    x1 = gingivaCutPlaneNormal[0];
+    y1 = gingivaCutPlaneNormal[1];
+    z1 = gingivaCutPlaneNormal[2];
+    float x2, y2, z2; //牙龈分割平面上的另一个点(记为点N)，若平面不与x轴平行，则取该点为平面与x轴的交点，否则按y、z轴依此类推
+    if(x1 != 0.0)
+    {
+        x2 = (y1 * y0 + z1 * z0) / x1 + x0;
+        y2 = 0.0;
+        z2 = 0.0;
+    }
+    else if(y1 != 0.0)
+    {
+        x2 = 0.0;
+        y2 = (x1 * x0 + z1 * z0) / y1 + y0;
+        z2 = 0;
+    }
+    else if(z1 != 0.0)
+    {
+        x2 = 0.0;
+        y2 = 0.0;
+        z2 = (y1 * y0 + x1 * x0) / z1 + z0;
+    }
+    float scale1 = gingivaCutPlaneSize / sqrt((x2 - x0) * (x2 - x0) + y0 * y0 + z0 * z0); //向量ON乘以此倍数得到长度为gingivaCutPlaneSize的向量（从点O指向正方形其中一个顶点(记为点A)）
+    float x3, y3, z3; //正方形其中一个顶点(点A)
+    x3 = x0 + (x2 - x0) * scale1;
+    y3 = y0 + (y2 - y0) * scale1;
+    z3 = z0 + (z2 - z0) * scale1;
+    float x4, y4, z4; //正方形中与上述顶点相邻的顶点(记为点B)
+    float x5, y5, z5; //与向量OB同向的向量(记为向量OM)（由法向量和OA作叉积而得）
+    x5 = y1 * (z3 - z0) - z1 * (y3 - y0);
+    y5 = z1 * (x3 - x0) - x1 * (z3 - z0);
+    z5 = x1 * (y3 - y0) - y1 * (x3 - x0);
+    float scale2 = gingivaCutPlaneSize / sqrt(x5 * x5 + y5 * y5 + z5 * z5); //向量OM乘以此倍数得到向量OB
+    x4 = x0 + x5 * scale2;
+    y4 = y0 + y5 * scale2;
+    z4 = z0 + z5 * scale2;
+    float x6, y6, z6; //正方形中与顶点A相对的顶点(记为点C)（根据A、C两点关于点O对称而得）
+    x6 = x0 * 2.0 - x3;
+    y6 = y0 * 2.0 - y3;
+    z6 = z0 * 2.0 - z3;
+    float x7, y7, z7; //正方形中与顶点B相对的顶点(记为点D)（根据B、D两点关于点O对称而得）
+    x7 = x0 * 2.0 - x4;
+    y7 = y0 * 2.0 - y4;
+    z7 = z0 * 2.0 - z4;
+
+    //测试，输出分割平面正方形4个顶点坐标
+    cout << "牙龈分割平面正方形顶点：" << endl
+         << "A: " << x3 << ", " << y3 << ", " << z3 << ", " << endl
+         << "B: " << x4 << ", " << y4 << ", " << z4 << ", " << endl
+         << "C: " << x6 << ", " << y6 << ", " << z6 << ", " << endl
+         << "D: " << x7 << ", " << y7 << ", " << z7 << ", " << endl;
+
+    //将分割平面添加到mExtraMesh中，以便显示
+    Mesh::VertexHandle vertexHandles[4];
+    vertexHandles[0] = mExtraMesh.add_vertex(Mesh::Point(x3, y3, z3));
+    vertexHandles[1] = mExtraMesh.add_vertex(Mesh::Point(x4, y4, z4));
+    vertexHandles[2] = mExtraMesh.add_vertex(Mesh::Point(x6, y6, z6));
+    vertexHandles[3] = mExtraMesh.add_vertex(Mesh::Point(x7, y7, z7));
+    std::vector<Mesh::VertexHandle> faceVertexhandles;
+    faceVertexhandles.clear();
+    faceVertexhandles.push_back(vertexHandles[0]);
+    faceVertexhandles.push_back(vertexHandles[1]);
+    faceVertexhandles.push_back(vertexHandles[2]);
+    faceVertexhandles.push_back(vertexHandles[3]);
+    mExtraMesh.add_face(faceVertexhandles);
+    if(!mExtraMesh.has_vertex_normals())
+    {
+        mExtraMesh.request_vertex_normals();
+    }
+    mExtraMesh.set_normal(vertexHandles[0], gingivaCutPlaneNormal);
+    mExtraMesh.set_normal(vertexHandles[1], gingivaCutPlaneNormal);
+    mExtraMesh.set_normal(vertexHandles[2], gingivaCutPlaneNormal);
+    mExtraMesh.set_normal(vertexHandles[3], gingivaCutPlaneNormal);
+    Mesh::FaceHandle faceHandle = *(mExtraMesh.vf_iter(vertexHandles[0]));
+    if(!mExtraMesh.has_face_normals())
+    {
+        mExtraMesh.request_face_normals();
+    }
+    mExtraMesh.set_normal(faceHandle, gingivaCutPlaneNormal);
+    Mesh::Color colorGreen(0.3, 1.0, 0.0); //TODO 将分割平面颜色设置成半透明（经测试，直接在Mesh::draw()方法中将glColor3f()改为glColor4f()并添加alpha参数并不会使的模型显示透明效果）
+    if(!mExtraMesh.has_vertex_colors())
+    {
+        mExtraMesh.request_vertex_colors();
+    }
+    mExtraMesh.set_color(vertexHandles[0], colorGreen);
+    mExtraMesh.set_color(vertexHandles[1], colorGreen);
+    mExtraMesh.set_color(vertexHandles[2], colorGreen);
+    mExtraMesh.set_color(vertexHandles[3], colorGreen);
+    if(!mExtraMesh.has_face_colors())
+    {
+        mExtraMesh.request_face_colors();
+    }
+    mExtraMesh.set_color(faceHandle, colorGreen);
+
 }
 
 /*float ToothSegmentation::cos(const Mesh::Point &vector1, const Mesh::Point &vector2) const

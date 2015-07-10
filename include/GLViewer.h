@@ -10,33 +10,29 @@
 //
 
 
-#include"include/Mesh.h"
-#include"QGLViewer/qglviewer.h"
+#include "include/Mesh.h"
+#include "QGLViewer/qglviewer.h"
+#include "include/Shader.h"
 
-
-#include<list>
-#include<vector>
-#include<QObject>
-#include<QMouseEvent>
-#include<QMenu>
-#include<QAction>
-# include <QMenu>
+#include <QObject>
+#include <QMouseEvent>
+#include <QMenu>
+#include <QAction>
+#include <QMenu>
 #include <qcursor.h>
 #include <qmap.h>
-#include <math.h>
-#include<QColor>
-#include<QListWidgetItem>
+#include <QColor>
+#include <QListWidgetItem>
 #include <QImage>
-#include<QKeyEvent>
-
-#include<QVector2D>
-#include<QVector3D>
-#include<QThread>
-
-#include"include/Shader.h"
+#include <QKeyEvent>
+#include <QVector2D>
+#include <QVector3D>
+#include <QThread>
+#include <list>
+#include <vector>
+#include <math.h>
 
 namespace SW{
-
 
 class  GLViewer : public QGLViewer
 {
@@ -62,13 +58,13 @@ public:
 
     void viewAll();
 
-    void addMesh(const Mesh & mesh){meshes.append(mesh);}
+    void addMesh(const Mesh &mesh);
 
-    int getMeshNum(){return meshes.size();}
+    int getMeshNum();
 
-    Mesh getMesh(int index){return meshes[index];}
+    Mesh getMesh(int index);
 
-    void removeAllMeshes(){meshes.clear();}
+    void removeAllMeshes();
 
     //为了解决每次重新构建项目时都需要注释ui_mainwindow.h中的两行的问题，添加下面两个空方法
     void setFrameShape(QFrame::Shape shape){}
@@ -85,20 +81,11 @@ protected:
 public slots:
     virtual void drawText(){}
 
-    void toggleDisplayVertices(){
-        displayType = VERTICES;
-        updateGL();
-    }
+    void toggleDisplayVertices();
 
-    void toggleDisplayWireFrame(){
-        displayType = WIREFRAME;
-        updateGL();
-    }
+    void toggleDisplayWireFrame();
 
-    void toggleDisplayFlatLine(){
-        displayType = FLATLINE;
-        updateGL();
-    }
+    void toggleDisplayFlatLine();
 
 
 signals:
