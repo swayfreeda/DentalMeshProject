@@ -17,7 +17,7 @@ namespace SW{
 
 class Mesh:public OpenMesh::TriMesh_ArrayKernelT<>
 {
-  public:
+public:
     Mesh(QString name);
     Mesh();
 
@@ -31,6 +31,13 @@ class Mesh:public OpenMesh::TriMesh_ArrayKernelT<>
 
     // 0--vertices 1-- wireframe 2-- flatLine
     void draw(int flag);
+
+private:
+    //画OpenGL原点
+    void drawOrigin();
+
+    //画BoundingBox
+    void drawBoundingBox();
 
    public:
     int mVertexNum, mFaceNum, mEdgeNum;

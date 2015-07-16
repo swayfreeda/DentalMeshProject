@@ -33,6 +33,8 @@
 
 #include <math.h>
 
+#include "ToothSegmentation.h"
+
 GLuint arrayId;
 GLuint numElement;
 
@@ -407,10 +409,23 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
     }
 
     OpenMesh::VPropHandleT<double> vPropHandleCurvature;
-    std::string mVPropHandleCurvatureName = "vprop_curvature";
+    std::string vPropHandleCurvatureName = "vprop_curvature";
     OpenMesh::VPropHandleT<bool> vPropHandleCurvatureComputed;
-    std::string mVPropHandleCurvatureComputedName = "vprop_curvature_computed";
-    if(!meshes[0].get_property_handle(vPropHandleCurvature, mVPropHandleCurvatureName) || !meshes[0].get_property_handle(vPropHandleCurvatureComputed, mVPropHandleCurvatureComputedName))
+    std::string vPropHandleCurvatureComputedName = "vprop_curvature_computed";
+    OpenMesh::VPropHandleT<bool> vPropHandleIsToothBoundary;
+    std::string vPropHandleIsToothBoundaryName = "vprop_is_tooth_boundary";
+    OpenMesh::VPropHandleT<ToothSegmentation::mBoundaryVertexType> vPropHandleBoundaryVertexType;
+    std::string vPropHandleBoundaryVertexTypeName = "vprop_boundary_vertex_type";
+    OpenMesh::VPropHandleT<ToothSegmentation::mNonBoundaryRegionType> vPropHandleNonBoundaryRegionType;
+    std::string vPropHandleNonBoundaryRegionTypeName = "vprop_non_boundary_region_type";
+    OpenMesh::VPropHandleT<bool> vPropHandleRegionGrowingVisited;
+    std::string vPropHandleRegionGrowingVisitedName = "vprop_region_growing_visited";
+    if(!meshes[0].get_property_handle(vPropHandleCurvature, vPropHandleCurvatureName)
+            || !meshes[0].get_property_handle(vPropHandleCurvatureComputed, vPropHandleCurvatureComputedName)
+            || !meshes[0].get_property_handle(vPropHandleIsToothBoundary, vPropHandleIsToothBoundaryName)
+            || !meshes[0].get_property_handle(vPropHandleBoundaryVertexType, vPropHandleBoundaryVertexTypeName)
+            || !meshes[0].get_property_handle(vPropHandleNonBoundaryRegionType, vPropHandleNonBoundaryRegionTypeName)
+            || !meshes[0].get_property_handle(vPropHandleRegionGrowingVisited, vPropHandleRegionGrowingVisitedName))
     {
         return;
     }
@@ -442,8 +457,7 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
     //判断点击的是模型上的哪个点（通过遍历所有模型上的所有点，找到距离点击位置最近的点，如果该点到点击位置的距离小于某个阈值，则认为该点即为点击位置）
     Mesh::Point tempVertex = meshes[0].point(*(meshes[0].vertices_begin()));
     float tempDistance, minDistance = distance(tempVertex, clickedVertex);
-    double curvatureValue; //点击位置的曲率
-    bool curvatureComputed; //是否被正确计算得到曲率
+    Mesh::VertexHandle vertexHandle;
     for(Mesh::VertexIter vertexIter = meshes[0].vertices_begin(); vertexIter != meshes[0].vertices_end(); vertexIter++)
     {
         tempVertex = meshes[0].point(*vertexIter);
@@ -451,8 +465,7 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
         if(tempDistance < minDistance)
         {
             minDistance = tempDistance;
-            curvatureValue = meshes[0].property(vPropHandleCurvature, *vertexIter);
-            curvatureComputed = meshes[0].property(vPropHandleCurvatureComputed, *vertexIter);
+            vertexHandle = *vertexIter;
         }
     }
     if(minDistance > meshes[0].BBox.size.x / 100)
@@ -461,7 +474,26 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
     }
     else
     {
-        QMessageBox::information(this, "Info", QString("Clicked vertex found!\nx: %1\ny: %2\nz: %3\ncurvature: %4\ncurvatureComputed: %5").arg(clickedVertex[0]).arg(clickedVertex[1]).arg(clickedVertex[2]).arg(curvatureValue).arg(curvatureComputed));
+        QMessageBox::information(this, "Info",
+                                 QString("Clicked vertex found!\n \
+                                         x: %1\n \
+                                         y: %2\n \
+                                         z: %3\n \
+                                         Curvature: %4\n \
+                                         CurvatureComputed: %5\n \
+                                         IsToothBoundary: %6\n \
+                                         BoundaryVertexType: %7\n \
+                                         NonBoundaryRegionType: %8\n \
+                                         RegionGrowingVisited: %9")
+                                         .arg(clickedVertex[0])
+                                         .arg(clickedVertex[1])
+                                         .arg(clickedVertex[2])
+                                         .arg(meshes[0].property(vPropHandleCurvature, vertexHandle))
+                                         .arg(meshes[0].property(vPropHandleCurvatureComputed, vertexHandle))
+                                         .arg(meshes[0].property(vPropHandleIsToothBoundary, vertexHandle))
+                                         .arg(meshes[0].property(vPropHandleBoundaryVertexType, vertexHandle))
+                                         .arg(meshes[0].property(vPropHandleNonBoundaryRegionType, vertexHandle))
+                                         .arg(meshes[0].property(vPropHandleRegionGrowingVisited, vertexHandle)));
     }
 
     QGLViewer::mousePressEvent(e);
@@ -492,7 +524,7 @@ void SW::GLViewer::wheelEvent(QWheelEvent *e)
         return;
     }
     int numDegrees = e->delta() / 8;
-    int numSteps = numDegrees / 15;
+    //int numSteps = numDegrees / 15;
     //    if(numSteps >0)
     //    m_length = 0.1/(float)numSteps;
     //    else

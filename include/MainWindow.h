@@ -72,6 +72,7 @@ namespace SW
 
          void doActionToothSegmentationIdentifyPotentialToothBoundary();
          void doActionToothSegmentationAutomaticCuttingOfGingiva();
+         void doActionToothSegmentationBoundarySkeletonExtraction();
 
     public:
          //////////////////////定义窗口部件/////////////////////////////////////

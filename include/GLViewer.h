@@ -67,8 +67,8 @@ public:
     void removeAllMeshes();
 
     //为了解决每次重新构建项目时都需要注释ui_mainwindow.h中的两行的问题，添加下面两个空方法
-    void setFrameShape(QFrame::Shape shape){}
-    void setFrameShadow(QFrame::Shadow shadow){}
+    void setFrameShape(QFrame::Shape){}
+    void setFrameShadow(QFrame::Shadow){}
 
 protected:
     //draw world coordinates

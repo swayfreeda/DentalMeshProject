@@ -11,6 +11,22 @@ using namespace std;
 class ToothSegmentation
 {
 
+public:
+    enum mBoundaryVertexType
+    {
+        CENTER_VERTEX = 0, //中心点（边界内部点）
+        DISK_VERTEX_1, //外围点（边界外围点，与牙龈区域相邻）
+        DISK_VERTEX_2, //外围点（边界外围点，与牙齿区域相邻）
+        COMPLEX_VERTEX //复杂点（单点宽度边界点）
+    };
+
+    enum mNonBoundaryRegionType
+    {
+        GINGIVA_REGION = 0, //牙龈区域
+        TOOTH_REGION, //牙齿区域
+        TEMP_REGION //临时区域（用来判断噪声区域）
+    };
+
 private:
     Mesh mToothMesh; //牙齿模型网格
     Mesh mExtraMesh; //附加信息网格，用来显示牙龈分割平面等附加信息
@@ -22,6 +38,12 @@ private:
     static const string mVPropHandleCurvatureComputedName;
     OpenMesh::VPropHandleT<bool> mVPropHandleIsToothBoundary; //该顶点是否是牙齿边界点
     static const string mVPropHandleIsToothBoundaryName;
+    OpenMesh::VPropHandleT<mBoundaryVertexType> mVPropHandleBoundaryVertexType; //该顶点属于的边界点类别
+    static const string mVPropHandleBoundaryVertexTypeName;
+    OpenMesh::VPropHandleT<mNonBoundaryRegionType> mVPropHandleNonBoundaryRegionType; //该顶点属于的非边界区域类别
+    static const string mVPropHandleNonBoundaryRegionTypeName;
+    OpenMesh::VPropHandleT<bool> mVPropHandleRegionGrowingVisited; //该顶点在区域生长过程中是否已被访问过
+    static const string mVPropHandleRegionGrowingVisitedName;
 
     int mBoundaryVertexNum; //牙齿边界点数量
 
@@ -45,6 +67,9 @@ public:
     //4.2. Automatic cutting of gingiva
     void automaticCuttingOfGingiva(QWidget *parentWidget);
 
+    //4.3. Boundary skeleton extraction
+    void boundarySkeletonExtraction(QWidget *parentWidget);
+
 private:
     //计算曲率
     void computeCurvature(QWidget *parentWidget, QProgressDialog &progress);
@@ -57,6 +82,39 @@ private:
 
     //检查mToothMesh中是否存在curvature（顶点处的曲率）属性和curvature_computed（曲率是否被正确计算），如果不存在则报错
     void checkCustomMeshPropertiesExistence();
+
+    //对边界区域进行1邻域腐蚀操作
+    void corrodeBoundary(QProgressDialog &progress);
+
+    //对边界区域进行1邻域膨胀操作
+    void dilateBoundary(QProgressDialog &progress);
+
+    //边界点着色
+    void paintBoundary(QProgressDialog &progress);
+
+    //边界点分类，classifiedBoundaryVertexNum返回各类边界点数量
+    void classifyBoundaryVertex(QProgressDialog &progress, int *classifiedBoundaryVertexNum);
+
+    //分类后的边界点着色
+    void paintClassifiedBoundary(QProgressDialog &progress);
+
+    //根据牙龈分割平面剔除牙龈上的初始边界点
+    void removeBoundaryVertexOnGingiva(QProgressDialog &progress);
+
+    //手动设置xz平面剔除牙龈上的初始边界点
+    void removeBoundaryVertexOnGingiva(QProgressDialog &progress, float y0);
+
+    //标记牙龈区域
+    void markGingivaRegion(QProgressDialog &progress);
+
+    //区域生长，返回该区域的顶点数量，如果regionType为TEMP_REGION，则只计算该区域的顶点数量，visited属性不变为true，也就是说可以再次进行区域生长
+    int regionGrowing(Mesh::VertexHandle vertexHandle, mNonBoundaryRegionType regionType);
+
+    //非边界区域分类着色
+    void paintClassifiedNonBoundary(QProgressDialog &progress);
+
+    //去除噪声区域（提取单点宽度边界前）
+    void removeNoiseRegion(QProgressDialog &progress);
 
 /*private:
     //计算两个向量夹角的cos值

@@ -23,6 +23,7 @@ SW::MainWindow::MainWindow()
 
     connect(actionToothSegmentationIdentifyPotentialToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationIdentifyPotentialToothBoundary()));
     connect(actionToothSegmentationAutomaticCuttingOfGingiva, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingiva()));
+    connect(actionToothSegmentationBoundarySkeletonExtraction, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationBoundarySkeletonExtraction()));
 
     update();
 }
@@ -106,19 +107,42 @@ void SW::MainWindow::doActionToothSegmentationIdentifyPotentialToothBoundary()
     mToothSegmentation.identifyPotentialToothBoundary(this);
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation.getToothMesh());
-    gv->updateGL();
+
     QMessageBox::information(this, "Info", "Identify potential tooth boundary done!");
+
+    gv->updateGL();
+    gv->viewAll();
+
+    //测试，将mesh保存到文件
+//    OpenMesh::IO::Options options;
+//    options += OpenMesh::IO::Options::VertexColor;
+//    OpenMesh::IO::write_mesh(mToothSegmentation.getToothMesh(), "data/output.obj", options);
 }
 
 void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingiva()
 {
-    if(gv->getMeshNum() <= 0)
-    {
-        return;
-    }
     mToothSegmentation.automaticCuttingOfGingiva(this);
-    gv->addMesh(mToothSegmentation.getExtraMesh());
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation.getToothMesh());
+
+    QMessageBox::information(this, "Info", "Automatic cutting of gingiva done!");
+
     gv->updateGL();
     gv->viewAll();
-    QMessageBox::information(this, "Info", "Automatic cutting of gingiva done!");
+
+    gv->addMesh(mToothSegmentation.getExtraMesh());
+
+    gv->updateGL();
+}
+
+void SW::MainWindow::doActionToothSegmentationBoundarySkeletonExtraction()
+{
+    mToothSegmentation.boundarySkeletonExtraction(this);
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation.getToothMesh());
+
+    QMessageBox::information(this, "Info", "Boundary skeleton extraction done!");
+
+    gv->updateGL();
+    //gv->viewAll();
 }

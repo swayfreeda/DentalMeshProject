@@ -72,8 +72,108 @@ void Mesh::computeEntityNumbers()
 // 0--vertices 1-- wireframe 2-- flatLine
 void Mesh::draw(int flag)
 {
-    //画OpenGL原点
+    drawOrigin();
+    drawBoundingBox();
+
+    Mesh::Point tempVertex;
+    Mesh::Color tempColor;
+    Mesh::Normal tempNormal;
+
+    switch (flag)
+    {
+    case 0:
+        glPushMatrix();
+        glPointSize(5);
+        glBegin(GL_POINTS);
+        for(Mesh::HalfedgeIter hit = this->halfedges_begin(); hit != this->halfedges_end(); hit++)
+        {
+            Mesh::VertexHandle vertexHandle = to_vertex_handle(hit);
+            tempVertex = this->point(vertexHandle);
+
+            //设置颜色
+            if(!this->has_vertex_colors()) //如果Mesh中没有顶点颜色这个属性，则将所有顶点设置成白色，否则按该点颜色属性设置实际颜色
+            {
+                glColor3f(1.0, 1.0, 1.0);
+            }
+            else
+            {
+                tempColor = this->color(vertexHandle);
+                glColor3f(tempColor[0], tempColor[1], tempColor[2]);
+            }
+
+            //设置法向量
+            calc_vertex_normal_loop(vertexHandle, tempNormal);
+            glNormal3f(tempNormal[0], tempNormal[1], tempNormal[2]);
+
+            //设置坐标
+            glVertex3f(tempVertex[0], tempVertex[1], tempVertex[2]);
+        }
+        glEnd();
+        glPopMatrix();
+        break;
+    case 1:
+        glPushMatrix();
+        glColor3f(1.0f, 1.0f, 1.0f);
+        glBegin(GL_LINES);
+        for(Mesh::EdgeIter eit = edges_begin(); eit != edges_end(); eit++)
+        {
+            Mesh::HalfedgeHandle hh1 = halfedge_handle(eit, 0);
+            Mesh::HalfedgeHandle hh2 = halfedge_handle(eit, 1);
+            Mesh::VertexHandle vh1 = to_vertex_handle(hh1);
+            Mesh::Point v1 = this->point(vh1);
+
+            Mesh::VertexHandle vh2 = to_vertex_handle(hh2);
+            Mesh::Point v2 = this->point(vh2);
+            glVertex3f(v1[0], v1[1], v1[2]);
+            glVertex3f(v2[0], v2[1], v2[2]);
+        }
+        glEnd();
+        glPopMatrix();
+        draw(0);
+        break;
+    case 2:
+        //glColor3f(1.0f, 1.0f, 1.0f);
+        //request_vertex_normals();
+        for(Mesh::FaceIter fit = faces_begin(); fit != faces_end(); fit++)
+        {
+            //如果存在顶点颜色，则计算该面片所有顶点颜色的平均值，显示在该面片上
+            if(!this->has_vertex_colors())
+            {
+                glColor3f(1.0, 1.0, 1.0);
+            }
+            else
+            {
+                tempColor[0] = 0; tempColor[1] = 0; tempColor[2] = 0;
+                for(Mesh::FaceVertexIter faceVertexIter = this->fv_iter(*fit); faceVertexIter.is_valid(); faceVertexIter++)
+                {
+                    tempColor += this->color(faceVertexIter);
+                }
+                tempColor /= 3.0;
+                glColor3f(tempColor[0], tempColor[1], tempColor[2]);
+            }
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glBegin(GL_POLYGON);
+            Mesh::Normal nor = calc_face_normal(fit);
+            glNormal3f(nor[0], nor[1], nor[2]);
+            for(Mesh::FaceHalfedgeIter fhit = fh_iter(*fit); fhit.is_valid(); ++fhit)
+            {
+                Mesh::VertexHandle vh = to_vertex_handle(fhit);
+                Mesh::Point v = this->point(vh);
+                glVertex3f(v[0], v[1], v[2]);
+            }
+            glEnd();
+        }
+        break;
+    }
+
+}
+
+void Mesh::drawOrigin()
+{
     glPushMatrix();
+    GLint pointSize;
+    glGetIntegerv(GL_POINT_SIZE, &pointSize);
     glPointSize(2);
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_LINES); //x坐标
@@ -96,11 +196,15 @@ void Mesh::draw(int flag)
         glVertex3f(0.0, 0.0, 0.1);
     }
     glEnd();
-    glPointSize(1);
+    glPointSize(pointSize);
     glPopMatrix();
+}
 
-    //画BoundingBox
+void Mesh::drawBoundingBox()
+{
     glPushMatrix();
+    GLint pointSize;
+    glGetIntegerv(GL_POINT_SIZE, &pointSize);
     glPointSize(2);
     glColor3f(1.0f, 0.0f, 0.0f);
     glBegin(GL_LINES); //x坐标
@@ -179,99 +283,6 @@ void Mesh::draw(int flag)
         glVertex3f(BBox.origin.x + BBox.size.x, BBox.origin.y + BBox.size.y, BBox.origin.z + BBox.size.z);
     }
     glEnd();
-    glPointSize(1);
+    glPointSize(pointSize);
     glPopMatrix();
-
-    //int featureVertexNum = 0; //牙齿分割初始边界点个数
-    Mesh::Point tempVertex;
-    Mesh::Color tempColor;
-    Mesh::Normal tempNormal;
-
-    switch (flag)
-    {
-    case 0:
-        glPushMatrix();
-        //glPointSize(1);
-        glBegin(GL_POINTS);
-        for(Mesh::HalfedgeIter hit = this->halfedges_begin(); hit != this->halfedges_end(); hit++)
-        {
-            Mesh::VertexHandle vertexHandle = to_vertex_handle(hit);
-            tempVertex = this->point(vertexHandle);
-
-            //设置颜色
-            if(!this->has_vertex_colors()) //如果Mesh中没有顶点颜色这个属性，则将所有顶点设置成白色，否则按该点颜色属性设置实际颜色
-            {
-                glColor3f(1.0, 1.0, 1.0);
-            }
-            else
-            {
-                tempColor = this->color(vertexHandle);
-                glColor3f(tempColor[0], tempColor[1], tempColor[2]);
-            }
-
-            //设置法向量
-            calc_vertex_normal_loop(vertexHandle, tempNormal);
-            glNormal3f(tempNormal[0], tempNormal[1], tempNormal[2]);
-
-            //设置坐标
-            glVertex3f(tempVertex[0], tempVertex[1], tempVertex[2]);
-        }
-        glEnd();
-        glPopMatrix();
-        break;
-    case 1:
-        glPushMatrix();
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glBegin(GL_LINES);
-        for(Mesh::EdgeIter eit = edges_begin(); eit != edges_end(); eit++)
-        {
-            Mesh::HalfedgeHandle hh1 = halfedge_handle(eit, 0);
-            Mesh::HalfedgeHandle hh2 = halfedge_handle(eit, 1);
-            Mesh::VertexHandle vh1 = to_vertex_handle(hh1);
-            Mesh::Point v1 = this->point(vh1);
-
-            Mesh::VertexHandle vh2 = to_vertex_handle(hh2);
-            Mesh::Point v2 = this->point(vh2);
-            glVertex3f(v1[0], v1[1], v1[2]);
-            glVertex3f(v2[0], v2[1], v2[2]);
-        }
-        glEnd();
-        glPopMatrix();
-        break;
-    case 2:
-        //glColor3f(1.0f, 1.0f, 1.0f);
-        //request_vertex_normals();
-        for(Mesh::FaceIter fit = faces_begin(); fit != faces_end(); fit++)
-        {
-            //如果存在顶点颜色，则计算该面片所有顶点颜色的平均值，显示在该面片上
-            if(!this->has_vertex_colors())
-            {
-                glColor3f(1.0, 1.0, 1.0);
-            }
-            else
-            {
-                tempColor[0] = 0; tempColor[1] = 0; tempColor[2] = 0;
-                for(Mesh::FaceVertexIter faceVertexIter = this->fv_iter(*fit); faceVertexIter.is_valid(); faceVertexIter++)
-                {
-                    tempColor += this->color(faceVertexIter);
-                }
-                tempColor /= 3.0;
-                glColor3f(tempColor[0], tempColor[1], tempColor[2]);
-            }
-
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            glBegin(GL_POLYGON);
-            Mesh::Normal nor = calc_face_normal(fit);
-            glNormal3f(nor[0], nor[1], nor[2]);
-            for(Mesh::FaceHalfedgeIter fhit = fh_iter(*fit); fhit.is_valid(); ++fhit)
-            {
-                Mesh::VertexHandle vh = to_vertex_handle(fhit);
-                Mesh::Point v = this->point(vh);
-                glVertex3f(v[0], v[1], v[2]);
-            }
-            glEnd();
-        }
-        break;
-    }
-
 }
