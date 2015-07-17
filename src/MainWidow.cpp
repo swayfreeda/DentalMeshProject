@@ -48,9 +48,13 @@ void SW::MainWindow::doActionOpen()
         statusBar()->showMessage("Loading Mesh from " + filePath);
 
         Mesh mesh(filePath);
-        if(!OpenMesh::IO::read_mesh(mesh, filePath.toStdString().c_str()))
+        OpenMesh::IO::Options options;
+        options += OpenMesh::IO::Options::VertexColor;
+        options += OpenMesh::IO::Options::ColorFloat; //TODO ColorFloat只支持*.off和*.ply格式的模型，但是经测试还是读不到颜色信息，不知为何
+        if(!OpenMesh::IO::read_mesh(mesh, filePath.toStdString().c_str(), options))
         {
             QMessageBox::information(this, "Error","Error to load " + filePath);
+            return;
         }
 
         // If the file did not provide vertex normals, then calculate them

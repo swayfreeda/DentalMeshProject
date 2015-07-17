@@ -15,16 +15,16 @@ public:
     enum mBoundaryVertexType
     {
         CENTER_VERTEX = 0, //中心点（边界内部点）
-        DISK_VERTEX_1, //外围点（边界外围点，与牙龈区域相邻）
-        DISK_VERTEX_2, //外围点（边界外围点，与牙齿区域相邻）
-        COMPLEX_VERTEX //复杂点（单点宽度边界点）
+        COMPLEX_VERTEX, //复杂点（单点宽度边界点）
+        DISK_VERTEX_GINGIVA, //外围点（边界外围点，与牙龈区域相邻）
+        DISK_VERTEX_TOOTH //外围点（边界外围点，与第1颗牙齿区域相邻，后续逐个加1）
     };
 
     enum mNonBoundaryRegionType
     {
-        GINGIVA_REGION = 0, //牙龈区域
-        TOOTH_REGION, //牙齿区域
-        TEMP_REGION //临时区域（用来判断噪声区域）
+        TEMP_REGION = 0, //临时区域（用来判断噪声区域）
+        GINGIVA_REGION, //牙龈区域
+        TOOTH_REGION //牙齿区域（此为第1颗牙齿区域，后续逐个加1）
     };
 
 private:
@@ -38,9 +38,9 @@ private:
     static const string mVPropHandleCurvatureComputedName;
     OpenMesh::VPropHandleT<bool> mVPropHandleIsToothBoundary; //该顶点是否是牙齿边界点
     static const string mVPropHandleIsToothBoundaryName;
-    OpenMesh::VPropHandleT<mBoundaryVertexType> mVPropHandleBoundaryVertexType; //该顶点属于的边界点类别
+    OpenMesh::VPropHandleT<int> mVPropHandleBoundaryVertexType; //该顶点属于的边界点类别
     static const string mVPropHandleBoundaryVertexTypeName;
-    OpenMesh::VPropHandleT<mNonBoundaryRegionType> mVPropHandleNonBoundaryRegionType; //该顶点属于的非边界区域类别
+    OpenMesh::VPropHandleT<int> mVPropHandleNonBoundaryRegionType; //该顶点属于的非边界区域类别
     static const string mVPropHandleNonBoundaryRegionTypeName;
     OpenMesh::VPropHandleT<bool> mVPropHandleRegionGrowingVisited; //该顶点在区域生长过程中是否已被访问过
     static const string mVPropHandleRegionGrowingVisitedName;
@@ -49,6 +49,8 @@ private:
 
     Mesh::Point mGingivaCuttingPlanePoint; //牙龈分割平面点
     Mesh::Normal mGingivaCuttingPlaneNormal; //牙龈分割平面法向量
+
+    int mToothNum; //牙齿颗数
 
 public:
     ToothSegmentation(const Mesh &toothMesh);
@@ -105,16 +107,19 @@ private:
     void removeBoundaryVertexOnGingiva(QProgressDialog &progress, float y0);
 
     //标记牙龈区域
-    void markGingivaRegion(QProgressDialog &progress);
+    void markNonBoundaryRegion(QProgressDialog &progress);
 
     //区域生长，返回该区域的顶点数量，如果regionType为TEMP_REGION，则只计算该区域的顶点数量，visited属性不变为true，也就是说可以再次进行区域生长
-    int regionGrowing(Mesh::VertexHandle vertexHandle, mNonBoundaryRegionType regionType);
+    int regionGrowing(Mesh::VertexHandle vertexHandle, int regionType);
 
     //非边界区域分类着色
     void paintClassifiedNonBoundary(QProgressDialog &progress);
 
-    //去除噪声区域（提取单点宽度边界前）
-    void removeNoiseRegion(QProgressDialog &progress);
+    //测试，保存模型（带颜色信息）
+    void saveToothMesh(string filename);
+
+    //灰度转伪彩色
+    void gray2PseudoColor(float grayValue, Mesh::Color &pseudoColor);
 
 /*private:
     //计算两个向量夹角的cos值

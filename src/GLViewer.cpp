@@ -414,9 +414,9 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
     std::string vPropHandleCurvatureComputedName = "vprop_curvature_computed";
     OpenMesh::VPropHandleT<bool> vPropHandleIsToothBoundary;
     std::string vPropHandleIsToothBoundaryName = "vprop_is_tooth_boundary";
-    OpenMesh::VPropHandleT<ToothSegmentation::mBoundaryVertexType> vPropHandleBoundaryVertexType;
+    OpenMesh::VPropHandleT<int> vPropHandleBoundaryVertexType;
     std::string vPropHandleBoundaryVertexTypeName = "vprop_boundary_vertex_type";
-    OpenMesh::VPropHandleT<ToothSegmentation::mNonBoundaryRegionType> vPropHandleNonBoundaryRegionType;
+    OpenMesh::VPropHandleT<int> vPropHandleNonBoundaryRegionType;
     std::string vPropHandleNonBoundaryRegionTypeName = "vprop_non_boundary_region_type";
     OpenMesh::VPropHandleT<bool> vPropHandleRegionGrowingVisited;
     std::string vPropHandleRegionGrowingVisitedName = "vprop_region_growing_visited";

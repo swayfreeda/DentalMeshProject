@@ -7,6 +7,5 @@ simpleMainwindow.pro.user
 simpleMainwindow*.pro.user
 
 # mesh data files
-data/*.obj
-data/*.curvature
+data/*
 

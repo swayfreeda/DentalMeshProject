@@ -190,6 +190,8 @@ void ToothSegmentation::identifyPotentialToothBoundary(QWidget *parentWidget)
     //测试，将曲率值转换成伪彩色
     //curvature2PseudoColor();
 
+    //测试，将mesh保存到文件
+    saveToothMesh(mToothMesh.MeshName.toStdString() + ".IdentifyPotentialToothBoundary.off");
 }
 
 void ToothSegmentation::computeCurvature(QWidget *parentWidget, QProgressDialog &progress)
@@ -345,31 +347,7 @@ void ToothSegmentation::curvature2PseudoColor()
         {
             colorGray = (mToothMesh.property(mVPropHandleCurvature, *vertexIter) - curvatureMin) / (curvatureMax - curvatureMin);
             //colorGray = (mToothMesh.property(mVPropHandleCurvature, *vertexIter) + 8.0) / 16.0;
-            if(colorGray < 0.0) colorGray = 0.0; if(colorGray > 1.0) colorGray = 1.0;
-            if(colorGray < 0.25)
-            {
-                colorPseudoRGB[0] = 0.0;
-                colorPseudoRGB[1] = colorGray * 4.0;
-                colorPseudoRGB[2] = 1.0;
-            }
-            else if(colorGray < 0.5)
-            {
-                colorPseudoRGB[0] = 0.0;
-                colorPseudoRGB[1] = 1.0;
-                colorPseudoRGB[2] = 1.0 - (colorGray - 0.25) * 4.0;
-            }
-            else if(colorGray < 0.75)
-            {
-                colorPseudoRGB[0] = (colorGray - 0.5) * 4.0;
-                colorPseudoRGB[1] = 1.0;
-                colorPseudoRGB[2] = 0.0;
-            }
-            else
-            {
-                colorPseudoRGB[0] = 1.0;
-                colorPseudoRGB[1] = 1.0 - (colorGray - 0.75) * 4.0;
-                colorPseudoRGB[2] = 0.0;
-            }
+            gray2PseudoColor(colorGray, colorPseudoRGB);
         }
         mToothMesh.set_color(*vertexIter, colorPseudoRGB);
     }
@@ -743,10 +721,7 @@ void ToothSegmentation::automaticCuttingOfGingiva(QWidget *parentWidget)
     removeBoundaryVertexOnGingiva(progress);
 
     //标记非边界区域
-    markGingivaRegion(progress);
-
-    //去除噪声区域
-    removeNoiseRegion(progress);
+    markNonBoundaryRegion(progress);
 
     //非边界区域着色
     paintClassifiedNonBoundary(progress);
@@ -756,6 +731,9 @@ void ToothSegmentation::automaticCuttingOfGingiva(QWidget *parentWidget)
 
     //关闭进度条
     progress.setValue(mToothMesh.mVertexNum);
+
+    //测试，将mesh保存到文件
+    saveToothMesh(mToothMesh.MeshName.toStdString() + ".AutomaticCuttingOfGingiva.off");
 }
 
 void ToothSegmentation::boundarySkeletonExtraction(QWidget *parentWidget)
@@ -770,26 +748,25 @@ void ToothSegmentation::boundarySkeletonExtraction(QWidget *parentWidget)
     progress.setWindowModality(Qt::WindowModal);
 
     //逐步删除某一类外围点
-    int classifiedBoundaryVertexNum[4];
+    int classifiedBoundaryVertexNum[3];
     int boundaryVertexIndex;
     static int iterTimes = 0; //迭代次数
     while(true)
     {
-        iterTimes++;
-
         //边界点分类
         classifyBoundaryVertex(progress, classifiedBoundaryVertexNum);
 
         //测试
         //break;
 
-        if(classifiedBoundaryVertexNum[0] == 0 && classifiedBoundaryVertexNum[1] == 0 && classifiedBoundaryVertexNum[2] == 0)
+        if(classifiedBoundaryVertexNum[0] == 0 && classifiedBoundaryVertexNum[2] == 0)
         {
             break;
         }
+
         //剔除某一类外围点
         boundaryVertexIndex = 0;
-        progress.setLabelText(QString("Deleting disk vertices...\nNo.%1 times.\n%2 center vertices left.\n%3 disk vertices(to gingiva) left.\n%4 disk vertices(to tooth) left.").arg(iterTimes).arg(classifiedBoundaryVertexNum[0]).arg(classifiedBoundaryVertexNum[1]).arg(classifiedBoundaryVertexNum[2]));
+        progress.setLabelText(QString("Deleting disk vertices...\nNo.%1 times.\n%2 center vertices left.\n%3 disk vertices left.").arg(iterTimes + 1).arg(classifiedBoundaryVertexNum[CENTER_VERTEX]).arg(classifiedBoundaryVertexNum[DISK_VERTEX_GINGIVA]));
         progress.setMinimum(0);
         progress.setMaximum(mBoundaryVertexNum);
         progress.setValue(0);
@@ -800,10 +777,10 @@ void ToothSegmentation::boundarySkeletonExtraction(QWidget *parentWidget)
                 continue;
             }
             progress.setValue(boundaryVertexIndex);
-            if(mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) == (iterTimes % 2 == 0 ? DISK_VERTEX_1 : DISK_VERTEX_2))
+            if(mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) == (iterTimes % (mToothNum + 1) + DISK_VERTEX_GINGIVA)) //共(mToothNum + 1)类外围点，每次迭代删除1类点
             {
                 mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter) = false;
-                mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexIter) = (iterTimes % 2 == 0 ? GINGIVA_REGION : TOOTH_REGION);
+                mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexIter) = (iterTimes % (mToothNum + 1) + GINGIVA_REGION);
                 if(iterTimes % 2 == 0) //将新出现的牙龈区域标记为已访问过，而新出现的非牙龈区域则不能，因为不确定是牙齿还是噪声
                 {
                     mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexIter) = true;
@@ -812,6 +789,8 @@ void ToothSegmentation::boundarySkeletonExtraction(QWidget *parentWidget)
             }
             boundaryVertexIndex++;
         }
+
+        iterTimes++;
     }
 
     //边界点分类着色
@@ -822,11 +801,14 @@ void ToothSegmentation::boundarySkeletonExtraction(QWidget *parentWidget)
 
     //关闭进度条
     progress.setValue(mBoundaryVertexNum);
+
+    //测试，将mesh保存到文件
+    saveToothMesh(mToothMesh.MeshName.toStdString() + ".BoundarySkeletonExtraction.off");
 }
 
 void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *classifiedBoundaryVertexNum)
 {
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < 3; i++)
     {
         classifiedBoundaryVertexNum[i] = 0;
     }
@@ -861,27 +843,29 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
             }
         }
 
-        //如果为孤立点，则任意判断其为DISK_VERTEX_1或DISK_VERTEX_2（总之要被剔除）（注意：不能直接将其设置为非边界点，因为在删除边界点之后要更新其所属的非边界区域）
+        //如果为孤立点，则任意判断其为DISK_VERTEX_GINGIVA或DISK_VERTEX_TOOTH（总之要被剔除）（注意：不能直接将其设置为非边界点，因为在删除边界点之后要更新其所属的非边界区域）
         if(neighborBoundaryVertexNum == 0)
         {
-            mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_2;
+            mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_GINGIVA;
+            classifiedBoundaryVertexNum[DISK_VERTEX_GINGIVA]++;
             boundaryVertexIndex++;
             continue;
         }
 
         switch(neighborVertexTypeChangeTimes)
         {
-        case 0: //TODO 如果邻域中只有1个边界点，应该判定为复杂点
+        case 0:
             mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = CENTER_VERTEX;
-            classifiedBoundaryVertexNum[0]++;
+            classifiedBoundaryVertexNum[CENTER_VERTEX]++;
             break;
         case 2:
-            mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_2;
+            mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_GINGIVA;
+            classifiedBoundaryVertexNum[DISK_VERTEX_GINGIVA]++;
             break;
         case 4:
         default:
             mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = COMPLEX_VERTEX;
-            classifiedBoundaryVertexNum[3]++;
+            classifiedBoundaryVertexNum[COMPLEX_VERTEX]++;
             break;
         }
         boundaryVertexIndex++;
@@ -889,6 +873,7 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
 
     //将外围点分成2类
     boundaryVertexIndex = 0;
+    int regionType;
     progress.setLabelText("Classifying boundary vertices(Disk vertices)...");
     progress.setMinimum(0);
     progress.setMaximum(mBoundaryVertexNum);
@@ -900,7 +885,7 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
             continue;
         }
         progress.setValue(boundaryVertexIndex);
-        if(mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) != DISK_VERTEX_2) //跳过非外围点
+        if(mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) != DISK_VERTEX_GINGIVA) //跳过非外围点
         {
             boundaryVertexIndex++;
             continue;
@@ -913,14 +898,13 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
             }
             if(mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexVertexIter) == GINGIVA_REGION)
             {
-                mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_1;
-                classifiedBoundaryVertexNum[1]++;
+                mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_GINGIVA;
                 break;
             }
-            if(mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexVertexIter) == TOOTH_REGION)
+            else
             {
-                mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = DISK_VERTEX_2;
-                classifiedBoundaryVertexNum[2]++;
+                regionType = mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexVertexIter);
+                mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) = regionType - TOOTH_REGION + DISK_VERTEX_TOOTH;
                 break;
             }
         }
@@ -931,7 +915,7 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
 void ToothSegmentation::paintClassifiedBoundary(QProgressDialog &progress)
 {
     int vertexIndex = 0;
-    Mesh::Color colorWhite(1.0, 1.0, 1.0), colorGreen(0.0, 1.0, 0.0), colorBlue(0.0, 0.0, 1.0), colorYellow(1.0, 1.0, 0.0), colorRed(1.0, 0.0, 0.0);
+    Mesh::Color colorWhite(1.0, 1.0, 1.0), colorGreen(0.0, 1.0, 0.0), colorKelly(0.5, 1.0, 0.0), colorOrange(1.0, 0.5, 0.0), colorRed(1.0, 0.0, 0.0);
     progress.setLabelText("Painting classified boundary vertices...");
     progress.setMinimum(0);
     progress.setMaximum(mToothMesh.mVertexNum);
@@ -950,11 +934,11 @@ void ToothSegmentation::paintClassifiedBoundary(QProgressDialog &progress)
             case CENTER_VERTEX:
                 mToothMesh.set_color(*vertexIter, colorGreen);
                 break;
-            case DISK_VERTEX_1:
-                mToothMesh.set_color(*vertexIter, colorBlue);
+            case DISK_VERTEX_GINGIVA:
+                mToothMesh.set_color(*vertexIter, colorKelly);
                 break;
-            case DISK_VERTEX_2:
-                mToothMesh.set_color(*vertexIter, colorYellow);
+            case DISK_VERTEX_TOOTH:
+                mToothMesh.set_color(*vertexIter, colorOrange);
                 break;
             case COMPLEX_VERTEX:
                 mToothMesh.set_color(*vertexIter, colorRed);
@@ -1026,11 +1010,11 @@ void ToothSegmentation::removeBoundaryVertexOnGingiva(QProgressDialog &progress,
     }
 }
 
-void ToothSegmentation::markGingivaRegion(QProgressDialog &progress)
+void ToothSegmentation::markNonBoundaryRegion(QProgressDialog &progress)
 {
     //初始化所有非边界点的NonBoundaryRegionType属性为TOOTH_REGION，RegionGrowingVisited属性为false
     int vertexIndex = 0;
-    progress.setLabelText("Init region type of all nonboundary vertices...");
+    progress.setLabelText("Init NonBoundaryRegionType of all nonboundary vertices...");
     progress.setMinimum(0);
     progress.setMaximum(mToothMesh.mVertexNum);
     progress.setValue(0);
@@ -1042,7 +1026,7 @@ void ToothSegmentation::markGingivaRegion(QProgressDialog &progress)
         vertexIndex++;
     }
 
-    //选择区域生长种子点
+    //选择牙龈区域生长种子点
     Mesh::Point tempVertex;
     Mesh::VertexIter vertexIter;
     float x0, y0, z0; //牙龈分割平面中心点
@@ -1062,11 +1046,32 @@ void ToothSegmentation::markGingivaRegion(QProgressDialog &progress)
         }
     }
 
-    //区域生长
+    //牙龈区域生长
     regionGrowing(*vertexIter, GINGIVA_REGION);
+
+    //去除噪声区域+分别标记牙齿区域
+    mToothNum = 0; //牙齿标号（数量）
+    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    {
+        if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter) || mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexIter))
+        {
+            continue;
+        }
+        int regionVertexNum = regionGrowing(*vertexIter, TEMP_REGION);
+        if(regionVertexNum < mToothMesh.mVertexNum * 0.001) //TODO 这个阈值是臆想的，但是达到了效果
+        {
+            regionGrowing(*vertexIter, GINGIVA_REGION);
+        }
+        else
+        {
+            regionGrowing(*vertexIter, TOOTH_REGION + mToothNum);
+            mToothNum++;
+        }
+    }
+
 }
 
-int ToothSegmentation::regionGrowing(Mesh::VertexHandle seedVertexHandle, mNonBoundaryRegionType regionType)
+int ToothSegmentation::regionGrowing(Mesh::VertexHandle seedVertexHandle, int regionType)
 {
     mToothMesh.property(mVPropHandleNonBoundaryRegionType, seedVertexHandle) = regionType;
     mToothMesh.property(mVPropHandleRegionGrowingVisited, seedVertexHandle) = true;
@@ -1126,6 +1131,7 @@ int ToothSegmentation::regionGrowing(Mesh::VertexHandle seedVertexHandle, mNonBo
 void ToothSegmentation::paintClassifiedNonBoundary(QProgressDialog &progress)
 {
     int vertexIndex = 0;
+    int regionType;
     Mesh::Color colorBlue(0.0, 0.0, 1.0), colorGreen(0.0, 1.0, 0.0), colorWhite(1.0, 1.0, 1.0);
     progress.setLabelText("Painting classified nonboundary regions...");
     progress.setMinimum(0);
@@ -1140,17 +1146,22 @@ void ToothSegmentation::paintClassifiedNonBoundary(QProgressDialog &progress)
         }
         else
         {
-            switch(mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexIter))
+            regionType = mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexIter);
+            switch(regionType)
             {
+            case TEMP_REGION: //正常情况不会有TEMP_REGION
+                mToothMesh.set_color(*vertexIter, colorWhite);
+                break;
             case GINGIVA_REGION:
                 mToothMesh.set_color(*vertexIter, colorBlue);
                 break;
-            case TOOTH_REGION:
-                mToothMesh.set_color(*vertexIter, colorGreen);
-                break;
-            case TEMP_REGION:
             default:
-                mToothMesh.set_color(*vertexIter, colorWhite);
+                float grayValue;
+                Mesh::Color pseudoColor;
+                int toothIndex = regionType - TOOTH_REGION;
+                grayValue = (float)(toothIndex + 1) / (mToothNum + 1); //toothIndex+1是因为灰度为0时得到的伪彩色是蓝色，和牙龈的颜色一样，所以跳过这个颜色；mToothNum+1是因为灰度为1时得到的伪彩色是红色，和边界的颜色一样，所以跳过这个颜色
+                gray2PseudoColor(grayValue, pseudoColor);
+                mToothMesh.set_color(*vertexIter, pseudoColor);
                 break;
             }
         }
@@ -1158,43 +1169,52 @@ void ToothSegmentation::paintClassifiedNonBoundary(QProgressDialog &progress)
     }
 }
 
-void ToothSegmentation::removeNoiseRegion(QProgressDialog &progress)
+void ToothSegmentation::saveToothMesh(string filename)
 {
-    //初始化所有点的RegionGrowingVisited属性（牙龈区域为true，其他为false）
-    int vertexIndex = 0;
-    progress.setLabelText("Init RegionGrowingVisited of all vertices...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
-    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    OpenMesh::IO::Options options;
+    options += OpenMesh::IO::Options::VertexColor;
+    options += OpenMesh::IO::Options::ColorFloat;
+    if(!OpenMesh::IO::write_mesh(mToothMesh, filename, options))
     {
-        progress.setValue(vertexIndex);
-        if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter) && mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexIter) == GINGIVA_REGION)
-        {
-            mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexIter) = true;
-        }
-        else
-        {
-            mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexIter) = false;
-        }
-        vertexIndex++;
+        cerr << "Failed to save tooth mesh to file: " + filename << endl;
+    }
+}
+
+void ToothSegmentation::gray2PseudoColor(float grayValue, Mesh::Color &pseudoColor)
+{
+    //将grayValue规范化到0～1之间
+    if(grayValue < 0.0)
+    {
+        grayValue = 0.0;
+    }
+    if(grayValue > 1.0)
+    {
+        grayValue = 1.0;
     }
 
-    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    if(grayValue < 0.25)
     {
-        if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter) || mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexIter))
-        {
-            continue;
-        }
-        int regionVertexNum = regionGrowing(*vertexIter, TEMP_REGION);
-        if(regionVertexNum < mToothMesh.mVertexNum * 0.001) //TODO 这个阈值是臆想的，但是达到了效果
-        {
-            regionGrowing(*vertexIter, GINGIVA_REGION);
-        }
-        else
-        {
-            regionGrowing(*vertexIter, TOOTH_REGION);
-        }
+        pseudoColor[0] = 0.0;
+        pseudoColor[1] = grayValue * 4.0;
+        pseudoColor[2] = 1.0;
+    }
+    else if(grayValue < 0.5)
+    {
+        pseudoColor[0] = 0.0;
+        pseudoColor[1] = 1.0;
+        pseudoColor[2] = 1.0 - (grayValue - 0.25) * 4.0;
+    }
+    else if(grayValue < 0.75)
+    {
+        pseudoColor[0] = (grayValue - 0.5) * 4.0;
+        pseudoColor[1] = 1.0;
+        pseudoColor[2] = 0.0;
+    }
+    else
+    {
+        pseudoColor[0] = 1.0;
+        pseudoColor[1] = 1.0 - (grayValue - 0.75) * 4.0;
+        pseudoColor[2] = 0.0;
     }
 }
 

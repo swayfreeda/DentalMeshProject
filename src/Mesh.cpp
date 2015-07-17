@@ -143,7 +143,7 @@ void Mesh::draw(int flag)
             }
             else
             {
-                tempColor[0] = 0; tempColor[1] = 0; tempColor[2] = 0;
+                tempColor[0] = 0.0; tempColor[1] = 0.0; tempColor[2] = 0.0;
                 for(Mesh::FaceVertexIter faceVertexIter = this->fv_iter(*fit); faceVertexIter.is_valid(); faceVertexIter++)
                 {
                     tempColor += this->color(faceVertexIter);
