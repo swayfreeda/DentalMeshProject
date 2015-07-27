@@ -5,8 +5,11 @@
 #include<QTextStream>
 #include<QGridLayout>
 #include<QProgressDialog>
+#include <QTime>
 
 #include "ToothSegmentation.h"
+
+using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 SW::MainWindow::MainWindow()
@@ -24,6 +27,8 @@ SW::MainWindow::MainWindow()
     connect(actionToothSegmentationIdentifyPotentialToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationIdentifyPotentialToothBoundary()));
     connect(actionToothSegmentationAutomaticCuttingOfGingiva, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingiva()));
     connect(actionToothSegmentationBoundarySkeletonExtraction, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationBoundarySkeletonExtraction()));
+    connect(actionToothSegmentationFindCuttingPoints, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationFindCuttingPoints()));
+    connect(actionToothSegmentationRefineToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationRefineToothBoundary()));
 
     update();
 }
@@ -82,6 +87,7 @@ void SW::MainWindow::doActionOpen()
         gv->viewAll();
     }
 
+    mToothSegmentation = new ToothSegmentation(this, gv->getMesh(0));
 }
 
 void SW::MainWindow::doActionCloseAll()
@@ -103,50 +109,102 @@ void SW::MainWindow::doActionUnion()
 
 void SW::MainWindow::doActionToothSegmentationIdentifyPotentialToothBoundary()
 {
-    if(gv->getMeshNum() <= 0)
+    if(mToothSegmentation == NULL)
     {
         return;
     }
-    mToothSegmentation.setToothMesh(gv->getMesh(0));
-    mToothSegmentation.identifyPotentialToothBoundary(this);
+
+    QTime time;
+    time.start();
+    mToothSegmentation->identifyPotentialToothBoundary(true);
+    cout << "ToothSegmentationIdentifyPotentialToothBoundary 用时：" << time.elapsed() / 1000 << "s." << endl;
+
     gv->removeAllMeshes();
-    gv->addMesh(mToothSegmentation.getToothMesh());
+    gv->addMesh(mToothSegmentation->getToothMesh());
 
     QMessageBox::information(this, "Info", "Identify potential tooth boundary done!");
 
     gv->updateGL();
     gv->viewAll();
-
-    //测试，将mesh保存到文件
-//    OpenMesh::IO::Options options;
-//    options += OpenMesh::IO::Options::VertexColor;
-//    OpenMesh::IO::write_mesh(mToothSegmentation.getToothMesh(), "data/output.obj", options);
 }
 
 void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingiva()
 {
-    mToothSegmentation.automaticCuttingOfGingiva(this);
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->automaticCuttingOfGingiva(true);
+    cout << "ToothSegmentationAutomaticCuttingOfGingiva 用时：" << time.elapsed() / 1000 << "s." << endl;
+
     gv->removeAllMeshes();
-    gv->addMesh(mToothSegmentation.getToothMesh());
+    gv->addMesh(mToothSegmentation->getToothMesh());
+    gv->addMesh(mToothSegmentation->getExtraMesh());
 
     QMessageBox::information(this, "Info", "Automatic cutting of gingiva done!");
-
-    gv->updateGL();
-    gv->viewAll();
-
-    gv->addMesh(mToothSegmentation.getExtraMesh());
 
     gv->updateGL();
 }
 
 void SW::MainWindow::doActionToothSegmentationBoundarySkeletonExtraction()
 {
-    mToothSegmentation.boundarySkeletonExtraction(this);
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->boundarySkeletonExtraction(true);
+    cout << "ToothSegmentationBoundarySkeletonExtraction 用时：" << time.elapsed() / 1000 << "s." << endl;
+
     gv->removeAllMeshes();
-    gv->addMesh(mToothSegmentation.getToothMesh());
+    gv->addMesh(mToothSegmentation->getToothMesh());
 
     QMessageBox::information(this, "Info", "Boundary skeleton extraction done!");
 
     gv->updateGL();
-    //gv->viewAll();
+}
+
+void SW::MainWindow::doActionToothSegmentationFindCuttingPoints()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->findCuttingPoints(true);
+    cout << "ToothSegmentationFindCuttingPoints 用时：" << time.elapsed() / 1000 << "s." << endl;
+
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation->getToothMesh());
+
+    QMessageBox::information(this, "Info", "Find cutting points done!");
+
+    gv->updateGL();
+}
+
+void SW::MainWindow::doActionToothSegmentationRefineToothBoundary()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->refineToothBoundary(true);
+    cout << "ToothSegmentationRefineToothBoundary 用时：" << time.elapsed() / 1000 << "s." << endl;
+
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation->getToothMesh());
+
+    QMessageBox::information(this, "Info", "Refine tooth boundary done!");
+
+    gv->updateGL();
 }

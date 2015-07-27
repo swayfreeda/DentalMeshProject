@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Fri Jul 17 17:11:45 2015
+** Created: Mon Jul 27 20:24:50 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -86,6 +86,8 @@ public:
     QAction *actionToothSegmentationIdentifyPotentialToothBoundary;
     QAction *actionToothSegmentationAutomaticCuttingOfGingiva;
     QAction *actionToothSegmentationBoundarySkeletonExtraction;
+    QAction *actionToothSegmentationRefineToothBoundary;
+    QAction *actionToothSegmentationFindCuttingPoints;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     SW::GLViewer *gv;
@@ -304,6 +306,10 @@ public:
         actionToothSegmentationAutomaticCuttingOfGingiva->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingiva"));
         actionToothSegmentationBoundarySkeletonExtraction = new QAction(MainWindow);
         actionToothSegmentationBoundarySkeletonExtraction->setObjectName(QString::fromUtf8("actionToothSegmentationBoundarySkeletonExtraction"));
+        actionToothSegmentationRefineToothBoundary = new QAction(MainWindow);
+        actionToothSegmentationRefineToothBoundary->setObjectName(QString::fromUtf8("actionToothSegmentationRefineToothBoundary"));
+        actionToothSegmentationFindCuttingPoints = new QAction(MainWindow);
+        actionToothSegmentationFindCuttingPoints->setObjectName(QString::fromUtf8("actionToothSegmentationFindCuttingPoints"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -365,6 +371,10 @@ public:
         toothSegmentationMenu->addAction(actionToothSegmentationIdentifyPotentialToothBoundary);
         toothSegmentationMenu->addAction(actionToothSegmentationAutomaticCuttingOfGingiva);
         toothSegmentationMenu->addAction(actionToothSegmentationBoundarySkeletonExtraction);
+        toothSegmentationMenu->addSeparator();
+        toothSegmentationMenu->addAction(actionToothSegmentationFindCuttingPoints);
+        toothSegmentationMenu->addSeparator();
+        toothSegmentationMenu->addAction(actionToothSegmentationRefineToothBoundary);
         displayMenu->addAction(actionDisplayVertices);
         displayMenu->addAction(actionDisplayWireFrame);
         displayMenu->addAction(actionDisplayFlatLine);
@@ -498,6 +508,8 @@ public:
         actionToothSegmentationIdentifyPotentialToothBoundary->setText(QApplication::translate("MainWindow", "Identify potential tooth boundary", 0, QApplication::UnicodeUTF8));
         actionToothSegmentationAutomaticCuttingOfGingiva->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva", 0, QApplication::UnicodeUTF8));
         actionToothSegmentationBoundarySkeletonExtraction->setText(QApplication::translate("MainWindow", "Boundary skeleton extraction", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationRefineToothBoundary->setText(QApplication::translate("MainWindow", "Refine tooth boundary", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationFindCuttingPoints->setText(QApplication::translate("MainWindow", "Find cutting points", 0, QApplication::UnicodeUTF8));
         fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0, QApplication::UnicodeUTF8));

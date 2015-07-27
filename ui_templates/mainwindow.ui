@@ -74,6 +74,10 @@ background:rgb(207, 207, 207)
      <addaction name="actionToothSegmentationIdentifyPotentialToothBoundary"/>
      <addaction name="actionToothSegmentationAutomaticCuttingOfGingiva"/>
      <addaction name="actionToothSegmentationBoundarySkeletonExtraction"/>
+     <addaction name="separator"/>
+     <addaction name="actionToothSegmentationFindCuttingPoints"/>
+     <addaction name="separator"/>
+     <addaction name="actionToothSegmentationRefineToothBoundary"/>
     </widget>
     <addaction name="actionLaplacianDeformation"/>
     <addaction name="actionUnion"/>
@@ -624,6 +628,16 @@ background: rgb(95, 95, 95);
   <action name="actionToothSegmentationBoundarySkeletonExtraction">
    <property name="text">
     <string>Boundary skeleton extraction</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationRefineToothBoundary">
+   <property name="text">
+    <string>Refine tooth boundary</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationFindCuttingPoints">
+   <property name="text">
+    <string>Find cutting points</string>
    </property>
   </action>
  </widget>

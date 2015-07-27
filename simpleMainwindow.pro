@@ -36,13 +36,16 @@ INCLUDEPATH += \
     /usr/include/qt4/QtXml/ \
     include/ \
     lib/libigl/include/ \ #libIGL库包含路径
-    lib/eigen/include/ #Eigen库包含路径
+    lib/eigen/include/ \ #Eigen库包含路径
+    /usr/include/pcl-1.7/ #PCL库包含路径
 
 LIBS += \
     -L/usr/X11R6/lib64 -lQtOpenGL -lQtGui -lQtCore \
     -lQGLViewer -lglut -lGL -lGLU \ #libQGLViewer和freeglut库文件
     -lOpenMeshCore -lOpenMeshTools \ #OpenMesh库文件
-    -lgomp -lpthread #为了支持OpenMP并行处理而添加此两项
+    -lgomp -lpthread \ #为了支持OpenMP并行处理而添加此两项
+    -lgsl -lgslcblas \ #GSL库文件
+    -lpcl_kdtree #PCL库文件
 
 FORMS += \
     ui_templates/mainwindow.ui

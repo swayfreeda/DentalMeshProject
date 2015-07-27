@@ -420,12 +420,15 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
     std::string vPropHandleNonBoundaryRegionTypeName = "vprop_non_boundary_region_type";
     OpenMesh::VPropHandleT<bool> vPropHandleRegionGrowingVisited;
     std::string vPropHandleRegionGrowingVisitedName = "vprop_region_growing_visited";
+    OpenMesh::VPropHandleT<int> vPropHandleBoundaryType;
+    std::string vPropHandleBoundaryTypeName = "vprop_boundary_type";
     if(!meshes[0].get_property_handle(vPropHandleCurvature, vPropHandleCurvatureName)
             || !meshes[0].get_property_handle(vPropHandleCurvatureComputed, vPropHandleCurvatureComputedName)
             || !meshes[0].get_property_handle(vPropHandleIsToothBoundary, vPropHandleIsToothBoundaryName)
             || !meshes[0].get_property_handle(vPropHandleBoundaryVertexType, vPropHandleBoundaryVertexTypeName)
             || !meshes[0].get_property_handle(vPropHandleNonBoundaryRegionType, vPropHandleNonBoundaryRegionTypeName)
-            || !meshes[0].get_property_handle(vPropHandleRegionGrowingVisited, vPropHandleRegionGrowingVisitedName))
+            || !meshes[0].get_property_handle(vPropHandleRegionGrowingVisited, vPropHandleRegionGrowingVisitedName)
+            || !meshes[0].get_property_handle(vPropHandleBoundaryType, vPropHandleBoundaryTypeName))
     {
         return;
     }
@@ -484,7 +487,8 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
                                          IsToothBoundary: %6\n \
                                          BoundaryVertexType: %7\n \
                                          NonBoundaryRegionType: %8\n \
-                                         RegionGrowingVisited: %9")
+                                         RegionGrowingVisited: %9\n \
+                                         BoundaryType: %10")
                                          .arg(clickedVertex[0])
                                          .arg(clickedVertex[1])
                                          .arg(clickedVertex[2])
@@ -493,7 +497,8 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
                                          .arg(meshes[0].property(vPropHandleIsToothBoundary, vertexHandle))
                                          .arg(meshes[0].property(vPropHandleBoundaryVertexType, vertexHandle))
                                          .arg(meshes[0].property(vPropHandleNonBoundaryRegionType, vertexHandle))
-                                         .arg(meshes[0].property(vPropHandleRegionGrowingVisited, vertexHandle)));
+                                         .arg(meshes[0].property(vPropHandleRegionGrowingVisited, vertexHandle))
+                                         .arg(meshes[0].property(vPropHandleBoundaryType, vertexHandle)));
     }
 
     QGLViewer::mousePressEvent(e);

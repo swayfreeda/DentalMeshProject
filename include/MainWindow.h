@@ -73,6 +73,8 @@ namespace SW
          void doActionToothSegmentationIdentifyPotentialToothBoundary();
          void doActionToothSegmentationAutomaticCuttingOfGingiva();
          void doActionToothSegmentationBoundarySkeletonExtraction();
+         void doActionToothSegmentationFindCuttingPoints();
+         void doActionToothSegmentationRefineToothBoundary();
 
     public:
          //////////////////////定义窗口部件/////////////////////////////////////
@@ -80,7 +82,7 @@ namespace SW
     signals:
 
     private:
-        ToothSegmentation mToothSegmentation;
+        ToothSegmentation *mToothSegmentation;
 
     };
 
