@@ -10,32 +10,29 @@
 //
 
 
-#include"GLViewer.h"
-#include"ui_mainwindow.h"
-#include"include/Mesh.h"
+#include "GLViewer.h"
+#include "ui_mainwindow.h"
+#include "include/Mesh.h"
 
 #include <QMainWindow>
-#include"qlayout.h"
-//#include"qpopmenu.h"
-#include"qcursor.h"
-#include"qevent.h"
+#include "qlayout.h"
+#include "qcursor.h"
+#include "qevent.h"
+#include <QWidget>
+#include "qnamespace.h"
+#include <QFrame>
+#include <QSlider>
+#include <QCheckBox>
+#include <QAction>
+#include <QActionGroup>
+#include <QToolBar>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QMessageBox>
+#include <QListWidget>
 
-#include<QWidget>
-#include"qnamespace.h"
-#include<QFrame>
-#include<QSlider>
-#include<QCheckBox>
-#include<QAction>
-#include<QActionGroup>
-#include<QToolBar>
-#include<QMenu>
-#include<QMenuBar>
-#include<QStatusBar>
-#include<QMessageBox>
-#include<QListWidget>
-
-
-//#include<opencv2/opencv.hpp>
+#include "ToothSegmentation.h"
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -73,13 +70,19 @@ namespace SW
          void doActionLaplacianDeformation();
          void doActionUnion();
 
-         void doActionSegmentation();
+         void doActionToothSegmentationIdentifyPotentialToothBoundary();
+         void doActionToothSegmentationAutomaticCuttingOfGingiva();
+         void doActionToothSegmentationBoundarySkeletonExtraction();
+         void doActionToothSegmentationFindCuttingPoints();
+         void doActionToothSegmentationRefineToothBoundary();
 
     public:
          //////////////////////定义窗口部件/////////////////////////////////////
 
+    signals:
 
-  signals:
+    private:
+        ToothSegmentation *mToothSegmentation;
 
     };
 

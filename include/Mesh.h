@@ -15,9 +15,14 @@
 
 namespace SW{
 
-class Mesh:public OpenMesh::TriMesh_ArrayKernelT<>
+struct MyTraits : public OpenMesh::DefaultTraits
 {
-  public:
+    typedef OpenMesh::Vec3f Color; //使用浮点颜色值
+};
+
+class Mesh:public OpenMesh::TriMesh_ArrayKernelT<MyTraits>
+{
+public:
     Mesh(QString name);
     Mesh();
 
@@ -26,10 +31,21 @@ class Mesh:public OpenMesh::TriMesh_ArrayKernelT<>
     //计算BoundingBox
     void computeBoundingBox();
 
+    //计算顶点数、面片数、边数
+    void computeEntityNumbers();
+
     // 0--vertices 1-- wireframe 2-- flatLine
     void draw(int flag);
 
+private:
+    //画OpenGL原点
+    void drawOrigin();
+
+    //画BoundingBox
+    void drawBoundingBox();
+
    public:
+    int mVertexNum, mFaceNum, mEdgeNum;
     BoundingBox BBox;
     QString MeshName;
 
