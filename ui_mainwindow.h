@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Mon Jul 27 20:24:50 2015
+** Created: Wed Aug 19 18:02:50 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -88,6 +88,9 @@ public:
     QAction *actionToothSegmentationBoundarySkeletonExtraction;
     QAction *actionToothSegmentationRefineToothBoundary;
     QAction *actionToothSegmentationFindCuttingPoints;
+    QAction *actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane;
+    QAction *actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp;
+    QAction *actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     SW::GLViewer *gv;
@@ -310,6 +313,12 @@ public:
         actionToothSegmentationRefineToothBoundary->setObjectName(QString::fromUtf8("actionToothSegmentationRefineToothBoundary"));
         actionToothSegmentationFindCuttingPoints = new QAction(MainWindow);
         actionToothSegmentationFindCuttingPoints->setObjectName(QString::fromUtf8("actionToothSegmentationFindCuttingPoints"));
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -370,6 +379,9 @@ public:
         editMenu->addAction(toothSegmentationMenu->menuAction());
         toothSegmentationMenu->addAction(actionToothSegmentationIdentifyPotentialToothBoundary);
         toothSegmentationMenu->addAction(actionToothSegmentationAutomaticCuttingOfGingiva);
+        toothSegmentationMenu->addAction(actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane);
+        toothSegmentationMenu->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp);
+        toothSegmentationMenu->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown);
         toothSegmentationMenu->addAction(actionToothSegmentationBoundarySkeletonExtraction);
         toothSegmentationMenu->addSeparator();
         toothSegmentationMenu->addAction(actionToothSegmentationFindCuttingPoints);
@@ -510,6 +522,9 @@ public:
         actionToothSegmentationBoundarySkeletonExtraction->setText(QApplication::translate("MainWindow", "Boundary skeleton extraction", 0, QApplication::UnicodeUTF8));
         actionToothSegmentationRefineToothBoundary->setText(QApplication::translate("MainWindow", "Refine tooth boundary", 0, QApplication::UnicodeUTF8));
         actionToothSegmentationFindCuttingPoints->setText(QApplication::translate("MainWindow", "Find cutting points", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva(flip cutting plane)", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva(move cutting plane up)", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva(move cutting plane down)", 0, QApplication::UnicodeUTF8));
         fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0, QApplication::UnicodeUTF8));

@@ -26,6 +26,9 @@ SW::MainWindow::MainWindow()
 
     connect(actionToothSegmentationIdentifyPotentialToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationIdentifyPotentialToothBoundary()));
     connect(actionToothSegmentationAutomaticCuttingOfGingiva, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingiva()));
+    connect(actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane()));
+    connect(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp()));
+    connect(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown()));
     connect(actionToothSegmentationBoundarySkeletonExtraction, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationBoundarySkeletonExtraction()));
     connect(actionToothSegmentationFindCuttingPoints, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationFindCuttingPoints()));
     connect(actionToothSegmentationRefineToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationRefineToothBoundary()));
@@ -84,8 +87,8 @@ void SW::MainWindow::doActionOpen()
         std::cout << std::endl;*/
 
         gv->addMesh(mesh);
-        gv->viewAll();
     }
+    gv->viewAll();
 
     mToothSegmentation = new ToothSegmentation(this, gv->getMesh(0));
 }
@@ -116,7 +119,7 @@ void SW::MainWindow::doActionToothSegmentationIdentifyPotentialToothBoundary()
 
     QTime time;
     time.start();
-    mToothSegmentation->identifyPotentialToothBoundary(true);
+    mToothSegmentation->identifyPotentialToothBoundary(false);
     cout << "ToothSegmentationIdentifyPotentialToothBoundary 用时：" << time.elapsed() / 1000 << "s." << endl;
 
     gv->removeAllMeshes();
@@ -137,7 +140,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingiva()
 
     QTime time;
     time.start();
-    mToothSegmentation->automaticCuttingOfGingiva(true);
+    mToothSegmentation->automaticCuttingOfGingiva(false, false, -0.2);
     cout << "ToothSegmentationAutomaticCuttingOfGingiva 用时：" << time.elapsed() / 1000 << "s." << endl;
 
     gv->removeAllMeshes();
@@ -145,6 +148,69 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingiva()
     gv->addMesh(mToothSegmentation->getExtraMesh());
 
     QMessageBox::information(this, "Info", "Automatic cutting of gingiva done!");
+
+    gv->updateGL();
+}
+
+void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->automaticCuttingOfGingiva(false, true, 0.0);
+    cout << "ToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane 用时：" << time.elapsed() / 1000 << "s." << endl;
+
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation->getToothMesh());
+    gv->addMesh(mToothSegmentation->getExtraMesh());
+
+    QMessageBox::information(this, "Info", "Automatic cutting of gingiva(flip cutting plane) done!");
+
+    gv->updateGL();
+}
+
+void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->automaticCuttingOfGingiva(false, false, 0.1);
+    cout << "ToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp 用时：" << time.elapsed() / 1000 << "s." << endl;
+
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation->getToothMesh());
+    gv->addMesh(mToothSegmentation->getExtraMesh());
+
+    QMessageBox::information(this, "Info", "Automatic cutting of gingiva(move cutting plane up) done!");
+
+    gv->updateGL();
+}
+
+void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    QTime time;
+    time.start();
+    mToothSegmentation->automaticCuttingOfGingiva(false, false, -0.1);
+    cout << "ToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown 用时：" << time.elapsed() / 1000 << "s." << endl;
+
+    gv->removeAllMeshes();
+    gv->addMesh(mToothSegmentation->getToothMesh());
+    gv->addMesh(mToothSegmentation->getExtraMesh());
+
+    QMessageBox::information(this, "Info", "Automatic cutting of gingiva(move cutting plane down) done!");
 
     gv->updateGL();
 }
@@ -158,7 +224,7 @@ void SW::MainWindow::doActionToothSegmentationBoundarySkeletonExtraction()
 
     QTime time;
     time.start();
-    mToothSegmentation->boundarySkeletonExtraction(true);
+    mToothSegmentation->boundarySkeletonExtraction(false);
     cout << "ToothSegmentationBoundarySkeletonExtraction 用时：" << time.elapsed() / 1000 << "s." << endl;
 
     gv->removeAllMeshes();
@@ -178,7 +244,7 @@ void SW::MainWindow::doActionToothSegmentationFindCuttingPoints()
 
     QTime time;
     time.start();
-    mToothSegmentation->findCuttingPoints(true);
+    mToothSegmentation->findCuttingPoints(false);
     cout << "ToothSegmentationFindCuttingPoints 用时：" << time.elapsed() / 1000 << "s." << endl;
 
     gv->removeAllMeshes();
@@ -198,7 +264,7 @@ void SW::MainWindow::doActionToothSegmentationRefineToothBoundary()
 
     QTime time;
     time.start();
-    mToothSegmentation->refineToothBoundary(true);
+    mToothSegmentation->refineToothBoundary(false);
     cout << "ToothSegmentationRefineToothBoundary 用时：" << time.elapsed() / 1000 << "s." << endl;
 
     gv->removeAllMeshes();

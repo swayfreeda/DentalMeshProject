@@ -62,7 +62,7 @@ public:
 
     int getMeshNum();
 
-    Mesh getMesh(int index);
+    Mesh & getMesh(int index);
 
     void removeAllMeshes();
 
@@ -89,8 +89,7 @@ public slots:
 
 
 signals:
-
-
+    void onMousePressed(QMouseEvent *e);
 
 private:
     static SW::Shader m_shader;

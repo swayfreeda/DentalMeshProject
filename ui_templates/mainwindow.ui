@@ -73,6 +73,9 @@ background:rgb(207, 207, 207)
      </property>
      <addaction name="actionToothSegmentationIdentifyPotentialToothBoundary"/>
      <addaction name="actionToothSegmentationAutomaticCuttingOfGingiva"/>
+     <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"/>
+     <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"/>
+     <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"/>
      <addaction name="actionToothSegmentationBoundarySkeletonExtraction"/>
      <addaction name="separator"/>
      <addaction name="actionToothSegmentationFindCuttingPoints"/>
@@ -638,6 +641,21 @@ background: rgb(95, 95, 95);
   <action name="actionToothSegmentationFindCuttingPoints">
    <property name="text">
     <string>Find cutting points</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane">
+   <property name="text">
+    <string>Automatic cutting of gingiva(flip cutting plane)</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp">
+   <property name="text">
+    <string>Automatic cutting of gingiva(move cutting plane up)</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown">
+   <property name="text">
+    <string>Automatic cutting of gingiva(move cutting plane down)</string>
    </property>
   </action>
  </widget>

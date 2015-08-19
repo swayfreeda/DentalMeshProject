@@ -8,8 +8,9 @@
 using namespace SW;
 using namespace std;
 
-class ToothSegmentation
+class ToothSegmentation : public QObject
 {
+    Q_OBJECT
 
 public:
     enum mBoundaryVertexType
@@ -22,8 +23,9 @@ public:
 
     enum mNonBoundaryRegionType
     {
-        FILL_BOUNDARY_REGION = -1, //需要填充为边界的区域（用来去除噪声区域）
-        TEMP_REGION = 0, //临时区域（用来计算区域内的定点数）
+        ERROR_REGION = -2, //被complex vertex包围的center vertex被归为此类
+        FILL_BOUNDARY_REGION = -1, //需要填充为边界的区域（用来去除噪声区域，最终mesh中不存在此类点）
+        TEMP_REGION = 0, //临时区域（用来计算区域内的定点数，最终mesh中不存在此类点）
         GINGIVA_REGION, //牙龈区域
         TOOTH_REGION //牙齿区域（此为第1颗牙齿区域，后续逐个加1）
     };
@@ -39,10 +41,11 @@ private:
     QWidget *mParentWidget;
 
     Mesh mToothMesh; //牙齿模型网格
+    Mesh mTempToothMesh; //用于保存ToothMesh的临时状态
     Mesh mExtraMesh; //附加信息网格，用来显示牙龈分割平面等附加信息
 
     //Mesh自定义属性
-    OpenMesh::VPropHandleT<double> mVPropHandleCurvature; //顶点处曲率
+    OpenMesh::VPropHandleT<float> mVPropHandleCurvature; //顶点处曲率
     static const string mVPropHandleCurvatureName; //保存带自定义属性的Mesh到文件时需要设置的对应属性的名称
     OpenMesh::VPropHandleT<bool> mVPropHandleCurvatureComputed; //该顶点处曲率是否被正确计算
     static const string mVPropHandleCurvatureComputedName;
@@ -63,6 +66,7 @@ private:
 
     Mesh::Point mGingivaCuttingPlanePoint; //牙龈分割平面点
     Mesh::Normal mGingivaCuttingPlaneNormal; //牙龈分割平面法向量
+    bool mGingivaCuttingPlaneComputed; //牙龈分割平面是否已计算过
 
     int mToothNum; //牙齿颗数
 
@@ -70,6 +74,9 @@ private:
     QVector<Mesh::VertexHandle> mCuttingPointHandles; //cutting point handle
 
     QVector< QVector<Mesh::VertexHandle> > mContourSections; //所有轮廓曲线段（顶点handle索引）
+
+    QVector<Mesh::Point> mToothMeshVertices;
+    QVector<Mesh::VertexHandle> mToothMeshVertexHandles;
 
 public:
     ToothSegmentation(QWidget *parentWidget, const Mesh &toothMesh);
@@ -84,7 +91,7 @@ public:
     void identifyPotentialToothBoundary(bool loadStateFromFile);
 
     //4.2 Automatic cutting of gingiva
-    void automaticCuttingOfGingiva(bool loadStateFromFile);
+    void automaticCuttingOfGingiva(bool loadStateFromFile, bool flipCuttingPlane, float moveCuttingPlaneDistance);
 
     //4.3 Boundary skeleton extraction
     void boundarySkeletonExtraction(bool loadStateFromFile);
@@ -118,7 +125,7 @@ private:
     void curvature2PseudoColor();
 
     //计算曲率最大值和最小值
-    void computeCurvatureMinAndMax(double &curvatureMin, double &curvatureMax);
+    void computeCurvatureMinAndMax(float &curvatureMin, float &curvatureMax);
 
     //对边界区域进行1邻域腐蚀操作
     void corrodeBoundary(QProgressDialog &progress);
@@ -169,13 +176,25 @@ private:
     bool loadState(QProgressDialog &progress, string stateSymbol);
 
     //基于PCL的3维点云K近邻搜索（querys中各点到points的最近距离），TODO 将工程中用到的所有STL转换为QTL
-    QVector< QVector<int> > kNearestNeighbours(QProgressDialog &progress, int Knn, const QVector<Mesh::Point> &querys, const QVector<Mesh::Point> &points);
+    QVector< QVector<int> > kNearestNeighbours(int Knn, const QVector<Mesh::Point> &querys, const QVector<Mesh::Point> &points);
 
     //分类后的边界着色
     void paintClassifiedBoundary(QProgressDialog &progress);
 
     //建立单点轮廓点索引
     void indexContourSectionsVertices(QProgressDialog &progress);
+
+    //获取k邻域内所有顶点，包括中心点（中心点在返回列表的首位）
+    inline void getKRing(const Mesh::VertexHandle &centerVertexHandle, const int k, QVector<Mesh::VertexHandle> &ringVertexHandles);
+
+    //获取k邻域中最外围的顶点，按连接顺序排序
+    inline void getKthRing(const Mesh::VertexHandle &centerVertexHandle, const int k, QVector<Mesh::VertexHandle> &ringVertexHandles);
+
+    //连接边界（k为连接桥梁半长）
+    void connectBoundary(QProgressDialog &progress, const int k);
+
+    //测试，计算曲率直方图
+    void computeCurvatureHistogram(QProgressDialog &progress);
 
     /*//检查mToothMesh中是否存在curvature（顶点处的曲率）属性和curvature_computed（曲率是否被正确计算），如果不存在则报错
     void checkCustomMeshPropertiesExistence();
@@ -185,6 +204,19 @@ private:
 
     //计算两个向量夹角的cot值
     float cot(const Mesh::Point &vector1, const Mesh::Point &vector2) const;*/
+
+    //将屏幕2维坐标转换为模型3维坐标
+    inline Mesh::Point screenCoordinate2Model3DCoordinate(int screenX, int screenY);
+
+    //计算两点之间距离
+    inline float distance(Mesh::Point point1, Mesh::Point point2);
+
+public slots:
+    //鼠标右键点击显示顶点属性信息
+    void mousePressEventShowVertexAttributes(QMouseEvent *e);
+
+    //鼠标右键点击连接初始边界断开处
+    void mousePressEventConnectBoundary(QMouseEvent *e);
 
 };
 

@@ -72,6 +72,9 @@ namespace SW
 
          void doActionToothSegmentationIdentifyPotentialToothBoundary();
          void doActionToothSegmentationAutomaticCuttingOfGingiva();
+         void doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane();
+         void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp();
+         void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown();
          void doActionToothSegmentationBoundarySkeletonExtraction();
          void doActionToothSegmentationFindCuttingPoints();
          void doActionToothSegmentationRefineToothBoundary();
