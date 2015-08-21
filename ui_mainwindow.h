@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Wed Aug 19 18:02:50 2015
+** Created: Fri Aug 21 16:08:46 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -91,6 +91,11 @@ public:
     QAction *actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane;
     QAction *actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp;
     QAction *actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown;
+    QAction *actionToothSegmentationManuallyAddBoundaryVertex;
+    QAction *actionManually_flip_gingiva_cutting_plane;
+    QAction *actionToothSegmentationManuallyDeleteBoundaryVertex;
+    QAction *actionToothSegmentationManuallyShowVertexProperties;
+    QAction *actionToothSegmentationManuallyDeleteErrorToothRegion;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     SW::GLViewer *gv;
@@ -319,6 +324,16 @@ public:
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"));
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown = new QAction(MainWindow);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"));
+        actionToothSegmentationManuallyAddBoundaryVertex = new QAction(MainWindow);
+        actionToothSegmentationManuallyAddBoundaryVertex->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyAddBoundaryVertex"));
+        actionManually_flip_gingiva_cutting_plane = new QAction(MainWindow);
+        actionManually_flip_gingiva_cutting_plane->setObjectName(QString::fromUtf8("actionManually_flip_gingiva_cutting_plane"));
+        actionToothSegmentationManuallyDeleteBoundaryVertex = new QAction(MainWindow);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyDeleteBoundaryVertex"));
+        actionToothSegmentationManuallyShowVertexProperties = new QAction(MainWindow);
+        actionToothSegmentationManuallyShowVertexProperties->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyShowVertexProperties"));
+        actionToothSegmentationManuallyDeleteErrorToothRegion = new QAction(MainWindow);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyDeleteErrorToothRegion"));
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -387,6 +402,11 @@ public:
         toothSegmentationMenu->addAction(actionToothSegmentationFindCuttingPoints);
         toothSegmentationMenu->addSeparator();
         toothSegmentationMenu->addAction(actionToothSegmentationRefineToothBoundary);
+        toothSegmentationMenu->addSeparator();
+        toothSegmentationMenu->addAction(actionToothSegmentationManuallyShowVertexProperties);
+        toothSegmentationMenu->addAction(actionToothSegmentationManuallyAddBoundaryVertex);
+        toothSegmentationMenu->addAction(actionToothSegmentationManuallyDeleteBoundaryVertex);
+        toothSegmentationMenu->addAction(actionToothSegmentationManuallyDeleteErrorToothRegion);
         displayMenu->addAction(actionDisplayVertices);
         displayMenu->addAction(actionDisplayWireFrame);
         displayMenu->addAction(actionDisplayFlatLine);
@@ -525,6 +545,11 @@ public:
         actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva(flip cutting plane)", 0, QApplication::UnicodeUTF8));
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva(move cutting plane up)", 0, QApplication::UnicodeUTF8));
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva(move cutting plane down)", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationManuallyAddBoundaryVertex->setText(QApplication::translate("MainWindow", "Manually add boundary vertex", 0, QApplication::UnicodeUTF8));
+        actionManually_flip_gingiva_cutting_plane->setText(QApplication::translate("MainWindow", "Manually flip gingiva cutting plane", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setText(QApplication::translate("MainWindow", "Manually delete boundary vertex", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationManuallyShowVertexProperties->setText(QApplication::translate("MainWindow", "Manually show vertex properties", 0, QApplication::UnicodeUTF8));
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setText(QApplication::translate("MainWindow", "Manually delete error tooth region", 0, QApplication::UnicodeUTF8));
         fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
         editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
         toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0, QApplication::UnicodeUTF8));

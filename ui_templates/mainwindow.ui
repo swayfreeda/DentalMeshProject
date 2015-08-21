@@ -81,6 +81,11 @@ background:rgb(207, 207, 207)
      <addaction name="actionToothSegmentationFindCuttingPoints"/>
      <addaction name="separator"/>
      <addaction name="actionToothSegmentationRefineToothBoundary"/>
+     <addaction name="separator"/>
+     <addaction name="actionToothSegmentationManuallyShowVertexProperties"/>
+     <addaction name="actionToothSegmentationManuallyAddBoundaryVertex"/>
+     <addaction name="actionToothSegmentationManuallyDeleteBoundaryVertex"/>
+     <addaction name="actionToothSegmentationManuallyDeleteErrorToothRegion"/>
     </widget>
     <addaction name="actionLaplacianDeformation"/>
     <addaction name="actionUnion"/>
@@ -656,6 +661,31 @@ background: rgb(95, 95, 95);
   <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown">
    <property name="text">
     <string>Automatic cutting of gingiva(move cutting plane down)</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyAddBoundaryVertex">
+   <property name="text">
+    <string>Manually add boundary vertex</string>
+   </property>
+  </action>
+  <action name="actionManually_flip_gingiva_cutting_plane">
+   <property name="text">
+    <string>Manually flip gingiva cutting plane</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyDeleteBoundaryVertex">
+   <property name="text">
+    <string>Manually delete boundary vertex</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyShowVertexProperties">
+   <property name="text">
+    <string>Manually show vertex properties</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyDeleteErrorToothRegion">
+   <property name="text">
+    <string>Manually delete error tooth region</string>
    </property>
   </action>
  </widget>

@@ -42,12 +42,17 @@ const string ToothSegmentation::mVPropHandleSearchContourSectionVisitedName = "v
 ToothSegmentation::ToothSegmentation(QWidget *parentWidget, const Mesh &toothMesh)
 {
     mParentWidget = parentWidget;
+    mProgress = new QProgressDialog(mParentWidget);
+    //mProgress->setWindowTitle("");
+    mProgress->setMinimumSize(400, 120);
+    mProgress->setCancelButtonText("cancel");
+    mProgress->setMinimumDuration(0);
+    mProgress->setWindowModality(Qt::WindowModal);
+    mProgress->setAutoClose(false);
+
     setToothMesh(toothMesh);
 
     mGingivaCuttingPlaneComputed = false;
-
-    //设置鼠标响应
-    connect(((MainWindow*)mParentWidget)->gv, SIGNAL(onMousePressed(QMouseEvent*)), this, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
 }
 
 void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
@@ -95,15 +100,9 @@ void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
     }
 
     //将所有顶点涂白
-//    QProgressDialog progress(mParentWidget);
-//    progress.setWindowTitle("Setup tooth mesh...");
-//    progress.setMinimumSize(400, 120);
-//    progress.setCancelButtonText("cancel");
-//    progress.setMinimumDuration(0);
-//    progress.setWindowModality(Qt::WindowModal);
-//    progress.setAutoClose(false);
-//    paintAllVerticesWhite(progress);
-//    progress.close();
+//    mProgress->setWindowTitle("Setup tooth mesh...");
+//    paintAllVerticesWhite();
+//    mProgress->close();
 
     //建立mesh顶点的线性索引
     mToothMeshVertices.clear();
@@ -127,24 +126,18 @@ Mesh ToothSegmentation::getExtraMesh() const
 
 void ToothSegmentation::identifyPotentialToothBoundary(bool loadStateFromFile)
 {
-    QProgressDialog progress(mParentWidget);
-    progress.setWindowTitle("Identify potential tooth boundary...");
-    progress.setMinimumSize(400, 120);
-    progress.setCancelButtonText("cancel");
-    progress.setMinimumDuration(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setAutoClose(false);
+    mProgress->setWindowTitle("Identify potential tooth boundary...");
 
     //如果存在之前保存的状态，则读取之
-    if(loadStateFromFile && loadState(progress, "IdentifyPotentialToothBoundary"))
+    if(loadStateFromFile && loadState("IdentifyPotentialToothBoundary"))
     {
         return;
     }
 
-    identifyPotentialToothBoundary(progress);
+    identifyPotentialToothBoundary();
 
-    paintAllVerticesWhite(progress);
-    paintBoundaryVertices(progress);
+    paintAllVerticesWhite();
+    paintBoundaryVertices();
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".IdentifyPotentialToothBoundary.off");
 
     //测试，将曲率值转换成伪彩色显示在模型上
@@ -154,20 +147,20 @@ void ToothSegmentation::identifyPotentialToothBoundary(bool loadStateFromFile)
     //保存当前状态（节省调试时间）
     if(loadStateFromFile)
     {
-        saveState(progress, "IdentifyPotentialToothBoundary");
+        saveState("IdentifyPotentialToothBoundary");
     }
 
     //关闭进度条
-    progress.close();
+    mProgress->close();
 }
 
-void ToothSegmentation::identifyPotentialToothBoundary(QProgressDialog &progress)
+void ToothSegmentation::identifyPotentialToothBoundary()
 {
     //计算顶点处曲率
-    computeCurvature(progress);
+    computeCurvature();
 
     //测试，计算曲率直方图，去掉两侧奇异点
-    computeCurvatureHistogram(progress);
+    computeCurvatureHistogram();
 
     //根据曲率阈值判断初始边界点
     float curvatureMin, curvatureMax;
@@ -177,13 +170,13 @@ void ToothSegmentation::identifyPotentialToothBoundary(QProgressDialog &progress
     float curvatureThreshold = curvatureMin * 0.02; //TODO 经肉眼观察，对于模型36293X_Zhenkan_070404.obj，0.01这个值最合适。
     mBoundaryVertexNum = 0;
     int vertexIndex = 0;
-    progress.setLabelText("Finding boundary by curvature...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Finding boundary by curvature...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         if(!mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter)) //跳过未被正确计算出曲率的顶点
         {
             mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter) = false;
@@ -214,13 +207,13 @@ void ToothSegmentation::identifyPotentialToothBoundary(QProgressDialog &progress
     int neighborNumMax = k * k * 20;
     float *ringCurvatures = new float[neighborNumMax]; //预分配足够的内存
     float ringCurvaturesVariance;
-    progress.setLabelText("Finding boundary by curvature...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Finding boundary by curvature...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
 
         if(!mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter)) //跳过未被正确计算出曲率的顶点
         {
@@ -252,23 +245,23 @@ void ToothSegmentation::identifyPotentialToothBoundary(QProgressDialog &progress
     delete[] ringCurvatures;*/
 
     //连接断开处
-    //connectBoundary(progress, 3);
+    //connectBoundary(3);
 
     //测试，显示边界点数目
     //QMessageBox::information(mParentWidget, "Info", QString("Boundary vertices: %1\nAll vertices: %2").arg(mBoundaryVertexNum).arg(mToothMesh.mVertexNum));
 
     //形态学操作
-    dilateBoundary(progress);
-    //dilateBoundary(progress);
-    //dilateBoundary(progress);
-    //corrodeBoundary(progress);
-    //corrodeBoundary(progress);
+    dilateBoundary();
+    //dilateBoundary();
+    //dilateBoundary();
+    //corrodeBoundary();
+    //corrodeBoundary();
 
     //测试，显示形态学操作后边界点数目
     //QMessageBox::information(mParentWidget, "Info", QString("Boundary vertices: %1\nAll vertices: %2").arg(mBoundaryVertexNum).arg(mToothMesh.mVertexNum));
 }
 
-void ToothSegmentation::computeCurvature(QProgressDialog &progress)
+void ToothSegmentation::computeCurvature()
 {
     QTime time;
     time.start();
@@ -278,7 +271,7 @@ void ToothSegmentation::computeCurvature(QProgressDialog &progress)
 
     //计算平均曲率
     CurvatureComputer curvatureComputer(mToothMesh);
-    curvatureComputer.computeCurvature(progress);
+    curvatureComputer.computeCurvature(mProgress);
     curvatureComputer.getResult(curvature, curvatureComputed);
 
     cout << "Time elapsed " << time.elapsed() / 1000 << "s. " << "计算平均曲率" << " ended." << endl;
@@ -299,13 +292,13 @@ void ToothSegmentation::computeCurvature(QProgressDialog &progress)
 
     //将计算得到的曲率信息写入到Mesh
     vertexIndex = 0;
-    progress.setLabelText("Adding curvature to mesh...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Adding curvature to mesh...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter) = curvatureComputed[vertexIndex];
         mToothMesh.property(mVPropHandleCurvature, *vertexIter) = curvature[vertexIndex]; //可通过curvature_computed判断该顶点处曲率是否已被正确计算
         vertexIndex++;
@@ -365,22 +358,22 @@ void ToothSegmentation::computeCurvatureMinAndMax(float &curvatureMin, float &cu
     }
 }
 
-void ToothSegmentation::corrodeBoundary(QProgressDialog &progress)
+void ToothSegmentation::corrodeBoundary()
 {
     int neighborNotBoundaryVertexNum; //邻域中非边界点的个数
     int boundaryVertexIndex = 0;
     bool *boundaryVertexEliminated = new bool[mBoundaryVertexNum]; //标记对应边界点是否应被剔除
-    progress.setLabelText("Corroding boundary...");
-    progress.setMinimum(0);
-    progress.setMaximum(mBoundaryVertexNum * 2);
-    progress.setValue(0);
+    mProgress->setLabelText("Corroding boundary...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mBoundaryVertexNum * 2);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点（包括未被正确计算出曲率的点，因为在上一步根据曲率阈值确定初始边界的过程中，未被正确计算出曲率的点全部被标记为非初始边界点）
         {
             continue;
         }
-        progress.setValue(boundaryVertexIndex);
+        mProgress->setValue(boundaryVertexIndex);
         //计算邻域中非边界点的个数
         neighborNotBoundaryVertexNum = 0;
         for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(*vertexIter); vertexVertexIter.is_valid(); vertexVertexIter++)
@@ -401,7 +394,7 @@ void ToothSegmentation::corrodeBoundary(QProgressDialog &progress)
         {
             continue;
         }
-        progress.setValue(mBoundaryVertexNum + boundaryVertexIndex);
+        mProgress->setValue(mBoundaryVertexNum + boundaryVertexIndex);
         //剔除被标记为应删除的边界点
         if(boundaryVertexEliminated[boundaryVertexIndex])
         {
@@ -413,22 +406,22 @@ void ToothSegmentation::corrodeBoundary(QProgressDialog &progress)
     delete []boundaryVertexEliminated;
 }
 
-void ToothSegmentation::dilateBoundary(QProgressDialog &progress)
+void ToothSegmentation::dilateBoundary()
 {
     int neighborBoundaryVertexNum; //邻域中边界点的个数
     int notBoundaryVertexIndex = 0;
     bool *boundaryVertexAdded = new bool[mToothMesh.mVertexNum - mBoundaryVertexNum]; //标记对应非边界点是否应被添加为边界点
-    progress.setLabelText("Dilating boundary...");
-    progress.setMinimum(0);
-    progress.setMaximum((mToothMesh.mVertexNum - mBoundaryVertexNum) * 2);
-    progress.setValue(0);
+    mProgress->setLabelText("Dilating boundary...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum((mToothMesh.mVertexNum - mBoundaryVertexNum) * 2);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过初始边界点
         {
             continue;
         }
-        progress.setValue(notBoundaryVertexIndex);
+        mProgress->setValue(notBoundaryVertexIndex);
         //计算邻域中边界点的个数
         neighborBoundaryVertexNum = 0;
         for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(*vertexIter); vertexVertexIter.is_valid(); vertexVertexIter++)
@@ -449,7 +442,7 @@ void ToothSegmentation::dilateBoundary(QProgressDialog &progress)
         {
             continue;
         }
-        progress.setValue((mToothMesh.mVertexNum - mBoundaryVertexNum) + notBoundaryVertexIndex);
+        mProgress->setValue((mToothMesh.mVertexNum - mBoundaryVertexNum) + notBoundaryVertexIndex);
         //添加被标记为应添加的非边界点
         if(boundaryVertexAdded[notBoundaryVertexIndex])
         {
@@ -461,17 +454,17 @@ void ToothSegmentation::dilateBoundary(QProgressDialog &progress)
     delete []boundaryVertexAdded;
 }
 
-void ToothSegmentation::paintBoundaryVertices(QProgressDialog &progress)
+void ToothSegmentation::paintBoundaryVertices()
 {
     int vertexIndex = 0;
     Mesh::Color colorRed(1.0, 0.0, 0.0), colorWhite(1.0, 1.0, 1.0);
-    progress.setLabelText("Painting boundary vertices...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Painting boundary vertices...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter))
         {
             mToothMesh.set_color(*vertexIter, colorRed);
@@ -486,16 +479,10 @@ void ToothSegmentation::paintBoundaryVertices(QProgressDialog &progress)
 
 void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool flipCuttingPlane, float moveCuttingPlaneDistance)
 {
-    QProgressDialog progress(mParentWidget);
-    progress.setWindowTitle("Automatic cutting Of gingiva...");
-    progress.setMinimumSize(400, 120);
-    progress.setCancelButtonText("cancel");
-    progress.setMinimumDuration(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setAutoClose(false);
+    mProgress->setWindowTitle("Automatic cutting Of gingiva...");
 
     //如果存在之前保存的状态，则读取之
-    if(loadStateFromFile && loadState(progress, "AutomaticCuttingOfGingiva"))
+    if(loadStateFromFile && loadState("AutomaticCuttingOfGingiva"))
     {
         return;
     }
@@ -503,12 +490,8 @@ void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool f
     if(!mGingivaCuttingPlaneComputed)
     {
         mTempToothMesh = mToothMesh;
-        automaticCuttingOfGingiva(progress);
+        automaticCuttingOfGingiva();
         mGingivaCuttingPlaneComputed = true;
-
-        //设置鼠标响应
-        disconnect(((MainWindow*)mParentWidget)->gv, SIGNAL(onMousePressed(QMouseEvent*)), this, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
-        connect(((MainWindow*)mParentWidget)->gv, SIGNAL(onMousePressed(QMouseEvent*)), this, SLOT(mousePressEventConnectBoundary(QMouseEvent*)));
     }
     else
     {
@@ -534,13 +517,13 @@ void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool f
     mGingivaCuttingPlanePoint += mGingivaCuttingPlaneNormal * boundingBoxMinEdgeLength * moveCuttingPlaneDistance;
 
     //剔除牙龈上的初始边界点
-    removeBoundaryVertexOnGingiva(progress);
+    removeBoundaryVertexOnGingiva();
 
     //标记非边界区域
-    markNonBoundaryRegion(progress);
+    markNonBoundaryRegion();
 
-    paintClassifiedNonBoundaryRegions(progress);
-    paintBoundaryVertices(progress);
+    paintClassifiedNonBoundaryRegions();
+    paintBoundaryVertices();
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".AutomaticCuttingOfGingiva.off");
 
     //创建牙龈分割平面mesh
@@ -561,14 +544,14 @@ void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool f
     //保存当前状态
     if(loadStateFromFile)
     {
-        saveState(progress, "AutomaticCuttingOfGingiva");
+        saveState("AutomaticCuttingOfGingiva");
     }
 
     //关闭进度条
-    progress.close();
+    mProgress->close();
 }
 
-void ToothSegmentation::automaticCuttingOfGingiva(QProgressDialog &progress)
+void ToothSegmentation::automaticCuttingOfGingiva()
 {
     //计算初始边界点质心
     mGingivaCuttingPlanePoint = Mesh::Point(0.0, 0.0, 0.0); //质心点
@@ -637,25 +620,15 @@ void ToothSegmentation::automaticCuttingOfGingiva(QProgressDialog &progress)
 
 void ToothSegmentation::boundarySkeletonExtraction(bool loadStateFromFile)
 {
-    //设置鼠标响应
-    disconnect(((MainWindow*)mParentWidget)->gv, SIGNAL(onMousePressed(QMouseEvent*)), this, SLOT(mousePressEventConnectBoundary(QMouseEvent*)));
-    connect(((MainWindow*)mParentWidget)->gv, SIGNAL(onMousePressed(QMouseEvent*)), this, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
-
-    QProgressDialog progress(mParentWidget);
-    progress.setWindowTitle("Boundary skeleton extraction...");
-    progress.setMinimumSize(400, 120);
-    progress.setCancelButtonText("cancel");
-    progress.setMinimumDuration(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setAutoClose(false);
+    mProgress->setWindowTitle("Boundary skeleton extraction...");
 
     //如果存在之前保存的状态，则读取之
-    if(loadStateFromFile && loadState(progress, "BoundarySkeletonExtraction"))
+    if(loadStateFromFile && loadState("BoundarySkeletonExtraction"))
     {
         return;
     }
 
-    boundarySkeletonExtraction(progress);
+    boundarySkeletonExtraction();
 
     //测试，将迭代后剩下的非单点宽度边界点（由于算法bug导致）保存到文件
     /*mExtraMesh = Mesh();
@@ -680,21 +653,21 @@ void ToothSegmentation::boundarySkeletonExtraction(bool loadStateFromFile)
     }
     saveExtraMesh(mToothMesh.MeshName.toStdString() + ".BoundarySkeletonExtraction.Extra.ErrorVertices.off");*/
 
-    paintClassifiedBoundaryVertices(progress);
-    paintClassifiedNonBoundaryRegions(progress);
+    paintClassifiedBoundaryVertices();
+    paintClassifiedNonBoundaryRegions();
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".BoundarySkeletonExtraction.off");
 
     //保存当前状态
     if(loadStateFromFile)
     {
-        saveState(progress, "BoundarySkeletonExtraction");
+        saveState("BoundarySkeletonExtraction");
     }
 
     //关闭进度条
-    progress.close();
+    mProgress->close();
 }
 
-void ToothSegmentation::boundarySkeletonExtraction(QProgressDialog &progress)
+void ToothSegmentation::boundarySkeletonExtraction()
 {
     //逐步删除某一类外围点
     int *classifiedBoundaryVertexNum = new int[mToothNum + DISK_VERTEX_TOOTH];
@@ -702,11 +675,11 @@ void ToothSegmentation::boundarySkeletonExtraction(QProgressDialog &progress)
     bool deleteIterationFinished = false;
 
     //边界点分类
-    classifyBoundaryVertex(progress, classifiedBoundaryVertexNum);
+    classifyBoundaryVertex(classifiedBoundaryVertexNum);
 
     //测试，保存中间结果
-//    paintAllVerticesWhite(progress);
-//    paintClassifiedBoundaryVertices(progress);
+//    paintAllVerticesWhite();
+//    paintClassifiedBoundaryVertices();
 //    saveToothMesh(mToothMesh.MeshName.toStdString() + ".BoundarySkeletonExtraction.temp.off");
 
     int diskVertexTypeIndex, diskVertexTypeIndex2;
@@ -720,10 +693,10 @@ void ToothSegmentation::boundarySkeletonExtraction(QProgressDialog &progress)
     int centerVertexNum;
     int diskVertexNum;
 
-    progress.setLabelText("Deleting disk vertices...");
-    progress.setMinimum(0);
-    progress.setMaximum(startCenterAndDiskVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Deleting disk vertices...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(startCenterAndDiskVertexNum);
+    mProgress->setValue(0);
     while(true)
     {
         for(diskVertexTypeIndex = 0; diskVertexTypeIndex < mToothNum + 1; diskVertexTypeIndex++)
@@ -746,11 +719,11 @@ void ToothSegmentation::boundarySkeletonExtraction(QProgressDialog &progress)
                     }
                 }
 
-                classifyBoundaryVertex(progress, classifiedBoundaryVertexNum);
+                classifyBoundaryVertex(classifiedBoundaryVertexNum);
 
                 //测试，保存中间结果
-//                paintAllVerticesWhite(progress);
-//                paintClassifiedBoundaryVertices(progress);
+//                paintAllVerticesWhite();
+//                paintClassifiedBoundaryVertices();
 //                stringstream ss;
 //                ss << deleteIterTimes;
 //                string s = ss.str();
@@ -767,8 +740,8 @@ void ToothSegmentation::boundarySkeletonExtraction(QProgressDialog &progress)
                 centerAndDiskVertexNum = centerVertexNum + diskVertexNum;
 
                 deleteIterTimes++;
-                progress.setLabelText(QString("Deleting disk vertices...\nNo.%1 iteration.\n%2 center vertices left;\n%3 disk vertices left.").arg(deleteIterTimes).arg(centerVertexNum).arg(diskVertexNum));
-                progress.setValue(startCenterAndDiskVertexNum - centerAndDiskVertexNum);
+                mProgress->setLabelText(QString("Deleting disk vertices...\nNo.%1 iteration.\n%2 center vertices left;\n%3 disk vertices left.").arg(deleteIterTimes).arg(centerVertexNum).arg(diskVertexNum));
+                mProgress->setValue(startCenterAndDiskVertexNum - centerAndDiskVertexNum);
 
                 //判断迭代结束条件
                 if(centerAndDiskVertexNum == 0)
@@ -807,7 +780,7 @@ void ToothSegmentation::boundarySkeletonExtraction(QProgressDialog &progress)
     }
 }
 
-void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *classifiedBoundaryVertexNum)
+void ToothSegmentation::classifyBoundaryVertex(int *classifiedBoundaryVertexNum)
 {
     for(int i = 0; i < mToothNum + DISK_VERTEX_TOOTH; i++)
     {
@@ -818,17 +791,17 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
     int neighborBoundaryVertexNum; //某边界点邻域中边界点数量
     Mesh::VertexVertexIter tempVvIterBegin; //由于在遍历邻域顶点时需要使用2个迭代器，因此保存初始邻域点
     int boundaryVertexIndex = 0;
-//    progress.setLabelText("Classifying boundary vertices...");
-//    progress.setMinimum(0);
-//    progress.setMaximum(mBoundaryVertexNum);
-//    progress.setValue(0);
+//    mProgress->setLabelText("Classifying boundary vertices...");
+//    mProgress->setMinimum(0);
+//    mProgress->setMaximum(mBoundaryVertexNum);
+//    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
         {
             continue;
         }
-//        progress.setValue(boundaryVertexIndex);
+//        mProgress->setValue(boundaryVertexIndex);
 
         if(mToothMesh.is_boundary(*vertexIter)) //跳过模型边界点（后面单独处理）
         {
@@ -885,10 +858,10 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
     boundaryVertexIndex = 0;
     int regionType;
     int vertexType;
-//    progress.setLabelText("Classifying boundary vertices(Disk vertices)...");
-//    progress.setMinimum(0);
-//    progress.setMaximum(mBoundaryVertexNum);
-//    progress.setValue(0);
+//    mProgress->setLabelText("Classifying boundary vertices(Disk vertices)...");
+//    mProgress->setMinimum(0);
+//    mProgress->setMaximum(mBoundaryVertexNum);
+//    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
@@ -899,7 +872,7 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
         {
             continue;
         }
-//        progress.setValue(boundaryVertexIndex);
+//        mProgress->setValue(boundaryVertexIndex);
         if(mToothMesh.property(mVPropHandleBoundaryVertexType, *vertexIter) != DISK_VERTEX_GINGIVA) //跳过非外围点
         {
             boundaryVertexIndex++;
@@ -1033,17 +1006,17 @@ void ToothSegmentation::classifyBoundaryVertex(QProgressDialog &progress, int *c
     }
 }
 
-void ToothSegmentation::paintClassifiedBoundaryVertices(QProgressDialog &progress)
+void ToothSegmentation::paintClassifiedBoundaryVertices()
 {
     int vertexIndex = 0;
     Mesh::Color colorWhite(1.0, 1.0, 1.0), colorGreen(0.0, 1.0, 0.0), colorKelly(0.5, 1.0, 0.0), colorOrange(1.0, 0.5, 0.0), colorRed(1.0, 0.0, 0.0);
-    progress.setLabelText("Painting classified boundary vertices...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Painting classified boundary vertices...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
         {
             //mToothMesh.set_color(*vertexIter, colorWhite);
@@ -1071,7 +1044,7 @@ void ToothSegmentation::paintClassifiedBoundaryVertices(QProgressDialog &progres
     }
 }
 
-void ToothSegmentation::removeBoundaryVertexOnGingiva(QProgressDialog &progress)
+void ToothSegmentation::removeBoundaryVertexOnGingiva()
 {
     float x0, y0, z0; //牙龈分割平面中心点
     x0 = mGingivaCuttingPlanePoint[0];
@@ -1084,17 +1057,17 @@ void ToothSegmentation::removeBoundaryVertexOnGingiva(QProgressDialog &progress)
 
     int boundaryVertexIndex = 0;
     Mesh::Point tempBoundaryVertex;
-    progress.setLabelText("Removing boundary vertices on gingiva...");
-    progress.setMinimum(0);
-    progress.setMaximum(mBoundaryVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Removing boundary vertices on gingiva...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mBoundaryVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非初始边界点
         {
             continue;
         }
-        progress.setValue(boundaryVertexIndex);
+        mProgress->setValue(boundaryVertexIndex);
         tempBoundaryVertex = mToothMesh.point(*vertexIter);
         //如果该初始边界点位于牙龈分割平面的上方（牙龈方向），则剔除此边界点
         if(x1 * (tempBoundaryVertex[0] - x0) + y1 * (tempBoundaryVertex[1] - y0) + z1 * (tempBoundaryVertex[2] - z0) < 0)
@@ -1106,17 +1079,17 @@ void ToothSegmentation::removeBoundaryVertexOnGingiva(QProgressDialog &progress)
     }
 }
 
-void ToothSegmentation::markNonBoundaryRegion(QProgressDialog &progress)
+void ToothSegmentation::markNonBoundaryRegion()
 {
     //初始化所有非边界点的NonBoundaryRegionType属性为TOOTH_REGION，RegionGrowingVisited属性为false
     int vertexIndex = 0;
-    progress.setLabelText("Init marking region...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Init marking region...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexIter) = TOOTH_REGION;
         mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexIter) = false;
         vertexIndex++;
@@ -1197,7 +1170,17 @@ int ToothSegmentation::regionGrowing(Mesh::VertexHandle seedVertexHandle, int re
             }
             if(mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexVertexIter))
             {
-                continue;
+                if(regionType == TEMP_REGION)
+                {
+                    if(mToothMesh.property(mVPropHandleNonBoundaryRegionType, *vertexVertexIter) == regionType)
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    continue;
+                }
             }
             mToothMesh.property(mVPropHandleRegionGrowingVisited, *vertexVertexIter) = true;
             if(regionType == FILL_BOUNDARY_REGION) //如果regionType为FILL_BOUNDARY_REGION，则将此区域填充为边界
@@ -1241,18 +1224,18 @@ int ToothSegmentation::regionGrowing(Mesh::VertexHandle seedVertexHandle, int re
     return regionVertexNum;
 }
 
-void ToothSegmentation::paintClassifiedNonBoundaryRegions(QProgressDialog &progress)
+void ToothSegmentation::paintClassifiedNonBoundaryRegions()
 {
     int vertexIndex = 0;
     int regionType;
     Mesh::Color colorBlue(0.0, 0.0, 1.0), colorGreen(0.0, 1.0, 0.0), colorWhite(1.0, 1.0, 1.0);
-    progress.setLabelText("Painting classified nonboundary regions...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Painting classified nonboundary regions...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter))
         {
             //mToothMesh.set_color(*vertexIter, colorGreen);
@@ -1348,27 +1331,21 @@ void ToothSegmentation::gray2PseudoColor(float grayValue, Mesh::Color &pseudoCol
 
 void ToothSegmentation::refineToothBoundary(bool loadStateFromFile)
 {
-    QProgressDialog progress(mParentWidget);
-    progress.setWindowTitle("Refine tooth boundary...");
-    progress.setMinimumSize(400, 120);
-    progress.setCancelButtonText("cancel");
-    progress.setMinimumDuration(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setAutoClose(false);
+    mProgress->setWindowTitle("Refine tooth boundary...");
 
-    refineToothBoundary(progress);
+    refineToothBoundary();
 
-    paintAllVerticesWhite(progress);
-    paintClassifiedBoundary(progress);
+    paintAllVerticesWhite();
+    paintClassifiedBoundary();
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.off");
-    paintClassifiedNonBoundaryRegions(progress);
+    paintClassifiedNonBoundaryRegions();
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.WithRegionGrowing.off");
 
     //关闭进度条
-    progress.close();
+    mProgress->close();
 }
 
-void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
+void ToothSegmentation::refineToothBoundary()
 {
     /*//分别处理每个牙齿的轮廓（改成了对由cutting point分成的每段轮廓分别进行插值）
     for(int toothIndex = 0; toothIndex < mToothNum; toothIndex++)
@@ -1890,7 +1867,7 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
 
         //利用K近邻搜索获取mesh上距离插值轮廓最近的顶点集合
         int knn = 4; //对于插值轮廓上的每一个点，在mesh上寻找前k个与其最近的顶点
-        QVector< QVector<int> > searchResult = kNearestNeighbours(progress, knn, contourInterpPoints, mToothMeshVertices);
+        QVector< QVector<int> > searchResult = kNearestNeighbours(knn, contourInterpPoints, mToothMeshVertices);
         QVector<Mesh::VertexHandle> interpContour; //插值后映射回mesh的轮廓点集
         for(contourInterpPointIndex = 0; contourInterpPointIndex < contourInterpPointNum; contourInterpPointIndex++)
         {
@@ -1920,7 +1897,7 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
         saveExtraMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.Extra.Tooth" + toothIndexString + "InterpContour.off");
 
         //测试，保存显示该牙齿轮廓（插值后）的牙齿模型
-        paintAllVerticesWhite(progress);
+        paintAllVerticesWhite();
         for(interpContourVertexIndex = 0; interpContourVertexIndex < interpContour.size(); interpContourVertexIndex++)
         {
             mToothMesh.set_color(interpContour.at(interpContourVertexIndex), colorRed);
@@ -1933,19 +1910,19 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
     }*/
 
     //寻找所有轮廓曲线段（两个cutting point之间的轮廓线）
-    indexContourSectionsVertices(progress);
+    indexContourSectionsVertices();
 
     Mesh::Color colorRed(1.0, 0.0, 0.0);
 
     //分别处理每一个contour section，选取控制点、插值、找近邻区域、细化
     int contourSectionIndex;
-    progress.setLabelText("Interpolating all contour sections...");
-    progress.setMinimum(0);
-    progress.setMaximum(mContourSections.size());
-    progress.setValue(0);
+    mProgress->setLabelText("Interpolating all contour sections...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mContourSections.size());
+    mProgress->setValue(0);
     for(contourSectionIndex = 0; contourSectionIndex < mContourSections.size(); contourSectionIndex++)
     {
-        progress.setValue(contourSectionIndex);
+        mProgress->setValue(contourSectionIndex);
 
         //选取插值控制点
         QVector<Mesh::VertexHandle> contourControlVertices; //控制点集
@@ -2087,7 +2064,7 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
         saveExtraMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.Extra.ContourSection" + contourSectionIndexString + "InterpNearestRegion.off");*/
 
         //测试，保存显示该轮廓（插值后）的牙齿模型
-        /*paintAllVerticesWhite(progress);
+        /*paintAllVerticesWhite();
         for(interpContourVertexIndex = 0; interpContourVertexIndex < interpContour.size(); interpContourVertexIndex++)
         {
             mToothMesh.set_color(interpContour.at(interpContourVertexIndex), colorRed);
@@ -2096,28 +2073,28 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
     }
 
     //测试，保存带平滑轮廓（非单点宽度）的牙齿模型到文件
-//    paintAllVerticesWhite(progress);
-//    paintBoundaryVertices(progress);
+//    paintAllVerticesWhite();
+//    paintBoundaryVertices();
 //    saveToothMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.WithInterpNearestRegion.off");
 
     //重新进行区域生长
-    markNonBoundaryRegion(progress);
+    markNonBoundaryRegion();
 
     //测试，保存带平滑轮廓（非单点宽度）并进行区域生长标记后的牙齿模型到文件
-//    paintClassifiedNonBoundaryRegions(progress);
+//    paintClassifiedNonBoundaryRegions();
 //    saveToothMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.WithInterpNearestRegionAndRegionGrowing.off");
 
     //重新进行单点宽度边界提取
-    boundarySkeletonExtraction(progress);
+    boundarySkeletonExtraction();
 
     //测试，保存重新提取单点宽度边界后的牙齿模型到文件
-//    paintClassifiedNonBoundaryRegions(progress);
-//    paintBoundaryVertices(progress);
+//    paintClassifiedNonBoundaryRegions();
+//    paintBoundaryVertices();
 //    saveToothMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.WithInterpNearestRegionSkeleton.off");
 
     //重新建立轮廓点索引
-    findCuttingPoints(progress);
-    indexContourSectionsVertices(progress);
+    findCuttingPoints();
+    indexContourSectionsVertices();
 
     //模板平滑（此步骤通过移动轮廓点的位置，来使得轮廓变得平滑）
     Mesh::Point tempPoint;
@@ -2125,13 +2102,13 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
     const int windowSize = halfWindowSize * 2 + 1;
     int realHalfWindowSize; //实际的窗口半边长，轮廓两端处窗口放不下时使用
     int realWindowSize;
-    progress.setLabelText("Smoothing all contour sections...");
-    progress.setMinimum(0);
-    progress.setMaximum(mContourSections.size());
-    progress.setValue(0);
+    mProgress->setLabelText("Smoothing all contour sections...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mContourSections.size());
+    mProgress->setValue(0);
     for(contourSectionIndex = 0; contourSectionIndex < mContourSections.size(); contourSectionIndex++)
     {
-        progress.setValue(contourSectionIndex);
+        mProgress->setValue(contourSectionIndex);
         if(mContourSections[contourSectionIndex].size() < windowSize)
         {
             continue;
@@ -2167,19 +2144,62 @@ void ToothSegmentation::refineToothBoundary(QProgressDialog &progress)
         mToothMeshVertices.push_back(mToothMesh.point(*vertexIter));
         mToothMeshVertexHandles.push_back(*vertexIter);
     }
+
+    //由于移动了轮廓顶点的位置，其周围可能出现较大的凹凸，因此需要对其周围顶点做平滑
+    bool *smoothContourNeighborVisited = (bool*)calloc(mToothMesh.mVertexNum, sizeof(bool));
+    QVector<Mesh::VertexHandle> neighborVertexHandles;
+    bool isContourNeighborVertex;
+    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    {
+        if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter))
+        {
+            continue;
+        }
+        if(smoothContourNeighborVisited[vertexIter->idx()])
+        {
+            continue;
+        }
+
+        //判断是否是轮廓周围点
+        isContourNeighborVertex = false;
+        neighborVertexHandles.clear();
+        getKRing(*vertexIter, 2, neighborVertexHandles);
+        for(int i = 0; i < neighborVertexHandles.size(); i++)
+        {
+            if(mToothMesh.property(mVPropHandleIsToothBoundary, neighborVertexHandles.at(i)))
+            {
+                isContourNeighborVertex = true;
+            }
+        }
+
+        if(!isContourNeighborVertex)
+        {
+            continue;
+        }
+
+        //平滑
+        tempPoint[0] = 0.0; tempPoint[1] = 0.0; tempPoint[2] = 0.0;
+        for(int i = 0; i < neighborVertexHandles.size(); i++)
+        {
+            tempPoint += mToothMesh.point(neighborVertexHandles.at(i));
+        }
+        tempPoint /= neighborVertexHandles.size();
+        mToothMesh.set_point(*vertexIter, tempPoint);
+    }
+    free(smoothContourNeighborVisited);
 }
 
-void ToothSegmentation::paintAllVerticesWhite(QProgressDialog &progress)
+void ToothSegmentation::paintAllVerticesWhite()
 {
     int vertexIndex = 0;
-    progress.setLabelText("Painting all vertices white...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Painting all vertices white...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     Mesh::Color colorWhite(1.0, 1.0, 1.0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         mToothMesh.set_color(*vertexIter, colorWhite);
         vertexIndex++;
     }
@@ -2291,25 +2311,19 @@ void ToothSegmentation::createPlaneInExtraMesh(Mesh::Point point, Mesh::Normal n
 
 void ToothSegmentation::findCuttingPoints(bool loadStateFromFile)
 {
-    QProgressDialog progress(mParentWidget);
-    progress.setWindowTitle("Finding cutting points...");
-    progress.setMinimumSize(400, 120);
-    progress.setCancelButtonText("cancel");
-    progress.setMinimumDuration(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setAutoClose(false);
+    mProgress->setWindowTitle("Finding cutting points...");
 
-    findCuttingPoints(progress);
+    findCuttingPoints();
 
-    paintAllVerticesWhite(progress);
-    paintClassifiedBoundary(progress);
+    paintAllVerticesWhite();
+    paintClassifiedBoundary();
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".FindCuttingPoints.off");
 
     //关闭进度条
-    progress.close();
+    mProgress->close();
 }
 
-bool ToothSegmentation::saveState(QProgressDialog &progress, string stateSymbol)
+bool ToothSegmentation::saveState(string stateSymbol)
 {
     string stateFileName = mToothMesh.MeshName.toStdString() + "." + stateSymbol + ".State";
     QFile stateFile(stateFileName.c_str());
@@ -2319,10 +2333,10 @@ bool ToothSegmentation::saveState(QProgressDialog &progress, string stateSymbol)
         return false;
     }
 
-    progress.setLabelText("Saving state...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Saving state...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
 
     stateFile.write((char *)(&mBoundaryVertexNum), sizeof(mBoundaryVertexNum));
     stateFile.write((char *)(&mGingivaCuttingPlanePoint), sizeof(mGingivaCuttingPlanePoint));
@@ -2340,7 +2354,7 @@ bool ToothSegmentation::saveState(QProgressDialog &progress, string stateSymbol)
     int vertexIndex = 0;
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         tempCurvature = mToothMesh.property(mVPropHandleCurvature, *vertexIter);
         stateFile.write((char *)(&tempCurvature), sizeof(tempCurvature));
         tempCurvatureComputed = mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter);
@@ -2363,7 +2377,7 @@ bool ToothSegmentation::saveState(QProgressDialog &progress, string stateSymbol)
     return true;
 }
 
-bool ToothSegmentation::loadState(QProgressDialog &progress, string stateSymbol)
+bool ToothSegmentation::loadState(string stateSymbol)
 {
     string stateFileName = mToothMesh.MeshName.toStdString() + "." + stateSymbol + ".State";
     QFile stateFile(stateFileName.c_str());
@@ -2373,10 +2387,10 @@ bool ToothSegmentation::loadState(QProgressDialog &progress, string stateSymbol)
         return false;
     }
 
-    progress.setLabelText("Loading state...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Loading state...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
 
     stateFile.read((char *)(&mBoundaryVertexNum), sizeof(mBoundaryVertexNum));
     stateFile.read((char *)(&mGingivaCuttingPlanePoint), sizeof(mGingivaCuttingPlanePoint));
@@ -2394,7 +2408,7 @@ bool ToothSegmentation::loadState(QProgressDialog &progress, string stateSymbol)
     int vertexIndex = 0;
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         stateFile.read((char *)(&tempCurvature), sizeof(tempCurvature));
         mToothMesh.property(mVPropHandleCurvature, *vertexIter) = tempCurvature;
         stateFile.read((char *)(&tempCurvatureComputed), sizeof(tempCurvatureComputed));
@@ -2419,10 +2433,10 @@ bool ToothSegmentation::loadState(QProgressDialog &progress, string stateSymbol)
 
 QVector< QVector<int> > ToothSegmentation::kNearestNeighbours(int Knn, const QVector<Mesh::Point> &querys, const QVector<Mesh::Point> &points)
 {
-//    progress.setLabelText("Computing k nearest neighbours...");
-//    progress.setMinimum(0);
-//    progress.setMaximum(querys.size());
-//    progress.setValue(0);
+//    mProgress->setLabelText("Computing k nearest neighbours...");
+//    mProgress->setMinimum(0);
+//    mProgress->setMaximum(querys.size());
+//    mProgress->setValue(0);
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
 
@@ -2448,7 +2462,7 @@ QVector< QVector<int> > ToothSegmentation::kNearestNeighbours(int Knn, const QVe
     QVector<QVector<int> > neighbours(querys.size());
     for(int i = 0; i < querys.size(); i++)
     {
-//        progress.setValue(i);
+//        mProgress->setValue(i);
         query.x = querys[i][0];
         query.y = querys[i][1];
         query.z = querys[i][2];
@@ -2464,7 +2478,7 @@ QVector< QVector<int> > ToothSegmentation::kNearestNeighbours(int Knn, const QVe
     return neighbours;
 }
 
-void ToothSegmentation::findCuttingPoints(QProgressDialog &progress)
+void ToothSegmentation::findCuttingPoints()
 {
     bool neighborHasGingivaRegion; //某顶点是否与牙龈区域相邻（若是，则可能为TOOTH_GINGIVA_BOUNDARY或CUTTING_POINT）
     int neighborBoundaryVertexNum; //某顶点邻域中边界点数量（若超过2个，并且其中没有cutting point，则为CUTTING_POINT）
@@ -2473,17 +2487,17 @@ void ToothSegmentation::findCuttingPoints(QProgressDialog &progress)
 
     //初始化所有顶点的BoundaryType为除CUTTING_POINT之外的任一类型，因为在保证不能存在两个相邻的cutting point时需要知道某顶点是否属于CUTTING_POINT
     boundaryVertexIndex = 0;
-    progress.setLabelText("Classifing boundary(init BoundaryType of all boundary vertices)...");
-    progress.setMinimum(0);
-    progress.setMaximum(mBoundaryVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Classifing boundary(init BoundaryType of all boundary vertices)...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mBoundaryVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非边界点
         {
             continue;
         }
-        progress.setValue(boundaryVertexIndex);
+        mProgress->setValue(boundaryVertexIndex);
         mToothMesh.property(mVPropHandleBoundaryType, *vertexIter) = TOOTH_GINGIVA_BOUNDARY;
     }
 
@@ -2492,10 +2506,10 @@ void ToothSegmentation::findCuttingPoints(QProgressDialog &progress)
         mCuttingPointHandles.clear();
     }
 
-    progress.setLabelText("Classifing boundary...");
-    progress.setMinimum(0);
-    progress.setMaximum(mBoundaryVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Classifing boundary...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mBoundaryVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非边界点
@@ -2503,7 +2517,7 @@ void ToothSegmentation::findCuttingPoints(QProgressDialog &progress)
             continue;
         }
 
-        progress.setValue(boundaryVertexIndex);
+        mProgress->setValue(boundaryVertexIndex);
 
         neighborHasGingivaRegion = false;
         neighborBoundaryVertexNum = 0;
@@ -2546,14 +2560,14 @@ void ToothSegmentation::findCuttingPoints(QProgressDialog &progress)
     }
 }
 
-void ToothSegmentation::paintClassifiedBoundary(QProgressDialog &progress)
+void ToothSegmentation::paintClassifiedBoundary()
 {
     int boundaryVertexIndex = 0;
     Mesh::Color colorRed(1.0, 0.0, 0.0), colorBlue(0.0, 0.0, 1.0), colorYellow(1.0, 1.0, 0.0);
-    progress.setLabelText("Painting classified boundary...");
-    progress.setMinimum(0);
-    progress.setMaximum(mBoundaryVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Painting classified boundary...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mBoundaryVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非边界点
@@ -2561,7 +2575,7 @@ void ToothSegmentation::paintClassifiedBoundary(QProgressDialog &progress)
             continue;
         }
 
-        progress.setValue(boundaryVertexIndex);
+        mProgress->setValue(boundaryVertexIndex);
 
         switch(mToothMesh.property(mVPropHandleBoundaryType, *vertexIter))
         {
@@ -2580,7 +2594,7 @@ void ToothSegmentation::paintClassifiedBoundary(QProgressDialog &progress)
     }
 }
 
-void ToothSegmentation::indexContourSectionsVertices(QProgressDialog &progress)
+void ToothSegmentation::indexContourSectionsVertices()
 {
     if(!mContourSections.empty())
     {
@@ -2591,17 +2605,17 @@ void ToothSegmentation::indexContourSectionsVertices(QProgressDialog &progress)
 
     //初始化SearchContourSectionVisited属性
     int boundaryVertexIndex = 0;
-    progress.setLabelText("Init SearchContourSectionVisited of all boundary vertices...");
-    progress.setMinimum(0);
-    progress.setMaximum(mBoundaryVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Init SearchContourSectionVisited of all boundary vertices...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mBoundaryVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非边界点
         {
             continue;
         }
-        progress.setValue(boundaryVertexIndex);
+        mProgress->setValue(boundaryVertexIndex);
         mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexIter) = false;
         boundaryVertexIndex++;
     }
@@ -2609,13 +2623,13 @@ void ToothSegmentation::indexContourSectionsVertices(QProgressDialog &progress)
     //从每个cutting point开始查找
     int cuttingPointIndex;
     Mesh::VertexHandle tempCuttingPointHandle;
-    progress.setLabelText("Finding all contour sections...");
-    progress.setMinimum(0);
-    progress.setMaximum(mCuttingPointHandles.size());
-    progress.setValue(0);
+    mProgress->setLabelText("Finding all contour sections...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mCuttingPointHandles.size());
+    mProgress->setValue(0);
     for(cuttingPointIndex = 0; cuttingPointIndex < mCuttingPointHandles.size(); cuttingPointIndex++)
     {
-        progress.setValue(cuttingPointIndex);
+        mProgress->setValue(cuttingPointIndex);
         tempCuttingPointHandle = mCuttingPointHandles.at(cuttingPointIndex);
 
         //查找所有以此cutting point为端点的轮廓曲线段
@@ -2783,24 +2797,24 @@ inline void ToothSegmentation::getKthRing(const Mesh::VertexHandle &centerVertex
     free(visited);
 }
 
-void ToothSegmentation::connectBoundary(QProgressDialog &progress, const int k)
+/*void ToothSegmentation::connectBoundary(, const int k)
 {
     QVector<Mesh::VertexHandle> kthRingVertexHandles;
     QVector<Mesh::VertexHandle> kRingVertexHandles;
     bool tempIsBoundary1, tempIsBoundary2;
     int changeTimes;
     int nonBoundaryVertexIndex = 0;
-    progress.setLabelText("Connecting boundary...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum - mBoundaryVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Connecting boundary...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum - mBoundaryVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         if(mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter))
         {
             continue;
         }
-        progress.setValue(nonBoundaryVertexIndex);
+        mProgress->setValue(nonBoundaryVertexIndex);
         kthRingVertexHandles.clear();
         getKthRing(*vertexIter, k, kthRingVertexHandles);
         kthRingVertexHandles.push_back(kthRingVertexHandles.front());
@@ -2826,10 +2840,9 @@ void ToothSegmentation::connectBoundary(QProgressDialog &progress, const int k)
         }
         nonBoundaryVertexIndex++;
     }
+}*/
 
-}
-
-void ToothSegmentation::computeCurvatureHistogram(QProgressDialog &progress)
+void ToothSegmentation::computeCurvatureHistogram()
 {
     float curvatureMin, curvatureMax;
     computeCurvatureMinAndMax(curvatureMin, curvatureMax);
@@ -2852,13 +2865,13 @@ void ToothSegmentation::computeCurvatureHistogram(QProgressDialog &progress)
     QVector<Mesh::VertexHandle> histVertexs[histNum];
     int vertexIndex = 0;
     float tempCurvature;
-    progress.setLabelText("Computing curvature histogram...");
-    progress.setMinimum(0);
-    progress.setMaximum(mToothMesh.mVertexNum);
-    progress.setValue(0);
+    mProgress->setLabelText("Computing curvature histogram...");
+    mProgress->setMinimum(0);
+    mProgress->setMaximum(mToothMesh.mVertexNum);
+    mProgress->setValue(0);
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
-        progress.setValue(vertexIndex);
+        mProgress->setValue(vertexIndex);
         if(!mToothMesh.property(mVPropHandleCurvatureComputed, *vertexIter))
         {
             continue;
@@ -3034,7 +3047,7 @@ void ToothSegmentation::mousePressEventShowVertexAttributes(QMouseEvent *e)
     .arg(mToothMesh.property(mVPropHandleSearchContourSectionVisited, clickedVertexHandle)));
 }
 
-void ToothSegmentation::mousePressEventConnectBoundary(QMouseEvent *e)
+void ToothSegmentation::mousePressEventAddBoundaryVertex(QMouseEvent *e)
 {
     //只响应鼠标右键点击事件
     if(e->button() != Qt::RightButton)
@@ -3042,13 +3055,7 @@ void ToothSegmentation::mousePressEventConnectBoundary(QMouseEvent *e)
         return;
     }
 
-    QProgressDialog progress(mParentWidget);
-    progress.setWindowTitle("Connecting boundary...");
-    progress.setMinimumSize(400, 120);
-    progress.setCancelButtonText("cancel");
-    progress.setMinimumDuration(0);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setAutoClose(false);
+    mProgress->setWindowTitle("Adding boundary vertex...");
 
     //鼠标点击位置坐标
     int x = e->x();
@@ -3084,15 +3091,135 @@ void ToothSegmentation::mousePressEventConnectBoundary(QMouseEvent *e)
     }
 
     //标记非边界区域
-    markNonBoundaryRegion(progress);
-    paintClassifiedNonBoundaryRegions(progress);
+    markNonBoundaryRegion();
+    paintClassifiedNonBoundaryRegions();
+
+    //关闭进度条
+    mProgress->close();
 
     //更新显示
     ((MainWindow*)mParentWidget)->gv->removeAllMeshes();
     ((MainWindow*)mParentWidget)->gv->addMesh(mToothMesh);
-    ((MainWindow*)mParentWidget)->gv->addMesh(mExtraMesh);
+    //((MainWindow*)mParentWidget)->gv->addMesh(mExtraMesh);
     ((MainWindow*)mParentWidget)->gv->updateGL();
 
     //保存新的mesh文件
-    saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualConnectBoundary.off");
+    saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualAddOrDeleteBoundaryVertex.off");
+}
+
+void ToothSegmentation::mousePressEventDeleteBoundaryVertex(QMouseEvent *e)
+{
+    //只响应鼠标右键点击事件
+    if(e->button() != Qt::RightButton)
+    {
+        return;
+    }
+
+    mProgress->setWindowTitle("Deleting boundary vertex...");
+
+    //鼠标点击位置坐标
+    int x = e->x();
+    int y = e->y();
+
+    //计算对应的三维坐标
+    QVector<Mesh::Point> clickedPoint;
+    clickedPoint.push_back(screenCoordinate2Model3DCoordinate(x, y));
+
+    //判断点击的是模型上的哪个点（通过遍历所有模型上的所有点，找到距离点击位置最近的点，如果该点到点击位置的距离小于某个阈值，则认为该点即为点击位置）
+    QVector< QVector<int> > searchResult = kNearestNeighbours(1, clickedPoint, mToothMeshVertices);
+    Mesh::Point clickedVertex = mToothMeshVertices.at(searchResult[0][0]);
+    Mesh::VertexHandle clickedVertexHandle = mToothMeshVertexHandles.at(searchResult[0][0]);
+    if(distance(clickedPoint[0], clickedVertex) > (mToothMesh.BBox.size.x + mToothMesh.BBox.size.y + mToothMesh.BBox.size.z) / 300)
+    {
+        QMessageBox::information(mParentWidget, "Error", "Clicked vertex not found!");
+        return;
+    }
+
+    int r = 1; //画笔宽度（点半径）
+    QVector<Mesh::VertexHandle> kRingVertexHandles;
+    getKRing(clickedVertexHandle, r, kRingVertexHandles);
+    Mesh::Color colorWhite(1.0, 1.0, 1.0);
+    for(int i = 0; i< kRingVertexHandles.size(); i++)
+    {
+        if(!mToothMesh.property(mVPropHandleIsToothBoundary, kRingVertexHandles.at(i)))
+        {
+            continue;
+        }
+        mToothMesh.property(mVPropHandleIsToothBoundary, kRingVertexHandles.at(i)) = false;
+        mBoundaryVertexNum--;
+        mToothMesh.set_color(kRingVertexHandles.at(i), colorWhite);
+    }
+
+    //标记非边界区域
+    markNonBoundaryRegion();
+    paintClassifiedNonBoundaryRegions();
+
+    //关闭进度条
+    mProgress->close();
+
+    //更新显示
+    ((MainWindow*)mParentWidget)->gv->removeAllMeshes();
+    ((MainWindow*)mParentWidget)->gv->addMesh(mToothMesh);
+    //((MainWindow*)mParentWidget)->gv->addMesh(mExtraMesh);
+    ((MainWindow*)mParentWidget)->gv->updateGL();
+
+    //保存新的mesh文件
+    saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualAddOrDeleteBoundaryVertex.off");
+}
+
+void ToothSegmentation::mousePressEventDeleteErrorToothRegion(QMouseEvent *e)
+{
+    //只响应鼠标右键点击事件
+    if(e->button() != Qt::RightButton)
+    {
+        return;
+    }
+
+    mProgress->setWindowTitle("Deleting error tooth region...");
+
+    //鼠标点击位置坐标
+    int x = e->x();
+    int y = e->y();
+
+    //计算对应的三维坐标
+    QVector<Mesh::Point> clickedPoint;
+    clickedPoint.push_back(screenCoordinate2Model3DCoordinate(x, y));
+
+    //判断点击的是模型上的哪个点（通过遍历所有模型上的所有点，找到距离点击位置最近的点，如果该点到点击位置的距离小于某个阈值，则认为该点即为点击位置）
+    QVector< QVector<int> > searchResult = kNearestNeighbours(1, clickedPoint, mToothMeshVertices);
+    Mesh::Point clickedVertex = mToothMeshVertices.at(searchResult[0][0]);
+    Mesh::VertexHandle clickedVertexHandle = mToothMeshVertexHandles.at(searchResult[0][0]);
+    if(distance(clickedPoint[0], clickedVertex) > (mToothMesh.BBox.size.x + mToothMesh.BBox.size.y + mToothMesh.BBox.size.z) / 300)
+    {
+        QMessageBox::information(mParentWidget, "Error", "Clicked vertex not found!");
+        return;
+    }
+
+    if(mToothMesh.property(mVPropHandleIsToothBoundary, clickedVertexHandle))
+    {
+        QMessageBox::information(mParentWidget, "Error", "Clicked vertex is boundary vertex!");
+        return;
+    }
+
+    regionGrowing(clickedVertexHandle, TEMP_REGION); //将此区域所有点visited属性还原为false
+    regionGrowing(clickedVertexHandle, FILL_BOUNDARY_REGION);
+
+    paintBoundaryVertices();
+
+    //关闭进度条
+    mProgress->close();
+
+    //更新显示
+    ((MainWindow*)mParentWidget)->gv->removeAllMeshes();
+    ((MainWindow*)mParentWidget)->gv->addMesh(mToothMesh);
+    //((MainWindow*)mParentWidget)->gv->addMesh(mExtraMesh);
+    ((MainWindow*)mParentWidget)->gv->updateGL();
+
+    //保存新的mesh文件
+    saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualDeleteErrorToothRegion.off");
+}
+
+void ToothSegmentation::mousePressEventDeleteErrorContourSection(QMouseEvent *e)
+{
+
 }

@@ -164,7 +164,7 @@ private:
 public:
     CurvatureComputer(Mesh &mesh);
 
-    void computeCurvature(QProgressDialog &progress);
+    void computeCurvature(QProgressDialog *progress);
 
     void getResult(QVector<float> &curvature, QVector<bool> &computed);
 
@@ -177,7 +177,7 @@ private:
 
     inline void getSphere(const Mesh::VertexHandle &centerVertexHandle, const float r, const int min, QVector<Mesh::VertexHandle> &vv);
 
-    inline float getAverageEdge(QProgressDialog &progress);
+    inline float getAverageEdge(QProgressDialog *progress);
 
     inline void applyProjOnPlane(const Mesh::Normal &ppn, const QVector<Mesh::VertexHandle> &vin, QVector<Mesh::VertexHandle> &vout);
 

@@ -39,6 +39,7 @@ public:
 
 private:
     QWidget *mParentWidget;
+    QProgressDialog *mProgress;
 
     Mesh mToothMesh; //牙齿模型网格
     Mesh mTempToothMesh; //用于保存ToothMesh的临时状态
@@ -104,22 +105,22 @@ public:
 
 private:
     //4.1 Identify potential tooth boundary
-    void identifyPotentialToothBoundary(QProgressDialog &progress);
+    void identifyPotentialToothBoundary();
 
     //4.2 Automatic cutting of gingiva
-    void automaticCuttingOfGingiva(QProgressDialog &progress);
+    void automaticCuttingOfGingiva();
 
     //4.3 Boundary skeleton extraction
-    void boundarySkeletonExtraction(QProgressDialog &progress);
+    void boundarySkeletonExtraction();
 
     //5.1 Finding cutting points
-    void findCuttingPoints(QProgressDialog &progress);
+    void findCuttingPoints();
 
     //6. Refine tooth boundary
-    void refineToothBoundary(QProgressDialog &progress);
+    void refineToothBoundary();
 
     //计算曲率
-    void computeCurvature(QProgressDialog &progress);
+    void computeCurvature();
 
     //将曲率转换成灰度，再转换成伪彩色，将伪彩色信息写入到顶点颜色属性
     void curvature2PseudoColor();
@@ -128,31 +129,31 @@ private:
     void computeCurvatureMinAndMax(float &curvatureMin, float &curvatureMax);
 
     //对边界区域进行1邻域腐蚀操作
-    void corrodeBoundary(QProgressDialog &progress);
+    void corrodeBoundary();
 
     //对边界区域进行1邻域膨胀操作
-    void dilateBoundary(QProgressDialog &progress);
+    void dilateBoundary();
 
     //边界点着色
-    void paintBoundaryVertices(QProgressDialog &progress);
+    void paintBoundaryVertices();
 
     //边界点分类，classifiedBoundaryVertexNum返回各类边界点数量
-    void classifyBoundaryVertex(QProgressDialog &progress, int *classifiedBoundaryVertexNum);
+    void classifyBoundaryVertex(int *classifiedBoundaryVertexNum);
 
     //分类后的边界点着色
-    void paintClassifiedBoundaryVertices(QProgressDialog &progress);
+    void paintClassifiedBoundaryVertices();
 
     //根据牙龈分割平面剔除牙龈上的初始边界点
-    void removeBoundaryVertexOnGingiva(QProgressDialog &progress);
+    void removeBoundaryVertexOnGingiva();
 
     //标记牙龈区域
-    void markNonBoundaryRegion(QProgressDialog &progress);
+    void markNonBoundaryRegion();
 
     //区域生长，返回该区域的顶点数量。如果regionType为TEMP_REGION，则只计算该区域的顶点数量，visited属性不变为true，也就是说可以再次进行区域生长；如果regionType为FILL_BOUNDARY_REGION，则将此区域填充为边界
     int regionGrowing(Mesh::VertexHandle vertexHandle, int regionType);
 
     //非边界区域分类着色
-    void paintClassifiedNonBoundaryRegions(QProgressDialog &progress);
+    void paintClassifiedNonBoundaryRegions();
 
     //测试，保存牙齿模型（带颜色信息）
     void saveToothMesh(string filename);
@@ -164,25 +165,25 @@ private:
     void gray2PseudoColor(float grayValue, Mesh::Color &pseudoColor);
 
     //将整个模型所有顶点颜色涂成白色
-    void paintAllVerticesWhite(QProgressDialog &progress);
+    void paintAllVerticesWhite();
 
     //创建一个平面，存放在mExtraMesh中（point：平面过一点，normal：平面法向量，size：平面正方形边长）
     void createPlaneInExtraMesh(Mesh::Point point, Mesh::Normal normal, float size);
 
     //保存当前状态（stateSymbol：要保存的状态的标志，返回是否保存成功）
-    bool saveState(QProgressDialog &progress, string stateSymbol);
+    bool saveState(string stateSymbol);
 
     //读取保存的状态（stateSymbol：要读取的状态的标志，返回是否读取成功）
-    bool loadState(QProgressDialog &progress, string stateSymbol);
+    bool loadState(string stateSymbol);
 
     //基于PCL的3维点云K近邻搜索（querys中各点到points的最近距离），TODO 将工程中用到的所有STL转换为QTL
     QVector< QVector<int> > kNearestNeighbours(int Knn, const QVector<Mesh::Point> &querys, const QVector<Mesh::Point> &points);
 
     //分类后的边界着色
-    void paintClassifiedBoundary(QProgressDialog &progress);
+    void paintClassifiedBoundary();
 
     //建立单点轮廓点索引
-    void indexContourSectionsVertices(QProgressDialog &progress);
+    void indexContourSectionsVertices();
 
     //获取k邻域内所有顶点，包括中心点（中心点在返回列表的首位）
     inline void getKRing(const Mesh::VertexHandle &centerVertexHandle, const int k, QVector<Mesh::VertexHandle> &ringVertexHandles);
@@ -191,10 +192,10 @@ private:
     inline void getKthRing(const Mesh::VertexHandle &centerVertexHandle, const int k, QVector<Mesh::VertexHandle> &ringVertexHandles);
 
     //连接边界（k为连接桥梁半长）
-    void connectBoundary(QProgressDialog &progress, const int k);
+    //void connectBoundary(, const int k);
 
     //测试，计算曲率直方图
-    void computeCurvatureHistogram(QProgressDialog &progress);
+    void computeCurvatureHistogram();
 
     /*//检查mToothMesh中是否存在curvature（顶点处的曲率）属性和curvature_computed（曲率是否被正确计算），如果不存在则报错
     void checkCustomMeshPropertiesExistence();
@@ -215,8 +216,17 @@ public slots:
     //鼠标右键点击显示顶点属性信息
     void mousePressEventShowVertexAttributes(QMouseEvent *e);
 
-    //鼠标右键点击连接初始边界断开处
-    void mousePressEventConnectBoundary(QMouseEvent *e);
+    //鼠标右键点击添加边界点（可用于连接初始边界断开处）
+    void mousePressEventAddBoundaryVertex(QMouseEvent *e);
+
+    //鼠标右键点击去除边界点（可用于去掉错误区域）
+    void mousePressEventDeleteBoundaryVertex(QMouseEvent *e);
+
+    //鼠标右键点击删除错误被判为牙齿的区域，将其填充为边界（比较大的错误区域最好手动将其和牙龈区域相连）
+    void mousePressEventDeleteErrorToothRegion(QMouseEvent *e);
+
+    //鼠标右键点击删除错误的轮廓段
+    void mousePressEventDeleteErrorContourSection(QMouseEvent *e);
 
 };
 

@@ -32,6 +32,10 @@ SW::MainWindow::MainWindow()
     connect(actionToothSegmentationBoundarySkeletonExtraction, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationBoundarySkeletonExtraction()));
     connect(actionToothSegmentationFindCuttingPoints, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationFindCuttingPoints()));
     connect(actionToothSegmentationRefineToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationRefineToothBoundary()));
+    connect(actionToothSegmentationManuallyShowVertexProperties, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyShowVertexProperties()));
+    connect(actionToothSegmentationManuallyAddBoundaryVertex, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyAddBoundaryVertex()));
+    connect(actionToothSegmentationManuallyDeleteBoundaryVertex, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyDeleteBoundaryVertex()));
+    connect(actionToothSegmentationManuallyDeleteErrorToothRegion, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyDeleteErrorToothRegion()));
 
     update();
 }
@@ -273,4 +277,48 @@ void SW::MainWindow::doActionToothSegmentationRefineToothBoundary()
     QMessageBox::information(this, "Info", "Refine tooth boundary done!");
 
     gv->updateGL();
+}
+
+void SW::MainWindow::doActionToothSegmentationManuallyShowVertexProperties()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0); //删除与onMousePressed连接的所有槽
+    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
+}
+
+void SW::MainWindow::doActionToothSegmentationManuallyAddBoundaryVertex()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0);
+    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventAddBoundaryVertex(QMouseEvent*)));
+}
+
+void SW::MainWindow::doActionToothSegmentationManuallyDeleteBoundaryVertex()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0);
+    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteBoundaryVertex(QMouseEvent*)));
+}
+
+void SW::MainWindow::doActionToothSegmentationManuallyDeleteErrorToothRegion()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0);
+    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteErrorToothRegion(QMouseEvent*)));
 }

@@ -78,6 +78,10 @@ namespace SW
          void doActionToothSegmentationBoundarySkeletonExtraction();
          void doActionToothSegmentationFindCuttingPoints();
          void doActionToothSegmentationRefineToothBoundary();
+         void doActionToothSegmentationManuallyShowVertexProperties();
+         void doActionToothSegmentationManuallyAddBoundaryVertex();
+         void doActionToothSegmentationManuallyDeleteBoundaryVertex();
+         void doActionToothSegmentationManuallyDeleteErrorToothRegion();
 
     public:
          //////////////////////定义窗口部件/////////////////////////////////////

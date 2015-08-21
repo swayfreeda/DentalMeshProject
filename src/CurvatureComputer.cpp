@@ -35,7 +35,7 @@ CurvatureComputer::CurvatureComputer(Mesh &mesh)
     mSphere = (mMesh.BBox.size.x + mMesh.BBox.size.y + mMesh.BBox.size.z) / 3 * 0.02;
 }
 
-void CurvatureComputer::computeCurvature(QProgressDialog &progress)
+void CurvatureComputer::computeCurvature(QProgressDialog *progress)
 {
     QTime time;
 
@@ -59,11 +59,11 @@ void CurvatureComputer::computeCurvature(QProgressDialog &progress)
     cout << "创建所有顶点的线性索引 用时：" << time.elapsed() << "ms." << endl;
 
     int completedVertexNum = 0; //已计算完的顶点数目
-    progress.setLabelText("Computing curvature...");
-    progress.setMinimum(0);
-    progress.setMaximum(vertexNum);
-    progress.setValue(0);
-    connect(this, SIGNAL(progressValueChanged(int)), &progress, SLOT(setValue(int)));
+    progress->setLabelText("Computing curvature...");
+    progress->setMinimum(0);
+    progress->setMaximum(vertexNum);
+    progress->setValue(0);
+    connect(this, SIGNAL(progressValueChanged(int)), progress, SLOT(setValue(int)));
 
     time.start();
 
@@ -266,20 +266,20 @@ inline void CurvatureComputer::getSphere(const Mesh::VertexHandle &centerVertexH
     free(visited);
 }
 
-inline float CurvatureComputer::getAverageEdge(QProgressDialog &progress)
+inline float CurvatureComputer::getAverageEdge(QProgressDialog *progress)
 {
     float edgeLengthSum = 0;
     int edgeIndex = 0;
     Mesh::HalfedgeHandle hh1, hh2;
     Mesh::VertexHandle vh1, vh2;
 
-    progress.setLabelText("Computing curvature(compute average edge)...");
-    progress.setMinimum(0);
-    progress.setMaximum(mMesh.mFaceNum);
-    progress.setValue(0);
+    progress->setLabelText("Computing curvature(compute average edge)...");
+    progress->setMinimum(0);
+    progress->setMaximum(mMesh.mFaceNum);
+    progress->setValue(0);
     for(Mesh::EdgeIter edgeIter = mMesh.edges_begin(); edgeIter != mMesh.edges_end(); edgeIter++)
     {
-        progress.setValue(edgeIndex);
+        progress->setValue(edgeIndex);
         hh1 = mMesh.halfedge_handle(edgeIter, 0);
         hh2 = mMesh.halfedge_handle(edgeIter, 1);
         vh1 = mMesh.to_vertex_handle(hh1);
