@@ -34,14 +34,14 @@
 
 namespace SW{
 
-class  GLViewer : public QGLViewer
+class GLViewer : public QGLViewer
 {
     Q_OBJECT
 
 public:
-     enum DispalyType{VERTICES, WIREFRAME, FLATLINE};
-     // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
-     GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
+    enum DispalyType{VERTICES, WIREFRAME, FLATLINE};
+    // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
+    GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
     ~GLViewer();
 
     virtual void init();
@@ -50,11 +50,21 @@ public:
     virtual void transform(){}
 
     virtual void mousePressEvent(QMouseEvent *e);
-    virtual void mouseReleaseEvent(QMouseEvent *e);
     virtual void mouseMoveEvent(QMouseEvent *e);
+    virtual void mouseReleaseEvent(QMouseEvent *e);
+    virtual void mouseDoubleClickEvent(QMouseEvent *e);
     virtual void wheelEvent(QWheelEvent *e);
-
     virtual void keyPressEvent(QKeyEvent *e);
+    virtual void keyReleaseEvent(QKeyEvent *e);
+
+    //设置是否调用父类的事件响应函数
+    void setCallSuperMousePressEvent(bool callSuperEvent);
+    void setCallSuperMouseMoveEvent(bool callSuperEvent);
+    void setCallSuperMouseReleaseEvent(bool callSuperEvent);
+    void setCallSuperMouseDoubleClickEvent(bool callSuperEvent);
+    void setCallSuperWheelEvent(bool callSuperEvent);
+    void setCallSuperKeyPressEvent(bool callSuperEvent);
+    void setCallSuperKeyReleaseEvent(bool callSuperEvent);
 
     void viewAll();
 
@@ -90,6 +100,12 @@ public slots:
 
 signals:
     void onMousePressed(QMouseEvent *e);
+    void onMouseMoved(QMouseEvent *e);
+    void onMouseReleased(QMouseEvent *e);
+    void onMouseDoubleClicked(QMouseEvent *e);
+    void onWheeled(QWheelEvent *e);
+    void onKeyPressed(QKeyEvent *e);
+    void onKeyReleased(QKeyEvent *e);
 
 private:
     static SW::Shader m_shader;
@@ -101,6 +117,15 @@ private:
     bool displayFlatLine;
 
     DispalyType displayType;
+
+    //标志是否调用父类的事件响应函数
+    bool mCallSuperMousePressEvent;
+    bool mCallSuperMouseMoveEvent;
+    bool mCallSuperMouseReleaseEvent;
+    bool mCallSuperMouseDoubleClickEvent;
+    bool mCallSuperWheelEvent;
+    bool mCallSuperKeyPressEvent;
+    bool mCallSuperKeyReleaseEvent;
 
 };
 

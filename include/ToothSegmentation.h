@@ -13,7 +13,7 @@ class ToothSegmentation : public QObject
     Q_OBJECT
 
 public:
-    enum mBoundaryVertexType
+    enum BoundaryVertexType
     {
         CENTER_VERTEX = 0, //中心点（边界内部点）
         COMPLEX_VERTEX, //复杂点（单点宽度边界点）
@@ -21,7 +21,7 @@ public:
         DISK_VERTEX_TOOTH //外围点（边界外围点，与第1颗牙齿区域相邻，后续逐个加1）
     };
 
-    enum mNonBoundaryRegionType
+    enum NonBoundaryRegionType
     {
         ERROR_REGION = -2, //被complex vertex包围的center vertex被归为此类
         FILL_BOUNDARY_REGION = -1, //需要填充为边界的区域（用来去除噪声区域，最终mesh中不存在此类点）
@@ -30,11 +30,30 @@ public:
         TOOTH_REGION //牙齿区域（此为第1颗牙齿区域，后续逐个加1）
     };
 
-    enum mBoundaryType
+    enum BoundaryType
     {
         TOOTH_GINGIVA_BOUNDARY = 0, //牙齿与牙龈的边界
         TOOTH_TOOTH_BOUNDARY, //牙齿间的边界
-        CUTTING_POINT //两种边界的交叉点
+        CUTTING_POINT, //两种边界的交叉点
+        JOINT_POINT //牙齿间边界与牙齿间边界的交叉点
+    };
+
+    enum ProgramScheduleValues
+    {
+        SCHEDULE_START = 0,
+        SCHEDULE_IdentifyPotentialToothBoundary_FINISHED,
+        SCHEDULE_AutomaticCuttingOfGingiva_FINISHED,
+        SCHEDULE_BoundarySkeletonExtraction_FINISHED,
+        SCHEDULE_FindCuttingPoints_FINISHED,
+        SCHEDULE_RefineToothBoundary_FINISHED
+    };
+
+    enum CursorType
+    {
+        CURSOR_DEFAULT = 0,
+        CURSOR_ADD_BOUNDARY_VERTEX,
+        CURSOR_DELETE_BOUNDARY_VERTEX,
+        CURSOR_DELETE_ERROR_CONTOUR_SECTION
     };
 
 private:
@@ -44,6 +63,8 @@ private:
     Mesh mToothMesh; //牙齿模型网格
     Mesh mTempToothMesh; //用于保存ToothMesh的临时状态
     Mesh mExtraMesh; //附加信息网格，用来显示牙龈分割平面等附加信息
+
+    ProgramScheduleValues mProgramSchedule; //记录程序运行进度
 
     //Mesh自定义属性
     OpenMesh::VPropHandleT<float> mVPropHandleCurvature; //顶点处曲率
@@ -72,17 +93,23 @@ private:
     int mToothNum; //牙齿颗数
 
     //TODO 新建成员变量分别保存边界点handle等中间结果、所有顶点handle和mesh的所有自定义属性
-    QVector<Mesh::VertexHandle> mCuttingPointHandles; //cutting point handle
 
+    QVector<Mesh::VertexHandle> mCuttingPointHandles; //cutting point handle
+    QVector<Mesh::VertexHandle> mJointPointHandles; //joint point handle
     QVector< QVector<Mesh::VertexHandle> > mContourSections; //所有轮廓曲线段（顶点handle索引）
 
     QVector<Mesh::Point> mToothMeshVertices;
     QVector<Mesh::VertexHandle> mToothMeshVertexHandles;
 
+    QVector<Mesh::VertexHandle> mErrorRegionVertexHandles; //记录属于ERROR_REGION的顶点
+
+    CursorType mCursorType; //鼠标形状类型（在不同鼠标操作时显示不同形状的鼠标）
+    int mCircleCursorRadius; //鼠标为圆形时圆形的半径
+
+    QVector<QPoint> mMouseTrack; //鼠标拖动轨迹
+
 public:
     ToothSegmentation(QWidget *parentWidget, const Mesh &toothMesh);
-
-    void setToothMesh(const Mesh &toothMesh);
 
     Mesh getToothMesh() const;
 
@@ -103,7 +130,15 @@ public:
     //6. Refine tooth boundary
     void refineToothBoundary(bool loadStateFromFile);
 
+    //设置自定义鼠标形状
+    void setCustomCursor(CursorType cursorType);
+
+    //获取程序当前运行进度
+    ProgramScheduleValues getProgramSchedule();
+
 private:
+    void setToothMesh(const Mesh &toothMesh);
+
     //4.1 Identify potential tooth boundary
     void identifyPotentialToothBoundary();
 
@@ -146,8 +181,8 @@ private:
     //根据牙龈分割平面剔除牙龈上的初始边界点
     void removeBoundaryVertexOnGingiva();
 
-    //标记牙龈区域
-    void markNonBoundaryRegion();
+    //标记牙龈区域，返回牙龈区域个数，可据此判断是否需要对牙龈分割平面进行翻转
+    int markNonBoundaryRegion();
 
     //区域生长，返回该区域的顶点数量。如果regionType为TEMP_REGION，则只计算该区域的顶点数量，visited属性不变为true，也就是说可以再次进行区域生长；如果regionType为FILL_BOUNDARY_REGION，则将此区域填充为边界
     int regionGrowing(Mesh::VertexHandle vertexHandle, int regionType);
@@ -179,6 +214,9 @@ private:
     //基于PCL的3维点云K近邻搜索（querys中各点到points的最近距离），TODO 将工程中用到的所有STL转换为QTL
     QVector< QVector<int> > kNearestNeighbours(int Knn, const QVector<Mesh::Point> &querys, const QVector<Mesh::Point> &points);
 
+    //基于PCL的2维点云K近邻搜索（querys中各点到points的最近距离）
+    QVector< QVector<int> > kNearestNeighbours(int Knn, const QVector<QPoint> &querys, const QVector<QPoint> &points);
+
     //分类后的边界着色
     void paintClassifiedBoundary();
 
@@ -207,26 +245,44 @@ private:
     float cot(const Mesh::Point &vector1, const Mesh::Point &vector2) const;*/
 
     //将屏幕2维坐标转换为模型3维坐标
-    inline Mesh::Point screenCoordinate2Model3DCoordinate(int screenX, int screenY);
+    inline Mesh::Point screenCoordinate2Model3DCoordinate(const int screenX, const int screenY);
+
+    //将模型3维坐标转换为屏幕2维坐标
+    inline void model3DCoordinate2ScreenCoordinate(const Mesh::Point modelPoint, int &screenX, int &screenY, float &depth);
 
     //计算两点之间距离
     inline float distance(Mesh::Point point1, Mesh::Point point2);
+
+    //判断某顶点是否可见
+    inline bool isVisiable(Mesh::VertexHandle vertexHandle);
+
+    //根据mMouseTrack获取鼠标拖动时选中的所有可见的顶点
+    QVector<Mesh::VertexHandle> getSelectedVertices();
 
 public slots:
     //鼠标右键点击显示顶点属性信息
     void mousePressEventShowVertexAttributes(QMouseEvent *e);
 
-    //鼠标右键点击添加边界点（可用于连接初始边界断开处）
-    void mousePressEventAddBoundaryVertex(QMouseEvent *e);
+    //鼠标右键点击开始记录鼠标轨迹（用于添加或去除边界点）（在automaticCuttingOfGingiva之后使用）
+    void mousePressEventStartRecordMouseTrack(QMouseEvent *e);
 
-    //鼠标右键点击去除边界点（可用于去掉错误区域）
-    void mousePressEventDeleteBoundaryVertex(QMouseEvent *e);
+    //鼠标右键拖动记录鼠标轨迹（用于添加或去除边界点）（在automaticCuttingOfGingiva之后使用）
+    void mouseMoveEventRecordMouseTrack(QMouseEvent *e);
 
-    //鼠标右键点击删除错误被判为牙齿的区域，将其填充为边界（比较大的错误区域最好手动将其和牙龈区域相连）
+    //将鼠标右键拖动选中的点添加为边界点（在automaticCuttingOfGingiva之后使用）
+    void mouseReleaseEventAddSelectedBoundaryVertex(QMouseEvent *e);
+
+    //将鼠标右键拖动选中的点剔除为非边界点（在automaticCuttingOfGingiva之后使用）
+    void mouseReleaseEventDeleteSelectedBoundaryVertex(QMouseEvent *e);
+
+    //鼠标右键点击删除错误被判为牙齿的区域，将其填充为边界（比较大的错误区域最好手动将其和牙龈区域相连）（在automaticCuttingOfGingiva之后使用）
     void mousePressEventDeleteErrorToothRegion(QMouseEvent *e);
 
-    //鼠标右键点击删除错误的轮廓段
+    //鼠标右键点击删除错误的轮廓段（在findCuttingPoints之后使用）
     void mousePressEventDeleteErrorContourSection(QMouseEvent *e);
+
+    //按键“Ctrl” + “+/-”调整鼠标(画笔)半径（用于添加或去除边界点）（在automaticCuttingOfGingiva之后使用）
+    void keyPressEventChangeMouseRadius(QKeyEvent *e);
 
 };
 

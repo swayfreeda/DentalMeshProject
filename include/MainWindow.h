@@ -65,31 +65,39 @@ namespace SW
         virtual void keyPressEvent(QKeyEvent *){}
 
     protected slots:
-         void doActionOpen();
-         void doActionCloseAll();
-         void doActionLaplacianDeformation();
-         void doActionUnion();
+        void doActionOpen();
+        void doActionCloseAll();
+        void doActionLaplacianDeformation();
+        void doActionUnion();
 
-         void doActionToothSegmentationIdentifyPotentialToothBoundary();
-         void doActionToothSegmentationAutomaticCuttingOfGingiva();
-         void doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane();
-         void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp();
-         void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown();
-         void doActionToothSegmentationBoundarySkeletonExtraction();
-         void doActionToothSegmentationFindCuttingPoints();
-         void doActionToothSegmentationRefineToothBoundary();
-         void doActionToothSegmentationManuallyShowVertexProperties();
-         void doActionToothSegmentationManuallyAddBoundaryVertex();
-         void doActionToothSegmentationManuallyDeleteBoundaryVertex();
-         void doActionToothSegmentationManuallyDeleteErrorToothRegion();
+        void doActionToothSegmentationIdentifyPotentialToothBoundary();
+        void doActionToothSegmentationAutomaticCuttingOfGingiva();
+        void doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane();
+        void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp();
+        void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown();
+        void doActionToothSegmentationBoundarySkeletonExtraction();
+        void doActionToothSegmentationFindCuttingPoints();
+        void doActionToothSegmentationRefineToothBoundary();
+        void doActionToothSegmentationManuallyShowVertexProperties(bool checked);
+        void doActionToothSegmentationManuallyAddBoundaryVertex(bool checked);
+        void doActionToothSegmentationManuallyDeleteBoundaryVertex(bool checked);
+        void doActionToothSegmentationManuallyDeleteErrorToothRegion(bool checked);
+        void doActionToothSegmentationManuallyDeleteErrorContourSection(bool checked);
+        void doActionToothSegmentationEnableManualOperation(bool enable);
+        void doActionToothSegmentationProgramControl();
+
+    private:
+        void setAllManualOperationActionUnChecked();
+        void setOtherManualOperationActionUnChecked(QAction *checkedAction);
 
     public:
-         //////////////////////定义窗口部件/////////////////////////////////////
+        //////////////////////定义窗口部件/////////////////////////////////////
 
     signals:
 
     private:
         ToothSegmentation *mToothSegmentation;
+        QVector<QAction *> mToothSegmentationManualOperationActions;
 
     };
 

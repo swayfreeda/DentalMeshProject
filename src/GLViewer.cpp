@@ -56,6 +56,14 @@ SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1, QGLWidget*f):
     displayType = FLATLINE;
 
     m_length = 0.1;
+
+    mCallSuperMousePressEvent = true;
+    mCallSuperMouseMoveEvent = true;
+    mCallSuperMouseReleaseEvent = true;
+    mCallSuperMouseDoubleClickEvent = true;
+    mCallSuperWheelEvent = true;
+    mCallSuperKeyPressEvent = true;
+    mCallSuperKeyReleaseEvent = true;
 }
 
 SW::GLViewer::~GLViewer()
@@ -389,33 +397,46 @@ void SW::GLViewer::mousePressEvent(QMouseEvent *e)
 {
     onMousePressed(e);
 
-    QGLViewer::mousePressEvent(e);
-}
-
-void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e)
-{
-    if(meshes.empty())
+    if(mCallSuperMousePressEvent)
     {
-        return;
+        QGLViewer::mousePressEvent(e);
     }
-    QGLViewer::mouseReleaseEvent(e);
 }
 
 void SW::GLViewer::mouseMoveEvent(QMouseEvent *e)
 {
-    if(meshes.empty())
+    onMouseMoved(e);
+
+    if(mCallSuperMouseMoveEvent)
     {
-        return;
+        QGLViewer::mouseMoveEvent(e);
     }
-    QGLViewer::mouseMoveEvent(e);
+}
+
+void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e)
+{
+    onMouseReleased(e);
+
+    if(mCallSuperMouseReleaseEvent)
+    {
+        QGLViewer::mouseReleaseEvent(e);
+    }
+}
+
+void SW::GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    onMouseDoubleClicked(e);
+
+    if(mCallSuperMouseDoubleClickEvent)
+    {
+        QGLViewer::mouseDoubleClickEvent(e);
+    }
 }
 
 void SW::GLViewer::wheelEvent(QWheelEvent *e)
 {
-    if(meshes.empty())
-    {
-        return;
-    }
+    onWheeled(e);
+
     int numDegrees = e->delta() / 8;
     //int numSteps = numDegrees / 15;
     //    if(numSteps >0)
@@ -428,16 +449,66 @@ void SW::GLViewer::wheelEvent(QWheelEvent *e)
     //    //imageScale();
     e->accept();
     update();
-    QGLViewer::wheelEvent(e);
+
+    if(mCallSuperWheelEvent)
+    {
+        QGLViewer::wheelEvent(e);
+    }
 }
 
 void SW::GLViewer::keyPressEvent(QKeyEvent *e)
 {
-    if(meshes.empty())
+    onKeyPressed(e);
+
+    if(mCallSuperKeyPressEvent)
     {
-        return;
+        QGLViewer::keyPressEvent(e);
     }
-    QGLViewer::keyPressEvent(e);
+}
+
+void SW::GLViewer::keyReleaseEvent(QKeyEvent *e)
+{
+    onKeyReleased(e);
+
+    if(mCallSuperKeyReleaseEvent)
+    {
+        QGLViewer::keyReleaseEvent(e);
+    }
+}
+
+void SW::GLViewer::setCallSuperMousePressEvent(bool callSuperEvent)
+{
+    mCallSuperMousePressEvent = callSuperEvent;
+}
+
+void SW::GLViewer::setCallSuperMouseMoveEvent(bool callSuperEvent)
+{
+    mCallSuperMouseMoveEvent = callSuperEvent;
+}
+
+void SW::GLViewer::setCallSuperMouseReleaseEvent(bool callSuperEvent)
+{
+    mCallSuperMouseReleaseEvent = callSuperEvent;
+}
+
+void SW::GLViewer::setCallSuperMouseDoubleClickEvent(bool callSuperEvent)
+{
+    mCallSuperMouseDoubleClickEvent = callSuperEvent;
+}
+
+void SW::GLViewer::setCallSuperWheelEvent(bool callSuperEvent)
+{
+    mCallSuperWheelEvent = callSuperEvent;
+}
+
+void SW::GLViewer::setCallSuperKeyPressEvent(bool callSuperEvent)
+{
+    mCallSuperKeyPressEvent = callSuperEvent;
+}
+
+void SW::GLViewer::setCallSuperKeyReleaseEvent(bool callSuperEvent)
+{
+    mCallSuperKeyReleaseEvent = callSuperEvent;
 }
 
 void SW::GLViewer::setGL(void){

@@ -32,12 +32,22 @@ SW::MainWindow::MainWindow()
     connect(actionToothSegmentationBoundarySkeletonExtraction, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationBoundarySkeletonExtraction()));
     connect(actionToothSegmentationFindCuttingPoints, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationFindCuttingPoints()));
     connect(actionToothSegmentationRefineToothBoundary, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationRefineToothBoundary()));
-    connect(actionToothSegmentationManuallyShowVertexProperties, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyShowVertexProperties()));
-    connect(actionToothSegmentationManuallyAddBoundaryVertex, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyAddBoundaryVertex()));
-    connect(actionToothSegmentationManuallyDeleteBoundaryVertex, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyDeleteBoundaryVertex()));
-    connect(actionToothSegmentationManuallyDeleteErrorToothRegion, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationManuallyDeleteErrorToothRegion()));
+    connect(actionToothSegmentationManuallyShowVertexProperties, SIGNAL(toggled(bool)), this, SLOT(doActionToothSegmentationManuallyShowVertexProperties(bool)));
+    connect(actionToothSegmentationManuallyAddBoundaryVertex, SIGNAL(toggled(bool)), this, SLOT(doActionToothSegmentationManuallyAddBoundaryVertex(bool)));
+    connect(actionToothSegmentationManuallyDeleteBoundaryVertex, SIGNAL(toggled(bool)), this, SLOT(doActionToothSegmentationManuallyDeleteBoundaryVertex(bool)));
+    connect(actionToothSegmentationManuallyDeleteErrorToothRegion, SIGNAL(toggled(bool)), this, SLOT(doActionToothSegmentationManuallyDeleteErrorToothRegion(bool)));
+    connect(actionToothSegmentationManuallyDeleteErrorContourSection, SIGNAL(toggled(bool)), this, SLOT(doActionToothSegmentationManuallyDeleteErrorContourSection(bool)));
+    connect(actionToothSegmentationEnableManualOperation, SIGNAL(toggled(bool)), this, SLOT(doActionToothSegmentationEnableManualOperation(bool)));
+    connect(actionToothSegmentationProgramControl, SIGNAL(triggered()), this, SLOT(doActionToothSegmentationProgramControl()));
 
     update();
+
+    mToothSegmentation = NULL;
+    mToothSegmentationManualOperationActions.push_back(actionToothSegmentationManuallyShowVertexProperties);
+    mToothSegmentationManualOperationActions.push_back(actionToothSegmentationManuallyAddBoundaryVertex);
+    mToothSegmentationManualOperationActions.push_back(actionToothSegmentationManuallyDeleteBoundaryVertex);
+    mToothSegmentationManualOperationActions.push_back(actionToothSegmentationManuallyDeleteErrorToothRegion);
+    mToothSegmentationManualOperationActions.push_back(actionToothSegmentationManuallyDeleteErrorContourSection);
 }
 ///////////////////////////////////////////////////////////////////////////////////
 SW::MainWindow::~MainWindow()
@@ -279,46 +289,215 @@ void SW::MainWindow::doActionToothSegmentationRefineToothBoundary()
     gv->updateGL();
 }
 
-void SW::MainWindow::doActionToothSegmentationManuallyShowVertexProperties()
+void SW::MainWindow::doActionToothSegmentationManuallyShowVertexProperties(bool checked)
 {
     if(mToothSegmentation == NULL)
     {
         return;
     }
 
-    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0); //删除与onMousePressed连接的所有槽
-    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
+    if(checked)
+    {
+        setOtherManualOperationActionUnChecked(actionToothSegmentationManuallyShowVertexProperties);
+        connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
+    }
+    else
+    {
+        //disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0); //删除与onMousePressed连接的所有槽
+        disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventShowVertexAttributes(QMouseEvent*)));
+    }
 }
 
-void SW::MainWindow::doActionToothSegmentationManuallyAddBoundaryVertex()
+void SW::MainWindow::doActionToothSegmentationManuallyAddBoundaryVertex(bool checked)
 {
     if(mToothSegmentation == NULL)
     {
         return;
     }
 
-    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0);
-    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventAddBoundaryVertex(QMouseEvent*)));
+    if(checked)
+    {
+        setOtherManualOperationActionUnChecked(actionToothSegmentationManuallyAddBoundaryVertex);
+        mToothSegmentation->setCustomCursor(mToothSegmentation->CURSOR_ADD_BOUNDARY_VERTEX);
+        gv->setCallSuperMouseMoveEvent(false);
+        connect(gv, SIGNAL(onKeyPressed(QKeyEvent*)), mToothSegmentation, SLOT(keyPressEventChangeMouseRadius(QKeyEvent*)));
+        connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventStartRecordMouseTrack(QMouseEvent*)));
+        connect(gv, SIGNAL(onMouseMoved(QMouseEvent*)), mToothSegmentation, SLOT(mouseMoveEventRecordMouseTrack(QMouseEvent*)));
+        connect(gv, SIGNAL(onMouseReleased(QMouseEvent*)), mToothSegmentation, SLOT(mouseReleaseEventAddSelectedBoundaryVertex(QMouseEvent*)));
+    }
+    else
+    {
+        mToothSegmentation->setCustomCursor(mToothSegmentation->CURSOR_DEFAULT);
+        gv->setCallSuperMouseMoveEvent(true);
+        disconnect(gv, SIGNAL(onKeyPressed(QKeyEvent*)), mToothSegmentation, SLOT(keyPressEventChangeMouseRadius(QKeyEvent*)));
+        disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventStartRecordMouseTrack(QMouseEvent*)));
+        disconnect(gv, SIGNAL(onMouseMoved(QMouseEvent*)), mToothSegmentation, SLOT(mouseMoveEventRecordMouseTrack(QMouseEvent*)));
+        disconnect(gv, SIGNAL(onMouseReleased(QMouseEvent*)), mToothSegmentation, SLOT(mouseReleaseEventAddSelectedBoundaryVertex(QMouseEvent*)));
+    }
 }
 
-void SW::MainWindow::doActionToothSegmentationManuallyDeleteBoundaryVertex()
+void SW::MainWindow::doActionToothSegmentationManuallyDeleteBoundaryVertex(bool checked)
 {
     if(mToothSegmentation == NULL)
     {
         return;
     }
 
-    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0);
-    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteBoundaryVertex(QMouseEvent*)));
+    if(checked)
+    {
+        setOtherManualOperationActionUnChecked(actionToothSegmentationManuallyDeleteBoundaryVertex);
+        mToothSegmentation->setCustomCursor(mToothSegmentation->CURSOR_DELETE_BOUNDARY_VERTEX);
+        gv->setCallSuperMouseMoveEvent(false);
+        connect(gv, SIGNAL(onKeyPressed(QKeyEvent*)), mToothSegmentation, SLOT(keyPressEventChangeMouseRadius(QKeyEvent*)));
+        connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventStartRecordMouseTrack(QMouseEvent*)));
+        connect(gv, SIGNAL(onMouseMoved(QMouseEvent*)), mToothSegmentation, SLOT(mouseMoveEventRecordMouseTrack(QMouseEvent*)));
+        connect(gv, SIGNAL(onMouseReleased(QMouseEvent*)), mToothSegmentation, SLOT(mouseReleaseEventDeleteSelectedBoundaryVertex(QMouseEvent*)));
+    }
+    else
+    {
+        mToothSegmentation->setCustomCursor(mToothSegmentation->CURSOR_DEFAULT);
+        gv->setCallSuperMouseMoveEvent(true);
+        disconnect(gv, SIGNAL(onKeyPressed(QKeyEvent*)), mToothSegmentation, SLOT(keyPressEventChangeMouseRadius(QKeyEvent*)));
+        disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventStartRecordMouseTrack(QMouseEvent*)));
+        disconnect(gv, SIGNAL(onMouseMoved(QMouseEvent*)), mToothSegmentation, SLOT(mouseMoveEventRecordMouseTrack(QMouseEvent*)));
+        disconnect(gv, SIGNAL(onMouseReleased(QMouseEvent*)), mToothSegmentation, SLOT(mouseReleaseEventDeleteSelectedBoundaryVertex(QMouseEvent*)));
+    }
 }
 
-void SW::MainWindow::doActionToothSegmentationManuallyDeleteErrorToothRegion()
+void SW::MainWindow::doActionToothSegmentationManuallyDeleteErrorToothRegion(bool checked)
 {
     if(mToothSegmentation == NULL)
     {
         return;
     }
 
-    disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), 0, 0);
-    connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteErrorToothRegion(QMouseEvent*)));
+    if(checked)
+    {
+        setOtherManualOperationActionUnChecked(actionToothSegmentationManuallyDeleteErrorToothRegion);
+        connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteErrorToothRegion(QMouseEvent*)));
+    }
+    else
+    {
+        disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteErrorToothRegion(QMouseEvent*)));
+    }
+}
+
+void SW::MainWindow::doActionToothSegmentationManuallyDeleteErrorContourSection(bool checked)
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    if(checked)
+    {
+        setOtherManualOperationActionUnChecked(actionToothSegmentationManuallyDeleteErrorContourSection);
+        mToothSegmentation->setCustomCursor(mToothSegmentation->CURSOR_DELETE_ERROR_CONTOUR_SECTION);
+        connect(gv, SIGNAL(onKeyPressed(QKeyEvent*)), mToothSegmentation, SLOT(keyPressEventChangeMouseRadius(QKeyEvent*)));
+        connect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteErrorContourSection(QMouseEvent*)));
+    }
+    else
+    {
+        mToothSegmentation->setCustomCursor(mToothSegmentation->CURSOR_DEFAULT);
+        disconnect(gv, SIGNAL(onKeyPressed(QKeyEvent*)), mToothSegmentation, SLOT(keyPressEventChangeMouseRadius(QKeyEvent*)));
+        disconnect(gv, SIGNAL(onMousePressed(QMouseEvent*)), mToothSegmentation, SLOT(mousePressEventDeleteErrorContourSection(QMouseEvent*)));
+    }
+}
+
+void SW::MainWindow::doActionToothSegmentationEnableManualOperation(bool enable)
+{
+    if(!enable)
+    {
+        setAllManualOperationActionUnChecked();
+
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+    }
+    else
+    {
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(true);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(true);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(true);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(true);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(true);
+    }
+}
+
+void SW::MainWindow::setAllManualOperationActionUnChecked()
+{
+    for(int i = 0; i < mToothSegmentationManualOperationActions.size(); i++)
+    {
+        mToothSegmentationManualOperationActions.at(i)->setChecked(false);
+    }
+}
+
+void SW::MainWindow::setOtherManualOperationActionUnChecked(QAction *checkedAction)
+{
+    for(int i = 0; i < mToothSegmentationManualOperationActions.size(); i++)
+    {
+        if(mToothSegmentationManualOperationActions.at(i)->text() != checkedAction->text()) //TODO 此处用两个QAction的text是否想同来判断是否同一个Action，欠妥
+        {
+            mToothSegmentationManualOperationActions.at(i)->setChecked(false);
+        }
+    }
+}
+
+void SW::MainWindow::doActionToothSegmentationProgramControl()
+{
+    if(mToothSegmentation == NULL)
+    {
+        return;
+    }
+
+    switch(mToothSegmentation->getProgramSchedule())
+    {
+    case ToothSegmentation::SCHEDULE_START:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+
+        mToothSegmentation->identifyPotentialToothBoundary(false);
+        mToothSegmentation->automaticCuttingOfGingiva(false, false, -0.2);
+        gv->removeAllMeshes();
+        gv->addMesh(mToothSegmentation->getToothMesh());
+        gv->addMesh(mToothSegmentation->getExtraMesh());
+        QMessageBox::information(this, "Info", "Identify potential tooth boundary done!\nAutomatic cutting of gingiva done!\nPlease manually refine potential tooth boundary!");
+        gv->updateGL();
+
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        break;
+    case ToothSegmentation::SCHEDULE_IdentifyPotentialToothBoundary_FINISHED:
+
+        break;
+    case ToothSegmentation::SCHEDULE_AutomaticCuttingOfGingiva_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+
+        mToothSegmentation->boundarySkeletonExtraction(false);
+        mToothSegmentation->findCuttingPoints(false);
+        gv->removeAllMeshes();
+        gv->addMesh(mToothSegmentation->getToothMesh());
+        QMessageBox::information(this, "Info", "Boundary skeleton extraction done!\nFind cutting points done!\nPlease manually remove error contour sections!");
+        gv->updateGL();
+
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        break;
+    case ToothSegmentation::SCHEDULE_BoundarySkeletonExtraction_FINISHED:
+
+        break;
+    case ToothSegmentation::SCHEDULE_FindCuttingPoints_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+
+        mToothSegmentation->refineToothBoundary(false);
+        gv->removeAllMeshes();
+        gv->addMesh(mToothSegmentation->getToothMesh());
+        QMessageBox::information(this, "Info", "Refine tooth boundary done!\nThe whole program completed!");
+        gv->updateGL();
+
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        break;
+    case ToothSegmentation::SCHEDULE_RefineToothBoundary_FINISHED:
+        QMessageBox::information(this, "Info", "The whole program completed!");
+        break;
+    }
 }

@@ -52,3 +52,6 @@ LIBS += \
 FORMS += \
     ui_templates/mainwindow.ui
 
+RESOURCES += \
+    resource/ToothSegmentation.qrc
+
