@@ -105,6 +105,11 @@ void SW::MainWindow::doActionOpen()
     gv->viewAll();
 
     mToothSegmentation = new ToothSegmentation(this, gv->getMesh(0));
+    mToothSegmentationHistory.clear();
+    mToothSegmentationHistory.push_back(*mToothSegmentation);
+    mToothSegmentationUsingIndexInHistory = 0;
+    connect(mToothSegmentation, SIGNAL(onSaveHistory()), this, SLOT(saveToothSegmentationHistory()));
+    actionToothSegmentationProgramControl->setEnabled(true);
 }
 
 void SW::MainWindow::doActionCloseAll()
@@ -112,6 +117,13 @@ void SW::MainWindow::doActionCloseAll()
     gv->removeAllMeshes();
     gv->updateGL();
     statusBar()->showMessage("All mesh closed!");
+
+    actionToothSegmentationProgramControl->setEnabled(false);
+    actionToothSegmentationEnableManualOperation->setChecked(false);
+    actionToothSegmentationEnableManualOperation->setEnabled(false);
+    actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+    actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+    actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
 }
 
 void SW::MainWindow::doActionLaplacianDeformation()
@@ -177,6 +189,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaFlipCutti
     time.start();
     mToothSegmentation->automaticCuttingOfGingiva(false, true, 0.0);
     cout << "ToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane 用时：" << time.elapsed() / 1000 << "s." << endl;
+    saveToothSegmentationHistory();
 
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
@@ -198,6 +211,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaMoveCutti
     time.start();
     mToothSegmentation->automaticCuttingOfGingiva(false, false, 0.1);
     cout << "ToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp 用时：" << time.elapsed() / 1000 << "s." << endl;
+    saveToothSegmentationHistory();
 
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
@@ -219,6 +233,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaMoveCutti
     time.start();
     mToothSegmentation->automaticCuttingOfGingiva(false, false, -0.1);
     cout << "ToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown 用时：" << time.elapsed() / 1000 << "s." << endl;
+    saveToothSegmentationHistory();
 
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
@@ -459,12 +474,20 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
 
         mToothSegmentation->identifyPotentialToothBoundary(false);
         mToothSegmentation->automaticCuttingOfGingiva(false, false, -0.2);
+        saveToothSegmentationHistory();
         gv->removeAllMeshes();
         gv->addMesh(mToothSegmentation->getToothMesh());
-        gv->addMesh(mToothSegmentation->getExtraMesh());
+        if(mToothSegmentation->shouldShowExtraMesh())
+        {
+            gv->addMesh(mToothSegmentation->getExtraMesh());
+        }
         QMessageBox::information(this, "Info", "Identify potential tooth boundary done!\nAutomatic cutting of gingiva done!\nPlease manually refine potential tooth boundary!");
         gv->updateGL();
 
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(true);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(true);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(true);
         actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
         break;
     case ToothSegmentation::SCHEDULE_IdentifyPotentialToothBoundary_FINISHED:
@@ -472,11 +495,19 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         break;
     case ToothSegmentation::SCHEDULE_AutomaticCuttingOfGingiva_FINISHED:
         actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
 
         mToothSegmentation->boundarySkeletonExtraction(false);
         mToothSegmentation->findCuttingPoints(false);
+        saveToothSegmentationHistory();
         gv->removeAllMeshes();
         gv->addMesh(mToothSegmentation->getToothMesh());
+        if(mToothSegmentation->shouldShowExtraMesh())
+        {
+            gv->addMesh(mToothSegmentation->getExtraMesh());
+        }
         QMessageBox::information(this, "Info", "Boundary skeleton extraction done!\nFind cutting points done!\nPlease manually remove error contour sections!");
         gv->updateGL();
 
@@ -489,8 +520,13 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
 
         mToothSegmentation->refineToothBoundary(false);
+        saveToothSegmentationHistory();
         gv->removeAllMeshes();
         gv->addMesh(mToothSegmentation->getToothMesh());
+        if(mToothSegmentation->shouldShowExtraMesh())
+        {
+            gv->addMesh(mToothSegmentation->getExtraMesh());
+        }
         QMessageBox::information(this, "Info", "Refine tooth boundary done!\nThe whole program completed!");
         gv->updateGL();
 
@@ -500,4 +536,58 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         QMessageBox::information(this, "Info", "The whole program completed!");
         break;
     }
+}
+
+void SW::MainWindow::keyPressEvent(QKeyEvent *e)
+{
+    if((e->modifiers() & Qt::ControlModifier)) //"Ctrl"
+    {
+        switch(e->key())
+        {
+        case Qt::Key_Z: //"Z"（撤销）
+            if(mToothSegmentationUsingIndexInHistory > 0)
+            {
+                mToothSegmentationUsingIndexInHistory--;
+                //*mToothSegmentation = *(mToothSegmentationHistory.data() + mToothSegmentationUsingIndexInHistory);
+                //memcpy(mToothSegmentation, mToothSegmentationHistory.data() + mToothSegmentationUsingIndexInHistory, sizeof(ToothSegmentation));
+                mToothSegmentation->copyFrom(mToothSegmentationHistory.at(mToothSegmentationUsingIndexInHistory));
+
+                //更新显示
+                gv->removeAllMeshes();
+                gv->addMesh(mToothSegmentation->getToothMesh());
+                if(mToothSegmentation->shouldShowExtraMesh())
+                {
+                    gv->addMesh(mToothSegmentation->getExtraMesh());
+                }
+                gv->updateGL();
+            }
+            break;
+        case Qt::Key_R: //"R"（重做）
+            if(mToothSegmentationUsingIndexInHistory < (mToothSegmentationHistory.size() - 1))
+            {
+                mToothSegmentationUsingIndexInHistory++;
+                mToothSegmentation->copyFrom(mToothSegmentationHistory.at(mToothSegmentationUsingIndexInHistory));
+
+                //更新显示
+                gv->removeAllMeshes();
+                gv->addMesh(mToothSegmentation->getToothMesh());
+                if(mToothSegmentation->shouldShowExtraMesh())
+                {
+                    gv->addMesh(mToothSegmentation->getExtraMesh());
+                }
+                gv->updateGL();
+            }
+            break;
+        }
+    }
+}
+
+void SW::MainWindow::saveToothSegmentationHistory()
+{
+    if(mToothSegmentationUsingIndexInHistory != (mToothSegmentationHistory.size() - 1))
+    {
+        mToothSegmentationHistory.remove(mToothSegmentationUsingIndexInHistory + 1, mToothSegmentationHistory.size() - mToothSegmentationUsingIndexInHistory - 1);
+    }
+    mToothSegmentationHistory.push_back(*mToothSegmentation);
+    mToothSegmentationUsingIndexInHistory++;
 }

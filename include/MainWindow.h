@@ -62,7 +62,7 @@ namespace SW
 
     protected:
 
-        virtual void keyPressEvent(QKeyEvent *){}
+        virtual void keyPressEvent(QKeyEvent *);
 
     protected slots:
         void doActionOpen();
@@ -86,6 +86,9 @@ namespace SW
         void doActionToothSegmentationEnableManualOperation(bool enable);
         void doActionToothSegmentationProgramControl();
 
+    public slots:
+        void saveToothSegmentationHistory();
+
     private:
         void setAllManualOperationActionUnChecked();
         void setOtherManualOperationActionUnChecked(QAction *checkedAction);
@@ -98,6 +101,8 @@ namespace SW
     private:
         ToothSegmentation *mToothSegmentation;
         QVector<QAction *> mToothSegmentationManualOperationActions;
+        QVector<ToothSegmentation> mToothSegmentationHistory;
+        int mToothSegmentationUsingIndexInHistory;
 
     };
 

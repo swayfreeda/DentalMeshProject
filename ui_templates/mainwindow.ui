@@ -650,6 +650,9 @@ background: rgb(95, 95, 95);
    </property>
   </action>
   <action name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resource/ToothSegmentation.qrc">
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png</iconset>
@@ -659,6 +662,9 @@ background: rgb(95, 95, 95);
    </property>
   </action>
   <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resource/ToothSegmentation.qrc">
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png</iconset>
@@ -668,6 +674,9 @@ background: rgb(95, 95, 95);
    </property>
   </action>
   <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resource/ToothSegmentation.qrc">
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png</iconset>
@@ -766,6 +775,9 @@ background: rgb(95, 95, 95);
    <property name="checked">
     <bool>false</bool>
    </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resource/ToothSegmentation.qrc">
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png</normaloff>
@@ -779,6 +791,9 @@ background: rgb(95, 95, 95);
    </property>
   </action>
   <action name="actionToothSegmentationProgramControl">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="../resource/ToothSegmentation.qrc">
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_program_control_start.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_program_control_start.png</iconset>

@@ -63,6 +63,7 @@ private:
     Mesh mToothMesh; //牙齿模型网格
     Mesh mTempToothMesh; //用于保存ToothMesh的临时状态
     Mesh mExtraMesh; //附加信息网格，用来显示牙龈分割平面等附加信息
+    bool mShouldShowExtraMesh; //是否要显示ExtraMesh
 
     ProgramScheduleValues mProgramSchedule; //记录程序运行进度
 
@@ -111,6 +112,14 @@ private:
 public:
     ToothSegmentation(QWidget *parentWidget, const Mesh &toothMesh);
 
+    ToothSegmentation();
+
+    ToothSegmentation(const ToothSegmentation &toothSegmentation);
+
+    ToothSegmentation& operator=(const ToothSegmentation &toothSegmentation);
+
+    void copyFrom(const ToothSegmentation &toothSegmentation);
+
     Mesh getToothMesh() const;
 
     Mesh getExtraMesh() const;
@@ -135,6 +144,9 @@ public:
 
     //获取程序当前运行进度
     ProgramScheduleValues getProgramSchedule();
+
+    //是否显示ExtraMesh
+    bool shouldShowExtraMesh();
 
 private:
     void setToothMesh(const Mesh &toothMesh);
@@ -283,6 +295,10 @@ public slots:
 
     //按键“Ctrl” + “+/-”调整鼠标(画笔)半径（用于添加或去除边界点）（在automaticCuttingOfGingiva之后使用）
     void keyPressEventChangeMouseRadius(QKeyEvent *e);
+
+signals:
+    //通知主窗口类保存历史状态，以便撤销操作
+    void onSaveHistory();
 
 };
 

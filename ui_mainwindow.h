@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sun Aug 30 20:33:50 2015
+** Created: Mon Aug 31 21:42:55 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -323,16 +323,19 @@ public:
         actionToothSegmentationFindCuttingPoints->setObjectName(QString::fromUtf8("actionToothSegmentationFindCuttingPoints"));
         actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane = new QAction(MainWindow);
         actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"));
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
         QIcon icon20;
         icon20.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setIcon(icon20);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp = new QAction(MainWindow);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
         QIcon icon21;
         icon21.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setIcon(icon21);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown = new QAction(MainWindow);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
         QIcon icon22;
         icon22.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setIcon(icon22);
@@ -378,12 +381,14 @@ public:
         actionToothSegmentationEnableManualOperation->setObjectName(QString::fromUtf8("actionToothSegmentationEnableManualOperation"));
         actionToothSegmentationEnableManualOperation->setCheckable(true);
         actionToothSegmentationEnableManualOperation->setChecked(false);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
         QIcon icon28;
         icon28.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png"), QSize(), QIcon::Normal, QIcon::Off);
         icon28.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_checked.png"), QSize(), QIcon::Normal, QIcon::On);
         actionToothSegmentationEnableManualOperation->setIcon(icon28);
         actionToothSegmentationProgramControl = new QAction(MainWindow);
         actionToothSegmentationProgramControl->setObjectName(QString::fromUtf8("actionToothSegmentationProgramControl"));
+        actionToothSegmentationProgramControl->setEnabled(false);
         QIcon icon29;
         icon29.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"), QSize(), QIcon::Normal, QIcon::Off);
         actionToothSegmentationProgramControl->setIcon(icon29);

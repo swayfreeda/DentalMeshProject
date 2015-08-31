@@ -52,10 +52,97 @@ ToothSegmentation::ToothSegmentation(QWidget *parentWidget, const Mesh &toothMes
 
     setToothMesh(toothMesh);
 
+    mShouldShowExtraMesh = false;
     mGingivaCuttingPlaneComputed = false;
     mProgramSchedule = SCHEDULE_START;
     mCursorType = CURSOR_DEFAULT;
     mCircleCursorRadius = 10;
+}
+
+ToothSegmentation::ToothSegmentation()
+{
+
+}
+
+ToothSegmentation::ToothSegmentation(const ToothSegmentation &toothSegmentation)
+{
+    mParentWidget = toothSegmentation.mParentWidget;
+    mProgress = toothSegmentation.mProgress;
+
+    mToothMesh = toothSegmentation.mToothMesh;
+    mTempToothMesh = toothSegmentation.mTempToothMesh;
+    mExtraMesh = toothSegmentation.mExtraMesh;
+
+    mProgramSchedule = toothSegmentation.mProgramSchedule;
+
+    mVPropHandleCurvature = toothSegmentation.mVPropHandleCurvature;
+    mVPropHandleCurvatureComputed = toothSegmentation.mVPropHandleCurvatureComputed;
+    mVPropHandleIsToothBoundary = toothSegmentation.mVPropHandleIsToothBoundary;
+    mVPropHandleBoundaryVertexType = toothSegmentation.mVPropHandleBoundaryVertexType;
+    mVPropHandleNonBoundaryRegionType = toothSegmentation.mVPropHandleNonBoundaryRegionType;
+    mVPropHandleRegionGrowingVisited = toothSegmentation.mVPropHandleRegionGrowingVisited;
+    mVPropHandleBoundaryType = toothSegmentation.mVPropHandleBoundaryType;
+    mVPropHandleSearchContourSectionVisited = toothSegmentation.mVPropHandleSearchContourSectionVisited;
+
+    mBoundaryVertexNum = toothSegmentation.mBoundaryVertexNum;
+
+    mGingivaCuttingPlanePoint = toothSegmentation.mGingivaCuttingPlanePoint;
+    mGingivaCuttingPlaneNormal = toothSegmentation.mGingivaCuttingPlaneNormal;
+    mGingivaCuttingPlaneComputed = toothSegmentation.mGingivaCuttingPlaneComputed;
+
+    mToothNum = toothSegmentation.mToothNum;
+
+    mCuttingPointHandles = toothSegmentation.mCuttingPointHandles;
+    mJointPointHandles = toothSegmentation.mJointPointHandles;
+    mContourSections = toothSegmentation.mContourSections;
+
+    mToothMeshVertices = toothSegmentation.mToothMeshVertices;
+    mToothMeshVertexHandles = toothSegmentation.mToothMeshVertexHandles;
+
+    mErrorRegionVertexHandles = toothSegmentation.mErrorRegionVertexHandles;
+
+    mCursorType = toothSegmentation.mCursorType;
+    mCircleCursorRadius = toothSegmentation.mCircleCursorRadius;
+
+    mMouseTrack = toothSegmentation.mMouseTrack;
+}
+
+ToothSegmentation& ToothSegmentation::operator=(const ToothSegmentation &toothSegmentation)
+{
+    *this = ToothSegmentation(toothSegmentation);
+    return *this;
+}
+
+void ToothSegmentation::copyFrom(const ToothSegmentation &toothSegmentation)
+{
+    mToothMesh = toothSegmentation.mToothMesh;
+    mTempToothMesh = toothSegmentation.mTempToothMesh;
+    mExtraMesh = toothSegmentation.mExtraMesh;
+    mShouldShowExtraMesh = toothSegmentation.mShouldShowExtraMesh;
+
+    mProgramSchedule = toothSegmentation.mProgramSchedule;
+
+    mBoundaryVertexNum = toothSegmentation.mBoundaryVertexNum;
+
+    mGingivaCuttingPlanePoint = toothSegmentation.mGingivaCuttingPlanePoint;
+    mGingivaCuttingPlaneNormal = toothSegmentation.mGingivaCuttingPlaneNormal;
+    mGingivaCuttingPlaneComputed = toothSegmentation.mGingivaCuttingPlaneComputed;
+
+    mToothNum = toothSegmentation.mToothNum;
+
+    mCuttingPointHandles = toothSegmentation.mCuttingPointHandles;
+    mJointPointHandles = toothSegmentation.mJointPointHandles;
+    mContourSections = toothSegmentation.mContourSections;
+
+    mToothMeshVertices = toothSegmentation.mToothMeshVertices;
+    mToothMeshVertexHandles = toothSegmentation.mToothMeshVertexHandles;
+
+    mErrorRegionVertexHandles = toothSegmentation.mErrorRegionVertexHandles;
+
+    mCursorType = toothSegmentation.mCursorType;
+    mCircleCursorRadius = toothSegmentation.mCircleCursorRadius;
+
+    mMouseTrack = toothSegmentation.mMouseTrack;
 }
 
 void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
@@ -103,9 +190,9 @@ void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
     }
 
     //将所有顶点涂白
-//    mProgress->setWindowTitle("Setup tooth mesh...");
-//    paintAllVerticesWhite();
-//    mProgress->close();
+    mProgress->setWindowTitle("Setup tooth mesh...");
+    paintAllVerticesWhite();
+    mProgress->close();
 
     //建立mesh顶点的线性索引
     mToothMeshVertices.clear();
@@ -156,6 +243,7 @@ void ToothSegmentation::identifyPotentialToothBoundary(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
+    mShouldShowExtraMesh = false;
     mProgramSchedule = SCHEDULE_IdentifyPotentialToothBoundary_FINISHED;
 }
 
@@ -564,6 +652,7 @@ void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool f
     //关闭进度条
     mProgress->close();
 
+    mShouldShowExtraMesh = true;
     mProgramSchedule = SCHEDULE_AutomaticCuttingOfGingiva_FINISHED;
 }
 
@@ -682,6 +771,7 @@ void ToothSegmentation::boundarySkeletonExtraction(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
+    mShouldShowExtraMesh = false;
     mProgramSchedule = SCHEDULE_BoundarySkeletonExtraction_FINISHED;
 }
 
@@ -1381,6 +1471,7 @@ void ToothSegmentation::refineToothBoundary(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
+    mShouldShowExtraMesh = false;
     mProgramSchedule = SCHEDULE_RefineToothBoundary_FINISHED;
 }
 
@@ -2361,6 +2452,7 @@ void ToothSegmentation::findCuttingPoints(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
+    mShouldShowExtraMesh = false;
     mProgramSchedule = SCHEDULE_FindCuttingPoints_FINISHED;
 }
 
@@ -2576,6 +2668,7 @@ void ToothSegmentation::findCuttingPoints()
         }
         mProgress->setValue(boundaryVertexIndex);
         mToothMesh.property(mVPropHandleBoundaryType, *vertexIter) = TOOTH_GINGIVA_BOUNDARY;
+        mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexIter) = false;
     }
 
     mCuttingPointHandles.clear();
@@ -2904,6 +2997,156 @@ void ToothSegmentation::indexContourSectionsVertices()
 //                saveExtraMesh(mToothMesh.MeshName.toStdString() + ".RefineToothBoundary.Extra.ContourSection" + contourSectionIndexString + ".off");
 
                 contourSectionIndex++;
+            }
+        }
+    }
+
+    //可能会有单独一颗牙齿，此时该轮廓段并没有cutting point或joint point作为起止点，需要对此情况作处理
+    for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
+    {
+        if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexIter)) //跳过非边界点
+        {
+            continue;
+        }
+        if(mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexIter)) //跳过已被搜索过的点
+        {
+            continue;
+        }
+        if(mToothMesh.property(mVPropHandleBoundaryType, *vertexIter) == CUTTING_POINT
+                || mToothMesh.property(mVPropHandleBoundaryType, *vertexIter) == JOINT_POINT) //跳过cutting point和joint point
+        {
+            continue;
+        }
+
+        //从该点开始搜索轮廓
+        mContourSections.push_back(QVector<Mesh::VertexHandle>());
+        contourSectionIndex = mContourSections.size() - 1;
+        mContourSections[contourSectionIndex].push_back(*vertexIter); //将该点添加作为该contour section的第1个点
+        mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexIter) = true;
+        bool secondContourVertexAdded = false;
+        for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(*vertexIter); vertexVertexIter.is_valid(); vertexVertexIter++)
+        {
+            if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexVertexIter)) //跳过非边界点
+            {
+                continue;
+            }
+            if(mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexVertexIter))
+            {
+                continue;
+            }
+            mContourSections[contourSectionIndex].push_back(*vertexVertexIter); //将该点添加作为该contour section的第2个点
+            mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexVertexIter) = true;
+            secondContourVertexAdded = true;
+        }
+        if(!secondContourVertexAdded)
+        {
+            QMessageBox::information(mParentWidget, "Error", "Error finding contour section.");
+            return;
+        }
+        bool thirdContourVertexAdded = false;
+        for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(mContourSections[contourSectionIndex].back()); vertexVertexIter.is_valid(); vertexVertexIter++)
+        {
+            if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexVertexIter)) //跳过非边界点
+            {
+                continue;
+            }
+            if(mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexVertexIter))
+            {
+                continue;
+            }
+            if(*vertexVertexIter == mContourSections[contourSectionIndex].front())
+            {
+                continue;
+            }
+            mContourSections[contourSectionIndex].push_back(*vertexVertexIter); //将该点添加作为该contour section的第3个点
+            mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexVertexIter) = true;
+            thirdContourVertexAdded = true;
+        }
+        if(!thirdContourVertexAdded)
+        {
+            QMessageBox::information(mParentWidget, "Error", "Error finding contour section.");
+            return;
+        }
+        Mesh::VertexHandle startContourVertex = mContourSections[contourSectionIndex].front(); //目前搜索的轮廓的起始点
+        Mesh::VertexHandle previousContourVertex; //目前找到的倒数第2个轮廓点
+        bool contourSectionFinished = false;
+        bool newVertexAdded; //某次迭代是否添加了新的顶点
+        while(true)
+        {
+            previousContourVertex = mContourSections[contourSectionIndex].at(mContourSections[contourSectionIndex].size() - 2);
+            newVertexAdded = false;
+
+            //寻找邻域中有没有该轮廓段的起始点，有则该轮廓段搜索结束
+            for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(mContourSections[contourSectionIndex].back()); vertexVertexIter.is_valid(); vertexVertexIter++)
+            {
+                if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexVertexIter)) //跳过非边界点
+                {
+                    continue;
+                }
+                if(*vertexVertexIter == previousContourVertex) //跳过之前的轮廓点
+                {
+                    continue;
+                }
+                if(*vertexVertexIter == startContourVertex)
+                {
+                    mContourSections[contourSectionIndex].push_back(*vertexVertexIter); //将此cutting point添加作为该contour section的最后1个点
+                    newVertexAdded = true;
+                    contourSectionFinished = true;
+                    break;
+                }
+            }
+            if(contourSectionFinished)
+            {
+                break;
+            }
+
+            //寻找邻域中下一个可以被添加的点
+            for(Mesh::VertexVertexIter vertexVertexIter = mToothMesh.vv_iter(mContourSections[contourSectionIndex].back()); vertexVertexIter.is_valid(); vertexVertexIter++)
+            {
+                if(!mToothMesh.property(mVPropHandleIsToothBoundary, *vertexVertexIter)) //跳过非边界点
+                {
+                    continue;
+                }
+                if(*vertexVertexIter == previousContourVertex) //跳过之前的轮廓点
+                {
+                    continue;
+                }
+                if(*vertexVertexIter == startContourVertex)
+                {
+                    mContourSections[contourSectionIndex].push_back(*vertexVertexIter); //将此cutting point添加作为该contour section的最后1个点
+                    newVertexAdded = true;
+                    contourSectionFinished = true;
+                    break;
+                }
+                if(mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexVertexIter)) //不能重复添加某个点
+                {
+                    continue;
+                }
+                if(mToothMesh.property(mVPropHandleBoundaryType, *vertexVertexIter) != mToothMesh.property(mVPropHandleBoundaryType, mContourSections[contourSectionIndex].back()))
+                {
+                    continue;
+                }
+                mContourSections[contourSectionIndex].push_back(*vertexVertexIter); //如果以上条件都不满足，则将此边界点添加作为该contour section的1个点
+                newVertexAdded = true;
+                mToothMesh.property(mVPropHandleSearchContourSectionVisited, *vertexVertexIter) = true;
+            }
+            if(contourSectionFinished)
+            {
+                break;
+            }
+            if(!newVertexAdded) //如果没有添加新的顶点，则可能是该边界在模型边缘处中断（由于模型不完整或存在空洞导致）
+            {
+                if(mToothMesh.is_boundary(mContourSections[contourSectionIndex].back()))
+                {
+                    break;
+                }
+                else //TODO 此情况为出错，如果到达此步需检查
+                {
+                    QMessageBox::information(mParentWidget, "Error", "Error finding contour section.");
+                    //throw runtime_error("Error finding contour section.");
+                    cout << "轮廓段搜索出错点：" << mToothMesh.point(mContourSections[contourSectionIndex].back()) << endl;
+                    break;
+                }
             }
         }
     }
@@ -3401,21 +3644,18 @@ void ToothSegmentation::mouseReleaseEventAddSelectedBoundaryVertex(QMouseEvent *
 
     //更新显示
     SW::GLViewer *gv = ((MainWindow*)mParentWidget)->gv;
-    if(gv->getMeshNum() > 1) //如果之前gv中有mExtraMesh，则现在也加入mExtraMesh，否则不加
+    gv->removeAllMeshes();
+    gv->addMesh(mToothMesh);
+    if(shouldShowExtraMesh())
     {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
         gv->addMesh(mExtraMesh);
-    }
-    else
-    {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
     }
     gv->updateGL();
 
     //保存新的mesh文件
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualAddOrDeleteBoundaryVertex.off");
+
+    onSaveHistory();
 }
 
 void ToothSegmentation::mouseReleaseEventDeleteSelectedBoundaryVertex(QMouseEvent *e)
@@ -3454,21 +3694,17 @@ void ToothSegmentation::mouseReleaseEventDeleteSelectedBoundaryVertex(QMouseEven
 
     //更新显示
     SW::GLViewer *gv = ((MainWindow*)mParentWidget)->gv;
-    if(gv->getMeshNum() > 1) //如果之前gv中有mExtraMesh，则现在也加入mExtraMesh，否则不加
+    gv->removeAllMeshes();
+    gv->addMesh(mToothMesh);
+    if(shouldShowExtraMesh())
     {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
         gv->addMesh(mExtraMesh);
     }
-    else
-    {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
-    }
-    gv->updateGL();
 
     //保存新的mesh文件
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualAddOrDeleteBoundaryVertex.off");
+
+    onSaveHistory();
 }
 
 void ToothSegmentation::mousePressEventDeleteErrorToothRegion(QMouseEvent *e)
@@ -3517,21 +3753,18 @@ void ToothSegmentation::mousePressEventDeleteErrorToothRegion(QMouseEvent *e)
 
     //更新显示
     SW::GLViewer *gv = ((MainWindow*)mParentWidget)->gv;
-    if(gv->getMeshNum() > 1) //如果之前gv中有mExtraMesh，则现在也加入mExtraMesh，否则不加
+    gv->removeAllMeshes();
+    gv->addMesh(mToothMesh);
+    if(shouldShowExtraMesh())
     {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
         gv->addMesh(mExtraMesh);
-    }
-    else
-    {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
     }
     gv->updateGL();
 
     //保存新的mesh文件
     saveToothMesh(mToothMesh.MeshName.toStdString() + ".ManualDeleteErrorToothRegion.off");
+
+    onSaveHistory();
 }
 
 void ToothSegmentation::mousePressEventDeleteErrorContourSection(QMouseEvent *e)
@@ -3599,6 +3832,7 @@ void ToothSegmentation::mousePressEventDeleteErrorContourSection(QMouseEvent *e)
                     {
                         selectedContourSectionIndex.push_back(contourSectionIndex);
                     }
+                    break;
                 }
             }
         }
@@ -3767,18 +4001,15 @@ void ToothSegmentation::mousePressEventDeleteErrorContourSection(QMouseEvent *e)
 
     //更新显示
     SW::GLViewer *gv = ((MainWindow*)mParentWidget)->gv;
-    if(gv->getMeshNum() > 1) //如果之前gv中有mExtraMesh，则现在也加入mExtraMesh，否则不加
+    gv->removeAllMeshes();
+    gv->addMesh(mToothMesh);
+    if(shouldShowExtraMesh())
     {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
         gv->addMesh(mExtraMesh);
     }
-    else
-    {
-        gv->removeAllMeshes();
-        gv->addMesh(mToothMesh);
-    }
     gv->updateGL();
+
+    onSaveHistory();
 }
 
 void ToothSegmentation::setCustomCursor(CursorType cursorType)
@@ -3874,4 +4105,9 @@ void ToothSegmentation::keyPressEventChangeMouseRadius(QKeyEvent *e)
 ToothSegmentation::ProgramScheduleValues ToothSegmentation::getProgramSchedule()
 {
     return mProgramSchedule;
+}
+
+bool ToothSegmentation::shouldShowExtraMesh()
+{
+    return mShouldShowExtraMesh;
 }
