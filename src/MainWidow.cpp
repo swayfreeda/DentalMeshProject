@@ -58,7 +58,7 @@ SW::MainWindow::~MainWindow()
 
 void SW::MainWindow::doActionOpen()
 {
-    QString fileFilters= "Mesh(*.obj *.off *.ply)";
+    QString fileFilters= tr("Mesh(*.obj *.off *.ply)");
     QStringList  selectedFiles = QFileDialog::getOpenFileNames(this, tr("Open File(s)"), "./data", fileFilters);
     if(selectedFiles.size() == 0)
     {
@@ -67,7 +67,7 @@ void SW::MainWindow::doActionOpen()
 
     foreach(QString filePath, selectedFiles)
     {
-        statusBar()->showMessage("Loading Mesh from " + filePath);
+        statusBar()->showMessage(tr("Loading Mesh from ") + filePath);
 
         Mesh mesh(filePath);
         OpenMesh::IO::Options options;
@@ -75,7 +75,7 @@ void SW::MainWindow::doActionOpen()
         options += OpenMesh::IO::Options::ColorFloat; //TODO ColorFloat只支持*.off和*.ply格式的模型，但是经测试还是读不到颜色信息，不知为何
         if(!OpenMesh::IO::read_mesh(mesh, filePath.toStdString().c_str(), options))
         {
-            QMessageBox::information(this, "Error","Error to load " + filePath);
+            QMessageBox::information(this, tr("Error"), tr("Error to load ") + filePath);
             return;
         }
 
@@ -88,8 +88,8 @@ void SW::MainWindow::doActionOpen()
         //计算顶点数、面片数、边数
         mesh.computeEntityNumbers();
 
-        QMessageBox::information(this, "Info", QString("Vertices: %1 \n Faces: %2 \n Edges: %3").arg(mesh.mVertexNum).arg(mesh.mFaceNum).arg(mesh.mEdgeNum));
-        statusBar()->showMessage("Load Successed!");
+        QMessageBox::information(this, tr("Info"), QString(tr("Vertices: %1\nFaces: %2\nEdges: %3")).arg(mesh.mVertexNum).arg(mesh.mFaceNum).arg(mesh.mEdgeNum));
+        statusBar()->showMessage(tr("Load Successed!"));
 
         //计算BoundingBox
         mesh.computeBoundingBox();
@@ -116,7 +116,7 @@ void SW::MainWindow::doActionCloseAll()
 {
     gv->removeAllMeshes();
     gv->updateGL();
-    statusBar()->showMessage("All mesh closed!");
+    statusBar()->showMessage(tr("All mesh closed!"));
 
     actionToothSegmentationProgramControl->setEnabled(false);
     actionToothSegmentationEnableManualOperation->setChecked(false);
@@ -151,7 +151,7 @@ void SW::MainWindow::doActionToothSegmentationIdentifyPotentialToothBoundary()
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
 
-    QMessageBox::information(this, "Info", "Identify potential tooth boundary done!");
+    QMessageBox::information(this, tr("Info"), tr("Identify potential tooth boundary done!"));
 
     gv->updateGL();
     gv->viewAll();
@@ -173,7 +173,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingiva()
     gv->addMesh(mToothSegmentation->getToothMesh());
     gv->addMesh(mToothSegmentation->getExtraMesh());
 
-    QMessageBox::information(this, "Info", "Automatic cutting of gingiva done!");
+    QMessageBox::information(this, tr("Info"), tr("Automatic cutting of gingiva done!"));
 
     gv->updateGL();
 }
@@ -195,7 +195,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaFlipCutti
     gv->addMesh(mToothSegmentation->getToothMesh());
     gv->addMesh(mToothSegmentation->getExtraMesh());
 
-    QMessageBox::information(this, "Info", "Automatic cutting of gingiva(flip cutting plane) done!");
+    QMessageBox::information(this, tr("Info"), tr("Automatic cutting of gingiva(flip cutting plane) done!"));
 
     gv->updateGL();
 }
@@ -217,7 +217,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaMoveCutti
     gv->addMesh(mToothSegmentation->getToothMesh());
     gv->addMesh(mToothSegmentation->getExtraMesh());
 
-    QMessageBox::information(this, "Info", "Automatic cutting of gingiva(move cutting plane up) done!");
+    QMessageBox::information(this, tr("Info"), tr("Automatic cutting of gingiva(move cutting plane up) done!"));
 
     gv->updateGL();
 }
@@ -239,7 +239,7 @@ void SW::MainWindow::doActionToothSegmentationAutomaticCuttingOfGingivaMoveCutti
     gv->addMesh(mToothSegmentation->getToothMesh());
     gv->addMesh(mToothSegmentation->getExtraMesh());
 
-    QMessageBox::information(this, "Info", "Automatic cutting of gingiva(move cutting plane down) done!");
+    QMessageBox::information(this, tr("Info"), tr("Automatic cutting of gingiva(move cutting plane down) done!"));
 
     gv->updateGL();
 }
@@ -259,7 +259,7 @@ void SW::MainWindow::doActionToothSegmentationBoundarySkeletonExtraction()
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
 
-    QMessageBox::information(this, "Info", "Boundary skeleton extraction done!");
+    QMessageBox::information(this, tr("Info"), tr("Boundary skeleton extraction done!"));
 
     gv->updateGL();
 }
@@ -279,7 +279,7 @@ void SW::MainWindow::doActionToothSegmentationFindCuttingPoints()
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
 
-    QMessageBox::information(this, "Info", "Find cutting points done!");
+    QMessageBox::information(this, tr("Info"), tr("Find cutting points done!"));
 
     gv->updateGL();
 }
@@ -299,7 +299,7 @@ void SW::MainWindow::doActionToothSegmentationRefineToothBoundary()
     gv->removeAllMeshes();
     gv->addMesh(mToothSegmentation->getToothMesh());
 
-    QMessageBox::information(this, "Info", "Refine tooth boundary done!");
+    QMessageBox::information(this, tr("Info"), tr("Refine tooth boundary done!"));
 
     gv->updateGL();
 }
@@ -481,7 +481,7 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         {
             gv->addMesh(mToothSegmentation->getExtraMesh());
         }
-        QMessageBox::information(this, "Info", "Identify potential tooth boundary done!\nAutomatic cutting of gingiva done!\nPlease manually refine potential tooth boundary!");
+        QMessageBox::information(this, tr("Info"), tr("Identify potential tooth boundary done!\nAutomatic cutting of gingiva done!\nPlease manually refine potential tooth boundary!"));
         gv->updateGL();
 
         actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(true);
@@ -508,7 +508,7 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         {
             gv->addMesh(mToothSegmentation->getExtraMesh());
         }
-        QMessageBox::information(this, "Info", "Boundary skeleton extraction done!\nFind cutting points done!\nPlease manually remove error contour sections!");
+        QMessageBox::information(this, tr("Info"), tr("Boundary skeleton extraction done!\nFind cutting points done!\nPlease manually remove error contour sections!"));
         gv->updateGL();
 
         actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
@@ -527,13 +527,13 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         {
             gv->addMesh(mToothSegmentation->getExtraMesh());
         }
-        QMessageBox::information(this, "Info", "Refine tooth boundary done!\nThe whole program completed!");
+        QMessageBox::information(this, tr("Info"), tr("Refine tooth boundary done!\nThe whole program completed!"));
         gv->updateGL();
 
         actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
         break;
     case ToothSegmentation::SCHEDULE_RefineToothBoundary_FINISHED:
-        QMessageBox::information(this, "Info", "The whole program completed!");
+        QMessageBox::information(this, tr("Info"), tr("The whole program completed!"));
         break;
     }
 }

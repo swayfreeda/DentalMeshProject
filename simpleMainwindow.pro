@@ -55,3 +55,6 @@ FORMS += \
 RESOURCES += \
     resource/ToothSegmentation.qrc
 
+TRANSLATIONS += \
+    language/zh_CN.ts
+
