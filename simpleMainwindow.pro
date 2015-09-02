@@ -17,7 +17,8 @@ SOURCES += \
     src/MainWidow.cpp \
     src/Mesh.cpp \
     src/Shader.cpp \
-    src/ToothSegmentation.cpp
+    src/ToothSegmentation.cpp \
+    src/CurvatureComputer.cpp
 
 HEADERS += \
     include/BoundingBox.h \
@@ -25,7 +26,8 @@ HEADERS += \
     include/MainWindow.h \
     include/Mesh.h \
     include/Shader.h \
-    include/ToothSegmentation.h
+    include/ToothSegmentation.h \
+    include/CurvatureComputer.h
 
 INCLUDEPATH += \
     /usr/include/qt4/QtCore \
@@ -49,4 +51,7 @@ LIBS += \
 
 FORMS += \
     ui_templates/mainwindow.ui
+
+RESOURCES += \
+    resource/ToothSegmentation.qrc
 
