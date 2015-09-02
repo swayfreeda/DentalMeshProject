@@ -40,8 +40,8 @@ class  GLViewer : public QGLViewer
 
 public:
      enum DispalyType{VERTICES, WIREFRAME, FLATLINE};
-     // GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WFlags f = 0);
-     GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
+      GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WindowFlags f = 0);
+     // GLViewer(QWidget *parent0=0, QGLWidget *f = 0, Qt::WindowFlags flag);
     ~GLViewer();
 
     virtual void init();

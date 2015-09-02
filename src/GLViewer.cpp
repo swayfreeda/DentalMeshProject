@@ -49,7 +49,7 @@ GLuint numElement;
 
 SW::Shader SW::GLViewer::m_shader;
 
-SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1, QGLWidget*f):
+SW::GLViewer::GLViewer(QWidget *parent0, const QGLWidget *parent1, Qt::WindowFlags f):
     QGLViewer(parent0, parent1, f)
 {
     //setAutoFillBackground(true);
@@ -296,7 +296,7 @@ void SW::GLViewer::draw()
 {
     // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     //m_shader.enable();
-    //drawAxises(0.1, m_length);
+    drawAxises(0.1, m_length);
     glPushAttrib( GL_ALL_ATTRIB_BITS );
     setMeshMaterial();
     foreach(SW::Mesh mesh, meshes){
@@ -373,15 +373,15 @@ void SW::GLViewer::drawAxises(double width, double length)
 
     //qglColor(Qt::red);
     glColor3f(1.0, 0.0, 0.0);
-    renderText(axisLength, 0.0, 0.0, "X", QFont("helvetica", 12, QFont::Bold, TRUE));
+    renderText(axisLength, 0.0, 0.0, "X", QFont("helvetica", 12, QFont::Bold));
 
     //qglColor(Qt::green);
     glColor3f(0.0, 1.0, 0.0);
-    renderText(0.0, axisLength, 0.0, "Y", QFont("helvetica", 12, QFont::Bold, TRUE));
+    renderText(0.0, axisLength, 0.0, "Y", QFont("helvetica", 12, QFont::Bold));
 
     //qglColor(Qt::blue);
     glColor3f(0.0, 0.0, 1.0);
-    renderText(0.0, 0.0, axisLength, "Z", QFont("helvetica", 12, QFont::Bold, TRUE));
+    renderText(0.0, 0.0, axisLength, "Z", QFont("helvetica", 12, QFont::Bold));
 
 }
 

@@ -11,6 +11,20 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
+
+#if QT_VERSION >= 0x05000
+#include<QtWidgets/QAction>
+#include<QtWidgets/QApplication>
+#include<QtWidgets/QButtonGroup>
+#include<QtWidgets/QHBoxLayout>
+#include<QtWidgets/QHeaderView>
+#include<QtWidgets/QMainWindow>
+#include<QtWidgets/QMenu>
+#include<QtWidgets/QMenuBar>
+#include<QtWidgets/QStatusBar>
+#include<QtWidgets/QToolBar>
+#include<QtWidgets/QWidget>
+#else
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
@@ -22,7 +36,11 @@
 #include <QtGui/QStatusBar>
 #include <QtGui/QToolBar>
 #include <QtGui/QWidget>
+#endif
+
 #include <include/GLViewer.h>
+
+
 
 QT_BEGIN_NAMESPACE
 
@@ -322,8 +340,8 @@ public:
         gv = new SW::GLViewer(centralwidget);
         gv->setObjectName(QString::fromUtf8("gv"));
         gv->setStyleSheet(QString::fromUtf8("QFrame{\n"
-"background:rgb(207, 207, 207)\n"
-"}"));
+                                            "background:rgb(207, 207, 207)\n"
+                                            "}"));
         gv->setFrameShape(QFrame::StyledPanel);
         gv->setFrameShadow(QFrame::Raised);
 
@@ -354,8 +372,8 @@ public:
         toolBar->setObjectName(QString::fromUtf8("toolBar"));
         toolBar->setEnabled(true);
         toolBar->setStyleSheet(QString::fromUtf8("QMainWindow{\n"
-"background: rgb(95, 95, 95);\n"
-"}"));
+                                                 "background: rgb(95, 95, 95);\n"
+                                                 "}"));
         MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
         menubar->addAction(fileMenu->menuAction());
@@ -389,134 +407,134 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
-        fileOpenAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From PLY", 0, QApplication::UnicodeUTF8));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        fileOpenAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From PLY", 0));
 #ifndef QT_NO_TOOLTIP
-        fileOpenAction->setToolTip(QApplication::translate("MainWindow", "Open a PLY file to Load point cloud.", 0, QApplication::UnicodeUTF8));
+        fileOpenAction->setToolTip(QApplication::translate("MainWindow", "Open a PLY file to Load point cloud.", 0));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
-        fileOpenAction->setStatusTip(QApplication::translate("MainWindow", "Load point cloud from PLY file", 0, QApplication::UnicodeUTF8));
+        fileOpenAction->setStatusTip(QApplication::translate("MainWindow", "Load point cloud from PLY file", 0));
 #endif // QT_NO_STATUSTIP
-        fileOpenAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0, QApplication::UnicodeUTF8));
-        fileSaveAction->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
+        fileOpenAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+O", 0));
+        fileSaveAction->setText(QApplication::translate("MainWindow", "Save", 0));
 #ifndef QT_NO_TOOLTIP
-        fileSaveAction->setToolTip(QApplication::translate("MainWindow", "Save a PLY file", 0, QApplication::UnicodeUTF8));
+        fileSaveAction->setToolTip(QApplication::translate("MainWindow", "Save a PLY file", 0));
 #endif // QT_NO_TOOLTIP
 #ifndef QT_NO_STATUSTIP
-        fileSaveAction->setStatusTip(QApplication::translate("MainWindow", "Save the current point cloud in the scene.", 0, QApplication::UnicodeUTF8));
+        fileSaveAction->setStatusTip(QApplication::translate("MainWindow", "Save the current point cloud in the scene.", 0));
 #endif // QT_NO_STATUSTIP
-        fileSaveAction->setShortcut(QApplication::translate("MainWindow", "Shift+S", 0, QApplication::UnicodeUTF8));
-        fileSaveAsAction->setText(QApplication::translate("MainWindow", "Save As", 0, QApplication::UnicodeUTF8));
-        exitAction->setText(QApplication::translate("MainWindow", "Exit", 0, QApplication::UnicodeUTF8));
-        exitAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0, QApplication::UnicodeUTF8));
-        selectPointsAction->setText(QApplication::translate("MainWindow", "Select Points", 0, QApplication::UnicodeUTF8));
+        fileSaveAction->setShortcut(QApplication::translate("MainWindow", "Shift+S", 0));
+        fileSaveAsAction->setText(QApplication::translate("MainWindow", "Save As", 0));
+        exitAction->setText(QApplication::translate("MainWindow", "Exit", 0));
+        exitAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Q", 0));
+        selectPointsAction->setText(QApplication::translate("MainWindow", "Select Points", 0));
 #ifndef QT_NO_STATUSTIP
-        selectPointsAction->setStatusTip(QApplication::translate("MainWindow", "Start selecting points by press the left button and draw a rectangle.", 0, QApplication::UnicodeUTF8));
+        selectPointsAction->setStatusTip(QApplication::translate("MainWindow", "Start selecting points by press the left button and draw a rectangle.", 0));
 #endif // QT_NO_STATUSTIP
-        selectPointsAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Shift+S", 0, QApplication::UnicodeUTF8));
-        setBackGroundAction->setText(QApplication::translate("MainWindow", "BackGround Color", 0, QApplication::UnicodeUTF8));
+        selectPointsAction->setShortcut(QApplication::translate("MainWindow", "Ctrl+Shift+S", 0));
+        setBackGroundAction->setText(QApplication::translate("MainWindow", "BackGround Color", 0));
 #ifndef QT_NO_TOOLTIP
-        setBackGroundAction->setToolTip(QApplication::translate("MainWindow", "set BackGround Color", 0, QApplication::UnicodeUTF8));
+        setBackGroundAction->setToolTip(QApplication::translate("MainWindow", "set BackGround Color", 0));
 #endif // QT_NO_TOOLTIP
-        helpAboutAction->setText(QApplication::translate("MainWindow", "About", 0, QApplication::UnicodeUTF8));
-        resetAction->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
-        extractPlaneBoundaryAction->setText(QApplication::translate("MainWindow", "Extract Boundary", 0, QApplication::UnicodeUTF8));
+        helpAboutAction->setText(QApplication::translate("MainWindow", "About", 0));
+        resetAction->setText(QApplication::translate("MainWindow", "Reset", 0));
+        extractPlaneBoundaryAction->setText(QApplication::translate("MainWindow", "Extract Boundary", 0));
 #ifndef QT_NO_STATUSTIP
-        extractPlaneBoundaryAction->setStatusTip(QApplication::translate("MainWindow", "Extract ", 0, QApplication::UnicodeUTF8));
+        extractPlaneBoundaryAction->setStatusTip(QApplication::translate("MainWindow", "Extract ", 0));
 #endif // QT_NO_STATUSTIP
-        displayAllPlanesAction->setText(QApplication::translate("MainWindow", "Display All Planes Points", 0, QApplication::UnicodeUTF8));
+        displayAllPlanesAction->setText(QApplication::translate("MainWindow", "Display All Planes Points", 0));
 #ifndef QT_NO_STATUSTIP
-        displayAllPlanesAction->setStatusTip(QApplication::translate("MainWindow", "Display all the planes.", 0, QApplication::UnicodeUTF8));
+        displayAllPlanesAction->setStatusTip(QApplication::translate("MainWindow", "Display all the planes.", 0));
 #endif // QT_NO_STATUSTIP
-        displaySinglePlaneAction->setText(QApplication::translate("MainWindow", "Display Single Plane Points", 0, QApplication::UnicodeUTF8));
+        displaySinglePlaneAction->setText(QApplication::translate("MainWindow", "Display Single Plane Points", 0));
 #ifndef QT_NO_STATUSTIP
-        displaySinglePlaneAction->setStatusTip(QApplication::translate("MainWindow", "Display single plane.", 0, QApplication::UnicodeUTF8));
+        displaySinglePlaneAction->setStatusTip(QApplication::translate("MainWindow", "Display single plane.", 0));
 #endif // QT_NO_STATUSTIP
-        displayAllPolygonsAction->setText(QApplication::translate("MainWindow", "Display All Polygons", 0, QApplication::UnicodeUTF8));
+        displayAllPolygonsAction->setText(QApplication::translate("MainWindow", "Display All Polygons", 0));
 #ifndef QT_NO_STATUSTIP
-        displayAllPolygonsAction->setStatusTip(QApplication::translate("MainWindow", "Display all Polygons.", 0, QApplication::UnicodeUTF8));
+        displayAllPolygonsAction->setStatusTip(QApplication::translate("MainWindow", "Display all Polygons.", 0));
 #endif // QT_NO_STATUSTIP
-        displaySinglePolygonAction->setText(QApplication::translate("MainWindow", "Display  Single Polygon", 0, QApplication::UnicodeUTF8));
-        displayPointCloudAction->setText(QApplication::translate("MainWindow", "Display Point Cloud", 0, QApplication::UnicodeUTF8));
-        exportOFFFileAction->setText(QApplication::translate("MainWindow", "Export OFF File", 0, QApplication::UnicodeUTF8));
+        displaySinglePolygonAction->setText(QApplication::translate("MainWindow", "Display  Single Polygon", 0));
+        displayPointCloudAction->setText(QApplication::translate("MainWindow", "Display Point Cloud", 0));
+        exportOFFFileAction->setText(QApplication::translate("MainWindow", "Export OFF File", 0));
 #ifndef QT_NO_STATUSTIP
-        exportOFFFileAction->setStatusTip(QApplication::translate("MainWindow", "Not implemented!", 0, QApplication::UnicodeUTF8));
+        exportOFFFileAction->setStatusTip(QApplication::translate("MainWindow", "Not implemented!", 0));
 #endif // QT_NO_STATUSTIP
-        delaunary_TriangulationAction->setText(QApplication::translate("MainWindow", "Delaunary Triangulation", 0, QApplication::UnicodeUTF8));
-        displayDelaunaryTriangulationAction->setText(QApplication::translate("MainWindow", "Display All Plane Delaunary Triangulation", 0, QApplication::UnicodeUTF8));
+        delaunary_TriangulationAction->setText(QApplication::translate("MainWindow", "Delaunary Triangulation", 0));
+        displayDelaunaryTriangulationAction->setText(QApplication::translate("MainWindow", "Display All Plane Delaunary Triangulation", 0));
 #ifndef QT_NO_STATUSTIP
-        displayDelaunaryTriangulationAction->setStatusTip(QApplication::translate("MainWindow", "Display Delaunary Triangulation", 0, QApplication::UnicodeUTF8));
+        displayDelaunaryTriangulationAction->setStatusTip(QApplication::translate("MainWindow", "Display Delaunary Triangulation", 0));
 #endif // QT_NO_STATUSTIP
 #ifndef QT_NO_WHATSTHIS
-        displayDelaunaryTriangulationAction->setWhatsThis(QApplication::translate("MainWindow", "Seleting Points", 0, QApplication::UnicodeUTF8));
+        displayDelaunaryTriangulationAction->setWhatsThis(QApplication::translate("MainWindow", "Seleting Points", 0));
 #endif // QT_NO_WHATSTHIS
-        texture_MappingAction->setText(QApplication::translate("MainWindow", "Texture&Mapping", 0, QApplication::UnicodeUTF8));
+        texture_MappingAction->setText(QApplication::translate("MainWindow", "Texture&Mapping", 0));
 #ifndef QT_NO_STATUSTIP
-        texture_MappingAction->setStatusTip(QApplication::translate("MainWindow", "Texture Mapping", 0, QApplication::UnicodeUTF8));
+        texture_MappingAction->setStatusTip(QApplication::translate("MainWindow", "Texture Mapping", 0));
 #endif // QT_NO_STATUSTIP
-        loadImageAction->setText(QApplication::translate("MainWindow", "Load Images", 0, QApplication::UnicodeUTF8));
+        loadImageAction->setText(QApplication::translate("MainWindow", "Load Images", 0));
 #ifndef QT_NO_STATUSTIP
-        loadImageAction->setStatusTip(QApplication::translate("MainWindow", "Load texture images", 0, QApplication::UnicodeUTF8));
+        loadImageAction->setStatusTip(QApplication::translate("MainWindow", "Load texture images", 0));
 #endif // QT_NO_STATUSTIP
-        loadProjectionMatrixAction->setText(QApplication::translate("MainWindow", "Load Projection Matrix", 0, QApplication::UnicodeUTF8));
+        loadProjectionMatrixAction->setText(QApplication::translate("MainWindow", "Load Projection Matrix", 0));
 #ifndef QT_NO_STATUSTIP
-        loadProjectionMatrixAction->setStatusTip(QApplication::translate("MainWindow", "Load camera projection matrix", 0, QApplication::UnicodeUTF8));
+        loadProjectionMatrixAction->setStatusTip(QApplication::translate("MainWindow", "Load camera projection matrix", 0));
 #endif // QT_NO_STATUSTIP
-        displayPolygonOnImageAction->setText(QApplication::translate("MainWindow", "Display Polygon on Image", 0, QApplication::UnicodeUTF8));
+        displayPolygonOnImageAction->setText(QApplication::translate("MainWindow", "Display Polygon on Image", 0));
 #ifndef QT_NO_STATUSTIP
-        displayPolygonOnImageAction->setStatusTip(QApplication::translate("MainWindow", "Polygons projection on image. (Region in cyan rectangle is the valid texture region.)", 0, QApplication::UnicodeUTF8));
+        displayPolygonOnImageAction->setStatusTip(QApplication::translate("MainWindow", "Polygons projection on image. (Region in cyan rectangle is the valid texture region.)", 0));
 #endif // QT_NO_STATUSTIP
-        triangulationBrokenAction->setText(QApplication::translate("MainWindow", "Triangulation Broken", 0, QApplication::UnicodeUTF8));
+        triangulationBrokenAction->setText(QApplication::translate("MainWindow", "Triangulation Broken", 0));
 #ifndef QT_NO_WHATSTHIS
-        triangulationBrokenAction->setWhatsThis(QApplication::translate("MainWindow", "Action to broke a large triangulation in to some small ones", 0, QApplication::UnicodeUTF8));
+        triangulationBrokenAction->setWhatsThis(QApplication::translate("MainWindow", "Action to broke a large triangulation in to some small ones", 0));
 #endif // QT_NO_WHATSTHIS
-        displayAxisAction->setText(QApplication::translate("MainWindow", "Display World Axis", 0, QApplication::UnicodeUTF8));
-        displayGridAction->setText(QApplication::translate("MainWindow", "Display Grid in the XZ Plane", 0, QApplication::UnicodeUTF8));
-        attitudeAdjustmentAction->setText(QApplication::translate("MainWindow", "Attitude Adjustment", 0, QApplication::UnicodeUTF8));
-        exportProjectionMatrixFileAction->setText(QApplication::translate("MainWindow", "Export Projection Matrix File", 0, QApplication::UnicodeUTF8));
-        structureOptimizationAction->setText(QApplication::translate("MainWindow", "structureOptimization", 0, QApplication::UnicodeUTF8));
-        InconsistentDetectionAction->setText(QApplication::translate("MainWindow", "Inconsistent Region Detection", 0, QApplication::UnicodeUTF8));
-        RANSACFittingPlanesAction->setText(QApplication::translate("MainWindow", "RANSAC Fitting Planes", 0, QApplication::UnicodeUTF8));
-        ExportPlaneInfromationAction->setText(QApplication::translate("MainWindow", "Export Plane Infromation", 0, QApplication::UnicodeUTF8));
-        LoadPlaneInformationAction->setText(QApplication::translate("MainWindow", "Load Plane Information", 0, QApplication::UnicodeUTF8));
-        TestPhotoConsistencyAction->setText(QApplication::translate("MainWindow", "TestPhotoConsistency", 0, QApplication::UnicodeUTF8));
+        displayAxisAction->setText(QApplication::translate("MainWindow", "Display World Axis", 0));
+        displayGridAction->setText(QApplication::translate("MainWindow", "Display Grid in the XZ Plane", 0));
+        attitudeAdjustmentAction->setText(QApplication::translate("MainWindow", "Attitude Adjustment", 0));
+        exportProjectionMatrixFileAction->setText(QApplication::translate("MainWindow", "Export Projection Matrix File", 0));
+        structureOptimizationAction->setText(QApplication::translate("MainWindow", "structureOptimization", 0));
+        InconsistentDetectionAction->setText(QApplication::translate("MainWindow", "Inconsistent Region Detection", 0));
+        RANSACFittingPlanesAction->setText(QApplication::translate("MainWindow", "RANSAC Fitting Planes", 0));
+        ExportPlaneInfromationAction->setText(QApplication::translate("MainWindow", "Export Plane Infromation", 0));
+        LoadPlaneInformationAction->setText(QApplication::translate("MainWindow", "Load Plane Information", 0));
+        TestPhotoConsistencyAction->setText(QApplication::translate("MainWindow", "TestPhotoConsistency", 0));
 #ifndef QT_NO_TOOLTIP
-        TestPhotoConsistencyAction->setToolTip(QApplication::translate("MainWindow", "TestPhotoConsistency", 0, QApplication::UnicodeUTF8));
+        TestPhotoConsistencyAction->setToolTip(QApplication::translate("MainWindow", "TestPhotoConsistency", 0));
 #endif // QT_NO_TOOLTIP
-        LoadVisibilityAction->setText(QApplication::translate("MainWindow", "Load Visibility", 0, QApplication::UnicodeUTF8));
-        LoadCameraInformationAction->setText(QApplication::translate("MainWindow", "Load Camera Information", 0, QApplication::UnicodeUTF8));
-        ExportCameraInformationAction->setText(QApplication::translate("MainWindow", "Export Camera Information", 0, QApplication::UnicodeUTF8));
-        loadPointCloudFromXMLAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From XML", 0, QApplication::UnicodeUTF8));
-        savePointCloudAsXMLAction->setText(QApplication::translate("MainWindow", "Save Point Cloud As XML", 0, QApplication::UnicodeUTF8));
-        displayCamrerasAction->setText(QApplication::translate("MainWindow", "Display Camreras", 0, QApplication::UnicodeUTF8));
-        floorPlanReconstructionAction->setText(QApplication::translate("MainWindow", "Floor Plan Reconstruction", 0, QApplication::UnicodeUTF8));
-        SuperPixelsAction->setText(QApplication::translate("MainWindow", "SuperPixels", 0, QApplication::UnicodeUTF8));
-        loadModelAction->setText(QApplication::translate("MainWindow", "Load Model From OFF", 0, QApplication::UnicodeUTF8));
-        saveModelAction->setText(QApplication::translate("MainWindow", "Save Model As", 0, QApplication::UnicodeUTF8));
-        displaySinglePlaneDTsAction->setText(QApplication::translate("MainWindow", "Display Single Plane Delaunary Triangulation", 0, QApplication::UnicodeUTF8));
-        displayModelResultsAction->setText(QApplication::translate("MainWindow", "Display Model Results", 0, QApplication::UnicodeUTF8));
-        actionDisplay_Texture_Model->setText(QApplication::translate("MainWindow", "Display Texture Model", 0, QApplication::UnicodeUTF8));
-        actionLoad_Texure_Model->setText(QApplication::translate("MainWindow", "Load Texure Model", 0, QApplication::UnicodeUTF8));
-        actionSave_Texture_Model->setText(QApplication::translate("MainWindow", "Save Texture Model", 0, QApplication::UnicodeUTF8));
-        actionOpen->setText(QApplication::translate("MainWindow", "Open", 0, QApplication::UnicodeUTF8));
-        actionLaplacianDeformation->setText(QApplication::translate("MainWindow", "Laplacian Deformation", 0, QApplication::UnicodeUTF8));
-        actionUnion->setText(QApplication::translate("MainWindow", "Union", 0, QApplication::UnicodeUTF8));
-        actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0, QApplication::UnicodeUTF8));
-        actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0, QApplication::UnicodeUTF8));
-        actionDisplayFlatLine->setText(QApplication::translate("MainWindow", "FlatLine", 0, QApplication::UnicodeUTF8));
-        actionCloseAll->setText(QApplication::translate("MainWindow", "Close All", 0, QApplication::UnicodeUTF8));
-        actionToothSegmentationIdentifyPotentialToothBoundary->setText(QApplication::translate("MainWindow", "Identify potential tooth boundary", 0, QApplication::UnicodeUTF8));
-        actionToothSegmentationAutomaticCuttingOfGingiva->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva", 0, QApplication::UnicodeUTF8));
-        actionToothSegmentationBoundarySkeletonExtraction->setText(QApplication::translate("MainWindow", "Boundary skeleton extraction", 0, QApplication::UnicodeUTF8));
-        actionToothSegmentationRefineToothBoundary->setText(QApplication::translate("MainWindow", "Refine tooth boundary", 0, QApplication::UnicodeUTF8));
-        actionToothSegmentationFindCuttingPoints->setText(QApplication::translate("MainWindow", "Find cutting points", 0, QApplication::UnicodeUTF8));
-        fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0, QApplication::UnicodeUTF8));
-        editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0, QApplication::UnicodeUTF8));
-        toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0, QApplication::UnicodeUTF8));
-        settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0, QApplication::UnicodeUTF8));
-        displayMenu->setTitle(QApplication::translate("MainWindow", "&Display", 0, QApplication::UnicodeUTF8));
-        helpMenu->setTitle(QApplication::translate("MainWindow", "&Help", 0, QApplication::UnicodeUTF8));
-        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
+        LoadVisibilityAction->setText(QApplication::translate("MainWindow", "Load Visibility", 0));
+        LoadCameraInformationAction->setText(QApplication::translate("MainWindow", "Load Camera Information", 0));
+        ExportCameraInformationAction->setText(QApplication::translate("MainWindow", "Export Camera Information", 0));
+        loadPointCloudFromXMLAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From XML", 0));
+        savePointCloudAsXMLAction->setText(QApplication::translate("MainWindow", "Save Point Cloud As XML", 0));
+        displayCamrerasAction->setText(QApplication::translate("MainWindow", "Display Camreras", 0));
+        floorPlanReconstructionAction->setText(QApplication::translate("MainWindow", "Floor Plan Reconstruction", 0));
+        SuperPixelsAction->setText(QApplication::translate("MainWindow", "SuperPixels", 0));
+        loadModelAction->setText(QApplication::translate("MainWindow", "Load Model From OFF", 0));
+        saveModelAction->setText(QApplication::translate("MainWindow", "Save Model As", 0));
+        displaySinglePlaneDTsAction->setText(QApplication::translate("MainWindow", "Display Single Plane Delaunary Triangulation", 0));
+        displayModelResultsAction->setText(QApplication::translate("MainWindow", "Display Model Results", 0));
+        actionDisplay_Texture_Model->setText(QApplication::translate("MainWindow", "Display Texture Model", 0));
+        actionLoad_Texure_Model->setText(QApplication::translate("MainWindow", "Load Texure Model", 0));
+        actionSave_Texture_Model->setText(QApplication::translate("MainWindow", "Save Texture Model", 0));
+        actionOpen->setText(QApplication::translate("MainWindow", "Open", 0));
+        actionLaplacianDeformation->setText(QApplication::translate("MainWindow", "Laplacian Deformation", 0));
+        actionUnion->setText(QApplication::translate("MainWindow", "Union", 0));
+        actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0));
+        actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0));
+        actionDisplayFlatLine->setText(QApplication::translate("MainWindow", "FlatLine", 0));
+        actionCloseAll->setText(QApplication::translate("MainWindow", "Close All", 0));
+        actionToothSegmentationIdentifyPotentialToothBoundary->setText(QApplication::translate("MainWindow", "Identify potential tooth boundary", 0));
+        actionToothSegmentationAutomaticCuttingOfGingiva->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva", 0));
+        actionToothSegmentationBoundarySkeletonExtraction->setText(QApplication::translate("MainWindow", "Boundary skeleton extraction", 0));
+        actionToothSegmentationRefineToothBoundary->setText(QApplication::translate("MainWindow", "Refine tooth boundary", 0));
+        actionToothSegmentationFindCuttingPoints->setText(QApplication::translate("MainWindow", "Find cutting points", 0));
+        fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0));
+        editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0));
+        toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0));
+        settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0));
+        displayMenu->setTitle(QApplication::translate("MainWindow", "&Display", 0));
+        helpMenu->setTitle(QApplication::translate("MainWindow", "&Help", 0));
+        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0));
 #ifndef QT_NO_STATUSTIP
         toolBar->setStatusTip(QString());
 #endif // QT_NO_STATUSTIP
@@ -525,7 +543,7 @@ public:
 };
 
 namespace Ui {
-    class MainWindow: public Ui_MainWindow {};
+class MainWindow: public Ui_MainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE
