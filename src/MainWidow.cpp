@@ -109,6 +109,7 @@ void SW::MainWindow::doActionOpen()
     mToothSegmentationHistory.push_back(*mToothSegmentation);
     mToothSegmentationUsingIndexInHistory = 0;
     connect(mToothSegmentation, SIGNAL(onSaveHistory()), this, SLOT(saveToothSegmentationHistory()));
+    connect(mToothSegmentation, SIGNAL(onProgramScheduleChanged(int)), this, SLOT(changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(int)));
     actionToothSegmentationProgramControl->setEnabled(true);
 }
 
@@ -470,8 +471,6 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
     switch(mToothSegmentation->getProgramSchedule())
     {
     case ToothSegmentation::SCHEDULE_START:
-        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
-
         mToothSegmentation->identifyPotentialToothBoundary(false);
         mToothSegmentation->automaticCuttingOfGingiva(false, false, -0.2);
         saveToothSegmentationHistory();
@@ -483,22 +482,11 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         }
         QMessageBox::information(this, tr("Info"), tr("Identify potential tooth boundary done!\nAutomatic cutting of gingiva done!\nPlease manually refine potential tooth boundary!"));
         gv->updateGL();
-
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(true);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(true);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(true);
-        actionToothSegmentationEnableManualOperation->setEnabled(true);
-        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
         break;
     case ToothSegmentation::SCHEDULE_IdentifyPotentialToothBoundary_FINISHED:
 
         break;
     case ToothSegmentation::SCHEDULE_AutomaticCuttingOfGingiva_FINISHED:
-        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
-
         mToothSegmentation->boundarySkeletonExtraction(false);
         mToothSegmentation->findCuttingPoints(false);
         saveToothSegmentationHistory();
@@ -510,15 +498,11 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         }
         QMessageBox::information(this, tr("Info"), tr("Boundary skeleton extraction done!\nFind cutting points done!\nPlease manually remove error contour sections!"));
         gv->updateGL();
-
-        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
         break;
     case ToothSegmentation::SCHEDULE_BoundarySkeletonExtraction_FINISHED:
 
         break;
     case ToothSegmentation::SCHEDULE_FindCuttingPoints_FINISHED:
-        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
-
         mToothSegmentation->refineToothBoundary(false);
         saveToothSegmentationHistory();
         gv->removeAllMeshes();
@@ -529,8 +513,6 @@ void SW::MainWindow::doActionToothSegmentationProgramControl()
         }
         QMessageBox::information(this, tr("Info"), tr("Refine tooth boundary done!\nThe whole program completed!"));
         gv->updateGL();
-
-        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
         break;
     case ToothSegmentation::SCHEDULE_RefineToothBoundary_FINISHED:
         QMessageBox::information(this, tr("Info"), tr("The whole program completed!"));
@@ -560,6 +542,9 @@ void SW::MainWindow::keyPressEvent(QKeyEvent *e)
                     gv->addMesh(mToothSegmentation->getExtraMesh());
                 }
                 gv->updateGL();
+
+                //更新toolbar按钮状态
+                changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(mToothSegmentation->getProgramSchedule());
             }
             break;
         case Qt::Key_R: //"R"（重做）
@@ -576,6 +561,9 @@ void SW::MainWindow::keyPressEvent(QKeyEvent *e)
                     gv->addMesh(mToothSegmentation->getExtraMesh());
                 }
                 gv->updateGL();
+
+                //更新toolbar按钮状态
+                changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(mToothSegmentation->getProgramSchedule());
             }
             break;
         }
@@ -590,4 +578,184 @@ void SW::MainWindow::saveToothSegmentationHistory()
     }
     mToothSegmentationHistory.push_back(*mToothSegmentation);
     mToothSegmentationUsingIndexInHistory++;
+}
+
+void SW::MainWindow::changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(int programSchedule)
+{
+    switch(programSchedule)
+    {
+    case ToothSegmentation::SCHEDULE_START:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_IdentifyPotentialToothBoundary_STARTED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationEnableManualOperation->setChecked(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setChecked(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setChecked(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_IdentifyPotentialToothBoundary_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_AutomaticCuttingOfGingiva_STARTED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationEnableManualOperation->setChecked(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setChecked(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setChecked(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_AutomaticCuttingOfGingiva_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(true);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(true);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(true);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(true);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(true);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(true);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(true);
+        break;
+    case ToothSegmentation::SCHEDULE_BoundarySkeletonExtraction_STARTED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationEnableManualOperation->setChecked(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setChecked(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setChecked(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_BoundarySkeletonExtraction_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_FindCuttingPoints_STARTED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationEnableManualOperation->setChecked(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setChecked(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setChecked(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_FindCuttingPoints_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(true);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(true);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_RefineToothBoundary_STARTED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_pause.png"));
+        actionToothSegmentationProgramControl->setEnabled(true);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationEnableManualOperation->setChecked(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setChecked(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setChecked(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setChecked(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    case ToothSegmentation::SCHEDULE_RefineToothBoundary_FINISHED:
+        actionToothSegmentationProgramControl->setIcon(QIcon(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"));
+        actionToothSegmentationProgramControl->setEnabled(false);
+        actionToothSegmentationEnableManualOperation->setEnabled(false);
+        actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
+        actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        break;
+    }
 }

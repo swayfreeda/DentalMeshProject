@@ -41,10 +41,15 @@ public:
     enum ProgramScheduleValues
     {
         SCHEDULE_START = 0,
+        SCHEDULE_IdentifyPotentialToothBoundary_STARTED,
         SCHEDULE_IdentifyPotentialToothBoundary_FINISHED,
+        SCHEDULE_AutomaticCuttingOfGingiva_STARTED,
         SCHEDULE_AutomaticCuttingOfGingiva_FINISHED,
+        SCHEDULE_BoundarySkeletonExtraction_STARTED,
         SCHEDULE_BoundarySkeletonExtraction_FINISHED,
+        SCHEDULE_FindCuttingPoints_STARTED,
         SCHEDULE_FindCuttingPoints_FINISHED,
+        SCHEDULE_RefineToothBoundary_STARTED,
         SCHEDULE_RefineToothBoundary_FINISHED
     };
 
@@ -63,7 +68,7 @@ private:
     Mesh mToothMesh; //牙齿模型网格
     Mesh mTempToothMesh; //用于保存ToothMesh的临时状态
     Mesh mExtraMesh; //附加信息网格，用来显示牙龈分割平面等附加信息
-    bool mShouldShowExtraMesh; //是否要显示ExtraMesh
+    //bool mShouldShowExtraMesh; //是否要显示ExtraMesh
 
     ProgramScheduleValues mProgramSchedule; //记录程序运行进度
 
@@ -271,6 +276,9 @@ private:
     //根据mMouseTrack获取鼠标拖动时选中的所有可见的顶点
     QVector<Mesh::VertexHandle> getSelectedVertices();
 
+    //更新程序运行状态
+    void updateProgramSchedule(ProgramScheduleValues programSchedule);
+
 public slots:
     //鼠标右键点击显示顶点属性信息
     void mousePressEventShowVertexAttributes(QMouseEvent *e);
@@ -299,6 +307,9 @@ public slots:
 signals:
     //通知主窗口类保存历史状态，以便撤销操作
     void onSaveHistory();
+
+    //通知主窗口程序运行状态改变
+    void onProgramScheduleChanged(int programSchedule);
 
 };
 

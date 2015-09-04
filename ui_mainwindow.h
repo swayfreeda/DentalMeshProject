@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Tue Sep 1 16:32:16 2015
+** Created: Thu Sep 3 19:48:31 2015
 **      by: Qt User Interface Compiler version 4.8.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -465,16 +465,16 @@ public:
         helpMenu->addAction(actionToothSegmentationTour);
         toolBar->addAction(actionToothSegmentationProgramControl);
         toolBar->addSeparator();
-        toolBar->addAction(actionToothSegmentationEnableManualOperation);
+        toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane);
+        toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp);
+        toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown);
+        toolBar->addSeparator();
         toolBar->addAction(actionToothSegmentationManuallyShowVertexProperties);
         toolBar->addAction(actionToothSegmentationManuallyAddBoundaryVertex);
         toolBar->addAction(actionToothSegmentationManuallyDeleteBoundaryVertex);
         toolBar->addAction(actionToothSegmentationManuallyDeleteErrorToothRegion);
         toolBar->addAction(actionToothSegmentationManuallyDeleteErrorContourSection);
         toolBar->addSeparator();
-        toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane);
-        toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp);
-        toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown);
 
         retranslateUi(MainWindow);
 

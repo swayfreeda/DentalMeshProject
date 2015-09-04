@@ -137,16 +137,16 @@ background: rgb(95, 95, 95);
    </attribute>
    <addaction name="actionToothSegmentationProgramControl"/>
    <addaction name="separator"/>
-   <addaction name="actionToothSegmentationEnableManualOperation"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"/>
+   <addaction name="separator"/>
    <addaction name="actionToothSegmentationManuallyShowVertexProperties"/>
    <addaction name="actionToothSegmentationManuallyAddBoundaryVertex"/>
    <addaction name="actionToothSegmentationManuallyDeleteBoundaryVertex"/>
    <addaction name="actionToothSegmentationManuallyDeleteErrorToothRegion"/>
    <addaction name="actionToothSegmentationManuallyDeleteErrorContourSection"/>
    <addaction name="separator"/>
-   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"/>
-   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"/>
-   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"/>
   </widget>
   <action name="fileOpenAction">
    <property name="icon">

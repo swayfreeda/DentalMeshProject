@@ -43,17 +43,18 @@ ToothSegmentation::ToothSegmentation(QWidget *parentWidget, const Mesh &toothMes
 {
     mParentWidget = parentWidget;
     mProgress = new QProgressDialog(mParentWidget);
-    mProgress->setMinimumSize(400, 120);
-    mProgress->setCancelButtonText(tr("cancel"));
+    mProgress->setMinimumSize(400, 80);
+    //mProgress->setCancelButtonText(tr("cancel"));
+    mProgress->setCancelButton(0); //不显示“取消”按钮
     mProgress->setMinimumDuration(0);
     mProgress->setWindowModality(Qt::WindowModal);
     mProgress->setAutoClose(false);
 
     setToothMesh(toothMesh);
 
-    mShouldShowExtraMesh = false;
+    //mShouldShowExtraMesh = false;
     mGingivaCuttingPlaneComputed = false;
-    mProgramSchedule = SCHEDULE_START;
+    updateProgramSchedule(SCHEDULE_START);
     mCursorType = CURSOR_DEFAULT;
     mCircleCursorRadius = 10;
 }
@@ -117,7 +118,7 @@ void ToothSegmentation::copyFrom(const ToothSegmentation &toothSegmentation)
     mToothMesh = toothSegmentation.mToothMesh;
     mTempToothMesh = toothSegmentation.mTempToothMesh;
     mExtraMesh = toothSegmentation.mExtraMesh;
-    mShouldShowExtraMesh = toothSegmentation.mShouldShowExtraMesh;
+    //mShouldShowExtraMesh = toothSegmentation.mShouldShowExtraMesh;
 
     mProgramSchedule = toothSegmentation.mProgramSchedule;
 
@@ -188,11 +189,6 @@ void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
         mToothMesh.request_vertex_colors();
     }
 
-    //将所有顶点涂白
-    mProgress->setWindowTitle(tr("Setup tooth mesh..."));
-    paintAllVerticesWhite();
-    mProgress->close();
-
     //建立mesh顶点的线性索引
     mToothMeshVertices.clear();
     mToothMeshVertexHandles.clear();
@@ -201,6 +197,11 @@ void ToothSegmentation::setToothMesh(const Mesh &toothMesh)
         mToothMeshVertices.push_back(mToothMesh.point(*vertexIter));
         mToothMeshVertexHandles.push_back(*vertexIter);
     }
+
+    //将所有顶点涂白
+    mProgress->setWindowTitle(tr("Setup tooth mesh..."));
+    paintAllVerticesWhite();
+    mProgress->close();
 }
 
 Mesh ToothSegmentation::getToothMesh() const
@@ -215,6 +216,8 @@ Mesh ToothSegmentation::getExtraMesh() const
 
 void ToothSegmentation::identifyPotentialToothBoundary(bool loadStateFromFile)
 {
+    updateProgramSchedule(SCHEDULE_IdentifyPotentialToothBoundary_STARTED);
+
     mProgress->setWindowTitle(tr("Identify potential tooth boundary..."));
 
     //如果存在之前保存的状态，则读取之
@@ -242,8 +245,8 @@ void ToothSegmentation::identifyPotentialToothBoundary(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
-    mShouldShowExtraMesh = false;
-    mProgramSchedule = SCHEDULE_IdentifyPotentialToothBoundary_FINISHED;
+    //mShouldShowExtraMesh = false;
+    updateProgramSchedule(SCHEDULE_IdentifyPotentialToothBoundary_FINISHED);
 }
 
 void ToothSegmentation::identifyPotentialToothBoundary()
@@ -571,6 +574,8 @@ void ToothSegmentation::paintBoundaryVertices()
 
 void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool flipCuttingPlane, float moveCuttingPlaneDistance)
 {
+    updateProgramSchedule(SCHEDULE_AutomaticCuttingOfGingiva_STARTED);
+
     mProgress->setWindowTitle(tr("Automatic cutting Of gingiva..."));
 
     //如果存在之前保存的状态，则读取之
@@ -651,8 +656,8 @@ void ToothSegmentation::automaticCuttingOfGingiva(bool loadStateFromFile, bool f
     //关闭进度条
     mProgress->close();
 
-    mShouldShowExtraMesh = true;
-    mProgramSchedule = SCHEDULE_AutomaticCuttingOfGingiva_FINISHED;
+    //mShouldShowExtraMesh = true;
+    updateProgramSchedule(SCHEDULE_AutomaticCuttingOfGingiva_FINISHED);
 }
 
 void ToothSegmentation::automaticCuttingOfGingiva()
@@ -724,6 +729,8 @@ void ToothSegmentation::automaticCuttingOfGingiva()
 
 void ToothSegmentation::boundarySkeletonExtraction(bool loadStateFromFile)
 {
+    updateProgramSchedule(SCHEDULE_BoundarySkeletonExtraction_STARTED);
+
     mProgress->setWindowTitle(tr("Boundary skeleton extraction..."));
 
     //如果存在之前保存的状态，则读取之
@@ -770,12 +777,21 @@ void ToothSegmentation::boundarySkeletonExtraction(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
-    mShouldShowExtraMesh = false;
-    mProgramSchedule = SCHEDULE_BoundarySkeletonExtraction_FINISHED;
+    //mShouldShowExtraMesh = false;
+    updateProgramSchedule(SCHEDULE_BoundarySkeletonExtraction_FINISHED);
 }
 
 void ToothSegmentation::boundarySkeletonExtraction()
 {
+    //如果之前已经执行过单点宽度边界提取，并且存在属于ERROR_REGION的点，则将这些点还原为边界点
+    if(!mErrorRegionVertexHandles.empty())
+    {
+        for(int i = 0; i < mErrorRegionVertexHandles.size(); i++)
+        {
+            mToothMesh.property(mVPropHandleIsToothBoundary, mErrorRegionVertexHandles.at(i)) = true;
+        }
+    }
+
     mErrorRegionVertexHandles.clear();
 
     //逐步删除某一类外围点
@@ -801,6 +817,7 @@ void ToothSegmentation::boundarySkeletonExtraction()
     int centerAndDiskVertexNum;
     int centerVertexNum;
     int diskVertexNum;
+    int lastBoundaryVertexNum;
 
     mProgress->setLabelText(tr("Deleting disk vertices..."));
     mProgress->setMinimum(0);
@@ -808,6 +825,7 @@ void ToothSegmentation::boundarySkeletonExtraction()
     mProgress->setValue(0);
     while(true)
     {
+        lastBoundaryVertexNum = mBoundaryVertexNum;
         for(diskVertexTypeIndex = 0; diskVertexTypeIndex < mToothNum + 1; diskVertexTypeIndex++)
         {
             //如果存在此类外围点，则将所有此类外围点删除，然后重新分类
@@ -888,7 +906,14 @@ void ToothSegmentation::boundarySkeletonExtraction()
         {
             break;
         }
+        else if(mBoundaryVertexNum == lastBoundaryVertexNum) //如果此轮迭代（所有类型的外围点均迭代1次）没有删除边界点，则退出循环（正常不会出现此情况，此处只是为了防止未知错误发生）
+        {
+            cout << "提取边界骨架while循环异常退出！" << endl;
+            break;
+        }
     }
+
+    delete[]classifiedBoundaryVertexNum;
 }
 
 void ToothSegmentation::classifyBoundaryVertex(int *classifiedBoundaryVertexNum)
@@ -1029,6 +1054,10 @@ void ToothSegmentation::classifyBoundaryVertex(int *classifiedBoundaryVertexNum)
         {
             continue;
         }
+
+        //测试
+//        Mesh::Point testPoint = mToothMesh.point(*vertexIter);
+//        printf("%.6f %.6f %.6f 1.000000 1.000000 0.000000\n", testPoint[0], testPoint[1], testPoint[2]);
 
         neighborHasNonBoundaryVertex = false;
         neighborHasDiskVertex = false;
@@ -1355,6 +1384,19 @@ void ToothSegmentation::paintClassifiedNonBoundaryRegions()
     int vertexIndex = 0;
     int regionType;
     Mesh::Color colorBlue(0.0, 0.0, 1.0), colorGreen(0.0, 1.0, 0.0), colorWhite(1.0, 1.0, 1.0);
+    QVector<Mesh::Color> toothColors;
+    float grayValue;
+
+    //为每颗牙齿分配颜色
+    Mesh::Color pseudoColor;
+    for(int i = 0; i < mToothNum; i++)
+    {
+        grayValue = (float)i / (mToothNum - 1);
+        grayValue = (grayValue - 0.5) * 0.75 + 0.5; //为了错开红色(边界的颜色)和蓝色(牙龈的颜色)
+        gray2PseudoColor(grayValue, pseudoColor);
+        toothColors.push_back(pseudoColor);
+    }
+
     mProgress->setLabelText(tr("Painting classified nonboundary regions..."));
     mProgress->setMinimum(0);
     mProgress->setMaximum(mToothMesh.mVertexNum);
@@ -1378,16 +1420,8 @@ void ToothSegmentation::paintClassifiedNonBoundaryRegions()
                 mToothMesh.set_color(*vertexIter, colorBlue);
                 break;
             default:
-                float grayValue;
-                Mesh::Color pseudoColor;
                 int toothIndex = regionType - TOOTH_REGION;
-                grayValue = (float)(toothIndex + 1) / (mToothNum + 1); //toothIndex+1是因为灰度为0时得到的伪彩色是蓝色，和牙龈的颜色一样，所以跳过这个颜色；mToothNum+1是因为灰度为1时得到的伪彩色是红色，和边界的颜色一样，所以跳过这个颜色
-
-                //测试
-//                grayValue = 0.5;
-
-                gray2PseudoColor(grayValue, pseudoColor);
-                mToothMesh.set_color(*vertexIter, pseudoColor);
+                mToothMesh.set_color(*vertexIter, toothColors.at(toothIndex));
                 break;
             }
         }
@@ -1457,6 +1491,8 @@ void ToothSegmentation::gray2PseudoColor(float grayValue, Mesh::Color &pseudoCol
 
 void ToothSegmentation::refineToothBoundary(bool loadStateFromFile)
 {
+    updateProgramSchedule(SCHEDULE_RefineToothBoundary_STARTED);
+
     mProgress->setWindowTitle(tr("Refine tooth boundary..."));
 
     refineToothBoundary();
@@ -1470,8 +1506,8 @@ void ToothSegmentation::refineToothBoundary(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
-    mShouldShowExtraMesh = false;
-    mProgramSchedule = SCHEDULE_RefineToothBoundary_FINISHED;
+    //mShouldShowExtraMesh = false;
+    updateProgramSchedule(SCHEDULE_RefineToothBoundary_FINISHED);
 }
 
 void ToothSegmentation::refineToothBoundary()
@@ -2324,12 +2360,39 @@ void ToothSegmentation::paintAllVerticesWhite()
     mProgress->setMaximum(mToothMesh.mVertexNum);
     mProgress->setValue(0);
     Mesh::Color colorWhite(1.0, 1.0, 1.0);
+
+    //测试
+//    QTime time;
+//    time.start();
+
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         mProgress->setValue(vertexIndex);
+//        if(mProgress->wasCanceled())
+//        {
+//            break;
+//        }
         mToothMesh.set_color(*vertexIter, colorWhite);
         vertexIndex++;
     }
+//    for(int i = 0; i < mToothMeshVertexHandles.size(); i++)
+//    {
+//        mProgress->setValue(vertexIndex);
+//        if(mProgress->wasCanceled())
+//        {
+//            break;
+//        }
+//        mToothMesh.set_color(mToothMeshVertexHandles.at(i), colorWhite);
+//        vertexIndex++;
+//    }
+
+    //测试
+//    cout << "PaintAllVerticesWhite 用时：" << time.elapsed() << "ms." << endl;
+
+    //经测试，得到如下结果：
+    //(1) OpenMesh中的Color类型可以为浮点或整型，set_color函数，对这两种情况的运行速度相差无几;
+    //(2) 使用OpenMesh自带的迭代器遍历所有顶点，和使用QVector遍历，所用时间相差无几;
+    //(3) 在循环中加入if(mProgress->wasCanceled())和不加入，两种情况运行时间相差很小，可以忽略。
 }
 
 void ToothSegmentation::createPlaneInExtraMesh(Mesh::Point point, Mesh::Normal normal, float size)
@@ -2438,6 +2501,8 @@ void ToothSegmentation::createPlaneInExtraMesh(Mesh::Point point, Mesh::Normal n
 
 void ToothSegmentation::findCuttingPoints(bool loadStateFromFile)
 {
+    updateProgramSchedule(SCHEDULE_FindCuttingPoints_STARTED);
+
     mProgress->setWindowTitle(tr("Finding cutting points..."));
 
     findCuttingPoints();
@@ -2451,8 +2516,8 @@ void ToothSegmentation::findCuttingPoints(bool loadStateFromFile)
     //关闭进度条
     mProgress->close();
 
-    mShouldShowExtraMesh = false;
-    mProgramSchedule = SCHEDULE_FindCuttingPoints_FINISHED;
+    //mShouldShowExtraMesh = false;
+    updateProgramSchedule(SCHEDULE_FindCuttingPoints_FINISHED);
 }
 
 bool ToothSegmentation::saveState(string stateSymbol)
@@ -3184,6 +3249,7 @@ inline void ToothSegmentation::getKRing(const Mesh::VertexHandle &centerVertexHa
     }
 
     free(visited);
+    visited = NULL;
 }
 
 inline void ToothSegmentation::getKthRing(const Mesh::VertexHandle &centerVertexHandle, const int k, QVector<Mesh::VertexHandle> &ringVertexHandles)
@@ -4108,5 +4174,12 @@ ToothSegmentation::ProgramScheduleValues ToothSegmentation::getProgramSchedule()
 
 bool ToothSegmentation::shouldShowExtraMesh()
 {
-    return mShouldShowExtraMesh;
+    return (mProgramSchedule == SCHEDULE_AutomaticCuttingOfGingiva_FINISHED);
+}
+
+void ToothSegmentation::updateProgramSchedule(ProgramScheduleValues programSchedule)
+{
+    mProgramSchedule = programSchedule;
+
+    onProgramScheduleChanged(programSchedule);
 }
