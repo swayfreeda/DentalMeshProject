@@ -18,7 +18,8 @@ SOURCES += \
     src/MainWidow.cpp \
     src/Mesh.cpp \
     src/Shader.cpp \
-    src/ToothSegmentation.cpp
+    src/ToothSegmentation.cpp \
+    src/CurvatureComputer.cpp
 
 HEADERS += \
     include/BoundingBox.h \
@@ -26,7 +27,8 @@ HEADERS += \
     include/MainWindow.h \
     include/Mesh.h \
     include/Shader.h \
-    include/ToothSegmentation.h
+    include/ToothSegmentation.h \
+    include/CurvatureComputer.h
 
 INCLUDEPATH += \
                                     /usr/include/qt5/QtXml/    \
@@ -35,7 +37,7 @@ INCLUDEPATH += \
                                      /usr/include/qt5/QtGui \
                                     include/ \
                                      lib/libigl/include/ \ #libIGL库包含路径
-                                     lib/eigen/include/ \ #Eigen库包含路径
+                                     lib/eigen/include/  \#Eigen库包含路径
                                      /usr/local/include/pcl-1.7/ #PCL库包含路径
 
 LIBS += \
@@ -48,4 +50,7 @@ LIBS += \
 
 FORMS += \
     ui_templates/mainwindow.ui
+
+RESOURCES += \
+    resource/ToothSegmentation.qrc
 

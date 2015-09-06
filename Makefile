@@ -50,16 +50,24 @@ SOURCES       = src/main.cpp \
 		src/MainWidow.cpp \
 		src/Mesh.cpp \
 		src/Shader.cpp \
-		src/ToothSegmentation.cpp moc_GLViewer.cpp \
-		moc_MainWindow.cpp
+		src/ToothSegmentation.cpp \
+		src/CurvatureComputer.cpp qrc_ToothSegmentation.cpp \
+		moc_GLViewer.cpp \
+		moc_MainWindow.cpp \
+		moc_ToothSegmentation.cpp \
+		moc_CurvatureComputer.cpp
 OBJECTS       = main.o \
 		GLViewer.o \
 		MainWidow.o \
 		Mesh.o \
 		Shader.o \
 		ToothSegmentation.o \
+		CurvatureComputer.o \
+		qrc_ToothSegmentation.o \
 		moc_GLViewer.o \
-		moc_MainWindow.o
+		moc_MainWindow.o \
+		moc_ToothSegmentation.o \
+		moc_CurvatureComputer.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/shell-unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
@@ -120,6 +128,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		simpleMainwindow.pro \
+		resource/ToothSegmentation.qrc \
 		simpleMainwindow.pro
 QMAKE_TARGET  = simpleMainwindow
 DESTDIR       = #avoid trailing-slash linebreak
@@ -214,6 +223,7 @@ Makefile: simpleMainwindow.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-6
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf \
 		simpleMainwindow.pro \
+		resource/ToothSegmentation.qrc \
 		/usr/lib/x86_64-linux-gnu/libQt5OpenGL.prl \
 		/usr/lib/x86_64-linux-gnu/libQt5Widgets.prl \
 		/usr/lib/x86_64-linux-gnu/libQt5Gui.prl \
@@ -280,6 +290,7 @@ Makefile: simpleMainwindow.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++-6
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/yacc.prf:
 /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/lex.prf:
 simpleMainwindow.pro:
+resource/ToothSegmentation.qrc:
 /usr/lib/x86_64-linux-gnu/libQt5OpenGL.prl:
 /usr/lib/x86_64-linux-gnu/libQt5Widgets.prl:
 /usr/lib/x86_64-linux-gnu/libQt5Gui.prl:
@@ -292,7 +303,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/simpleMainwindow1.0.0 || mkdir -p .tmp/simpleMainwindow1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents include/BoundingBox.h include/GLViewer.h include/MainWindow.h include/Mesh.h include/Shader.h include/ToothSegmentation.h .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents src/main.cpp src/GLViewer.cpp src/MainWidow.cpp src/Mesh.cpp src/Shader.cpp src/ToothSegmentation.cpp .tmp/simpleMainwindow1.0.0/ && (cd `dirname .tmp/simpleMainwindow1.0.0` && $(TAR) simpleMainwindow1.0.0.tar simpleMainwindow1.0.0 && $(COMPRESS) simpleMainwindow1.0.0.tar) && $(MOVE) `dirname .tmp/simpleMainwindow1.0.0`/simpleMainwindow1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/simpleMainwindow1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents resource/ToothSegmentation.qrc .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents include/BoundingBox.h include/GLViewer.h include/MainWindow.h include/Mesh.h include/Shader.h include/ToothSegmentation.h include/CurvatureComputer.h .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents src/main.cpp src/GLViewer.cpp src/MainWidow.cpp src/Mesh.cpp src/Shader.cpp src/ToothSegmentation.cpp src/CurvatureComputer.cpp .tmp/simpleMainwindow1.0.0/ && (cd `dirname .tmp/simpleMainwindow1.0.0` && $(TAR) simpleMainwindow1.0.0.tar simpleMainwindow1.0.0 && $(COMPRESS) simpleMainwindow1.0.0.tar) && $(MOVE) `dirname .tmp/simpleMainwindow1.0.0`/simpleMainwindow1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/simpleMainwindow1.0.0
 
 
 clean:compiler_clean 
@@ -313,11 +324,27 @@ mocables: compiler_moc_header_make_all compiler_moc_source_make_all
 
 check: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_ToothSegmentation.cpp
 compiler_rcc_clean:
-compiler_moc_header_make_all: moc_GLViewer.cpp moc_MainWindow.cpp
+	-$(DEL_FILE) qrc_ToothSegmentation.cpp
+qrc_ToothSegmentation.cpp: resource/ToothSegmentation.qrc \
+		resource/image/toolbar_add_boundary_vertex.png \
+		resource/image/toolbar_move_cutting_plane_up.png \
+		resource/image/toolbar_delete_error_contour_section.png \
+		resource/image/toolbar_program_control_start.png \
+		resource/image/toolbar_enable_manual_operation_checked.png \
+		resource/image/toolbar_show_vertex_properties.png \
+		resource/image/toolbar_delete_error_tooth_region.png \
+		resource/image/toolbar_enable_manual_operation_normal.png \
+		resource/image/toolbar_program_control_pause.png \
+		resource/image/toolbar_delete_boundary_vertex.png \
+		resource/image/toolbar_move_cutting_plane_down.png \
+		resource/image/toolbar_flip_cutting_plane.png
+	/usr/lib/x86_64-linux-gnu/qt5/bin/rcc -name ToothSegmentation resource/ToothSegmentation.qrc -o qrc_ToothSegmentation.cpp
+
+compiler_moc_header_make_all: moc_GLViewer.cpp moc_MainWindow.cpp moc_ToothSegmentation.cpp moc_CurvatureComputer.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_GLViewer.cpp moc_MainWindow.cpp
+	-$(DEL_FILE) moc_GLViewer.cpp moc_MainWindow.cpp moc_ToothSegmentation.cpp moc_CurvatureComputer.cpp
 moc_GLViewer.cpp: include/Mesh.h \
 		include/BoundingBox.h \
 		include/Shader.h \
@@ -655,6 +682,468 @@ moc_MainWindow.cpp: include/GLViewer.h \
 		include/MainWindow.h
 	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/MainWindow.h -o moc_MainWindow.cpp
 
+moc_ToothSegmentation.cpp: include/Mesh.h \
+		include/BoundingBox.h \
+		/usr/include/qt5/QtWidgets/QProgressDialog \
+		/usr/include/qt5/QtWidgets/qprogressdialog.h \
+		/usr/include/qt5/QtWidgets/qdialog.h \
+		/usr/include/qt5/QtWidgets/qwidget.h \
+		/usr/include/qt5/QtGui/qwindowdefs.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtGui/qwindowdefs_win.h \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
+		/usr/include/qt5/QtCore/qmargins.h \
+		/usr/include/qt5/QtCore/qrect.h \
+		/usr/include/qt5/QtCore/qsize.h \
+		/usr/include/qt5/QtCore/qpoint.h \
+		/usr/include/qt5/QtGui/qpaintdevice.h \
+		/usr/include/qt5/QtGui/qpalette.h \
+		/usr/include/qt5/QtGui/qcolor.h \
+		/usr/include/qt5/QtGui/qrgb.h \
+		/usr/include/qt5/QtCore/qstringlist.h \
+		/usr/include/qt5/QtCore/qdatastream.h \
+		/usr/include/qt5/QtCore/qiodevice.h \
+		/usr/include/qt5/QtCore/qpair.h \
+		/usr/include/qt5/QtCore/qregexp.h \
+		/usr/include/qt5/QtCore/qstringmatcher.h \
+		/usr/include/qt5/QtGui/qbrush.h \
+		/usr/include/qt5/QtCore/qvector.h \
+		/usr/include/qt5/QtGui/qmatrix.h \
+		/usr/include/qt5/QtGui/qpolygon.h \
+		/usr/include/qt5/QtGui/qregion.h \
+		/usr/include/qt5/QtCore/qline.h \
+		/usr/include/qt5/QtGui/qtransform.h \
+		/usr/include/qt5/QtGui/qpainterpath.h \
+		/usr/include/qt5/QtGui/qimage.h \
+		/usr/include/qt5/QtGui/qpixmap.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtGui/qfont.h \
+		/usr/include/qt5/QtGui/qfontmetrics.h \
+		/usr/include/qt5/QtGui/qfontinfo.h \
+		/usr/include/qt5/QtWidgets/qsizepolicy.h \
+		/usr/include/qt5/QtGui/qcursor.h \
+		/usr/include/qt5/QtGui/qkeysequence.h \
+		/usr/include/qt5/QtGui/qevent.h \
+		/usr/include/qt5/QtCore/qvariant.h \
+		/usr/include/qt5/QtCore/qmap.h \
+		/usr/include/qt5/QtCore/qdebug.h \
+		/usr/include/qt5/QtCore/qtextstream.h \
+		/usr/include/qt5/QtCore/qlocale.h \
+		/usr/include/qt5/QtCore/qset.h \
+		/usr/include/qt5/QtCore/qcontiguouscache.h \
+		/usr/include/qt5/QtCore/qurl.h \
+		/usr/include/qt5/QtCore/qurlquery.h \
+		/usr/include/qt5/QtCore/qfile.h \
+		/usr/include/qt5/QtCore/qfiledevice.h \
+		/usr/include/qt5/QtGui/qvector2d.h \
+		/usr/include/qt5/QtGui/qtouchdevice.h \
+		include/ToothSegmentation.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/ToothSegmentation.h -o moc_ToothSegmentation.cpp
+
+moc_CurvatureComputer.cpp: /usr/include/qt5/QtWidgets/QProgressDialog \
+		/usr/include/qt5/QtWidgets/qprogressdialog.h \
+		/usr/include/qt5/QtWidgets/qdialog.h \
+		/usr/include/qt5/QtWidgets/qwidget.h \
+		/usr/include/qt5/QtGui/qwindowdefs.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtGui/qwindowdefs_win.h \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
+		/usr/include/qt5/QtCore/qmargins.h \
+		/usr/include/qt5/QtCore/qrect.h \
+		/usr/include/qt5/QtCore/qsize.h \
+		/usr/include/qt5/QtCore/qpoint.h \
+		/usr/include/qt5/QtGui/qpaintdevice.h \
+		/usr/include/qt5/QtGui/qpalette.h \
+		/usr/include/qt5/QtGui/qcolor.h \
+		/usr/include/qt5/QtGui/qrgb.h \
+		/usr/include/qt5/QtCore/qstringlist.h \
+		/usr/include/qt5/QtCore/qdatastream.h \
+		/usr/include/qt5/QtCore/qiodevice.h \
+		/usr/include/qt5/QtCore/qpair.h \
+		/usr/include/qt5/QtCore/qregexp.h \
+		/usr/include/qt5/QtCore/qstringmatcher.h \
+		/usr/include/qt5/QtGui/qbrush.h \
+		/usr/include/qt5/QtCore/qvector.h \
+		/usr/include/qt5/QtGui/qmatrix.h \
+		/usr/include/qt5/QtGui/qpolygon.h \
+		/usr/include/qt5/QtGui/qregion.h \
+		/usr/include/qt5/QtCore/qline.h \
+		/usr/include/qt5/QtGui/qtransform.h \
+		/usr/include/qt5/QtGui/qpainterpath.h \
+		/usr/include/qt5/QtGui/qimage.h \
+		/usr/include/qt5/QtGui/qpixmap.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtGui/qfont.h \
+		/usr/include/qt5/QtGui/qfontmetrics.h \
+		/usr/include/qt5/QtGui/qfontinfo.h \
+		/usr/include/qt5/QtWidgets/qsizepolicy.h \
+		/usr/include/qt5/QtGui/qcursor.h \
+		/usr/include/qt5/QtGui/qkeysequence.h \
+		/usr/include/qt5/QtGui/qevent.h \
+		/usr/include/qt5/QtCore/qvariant.h \
+		/usr/include/qt5/QtCore/qmap.h \
+		/usr/include/qt5/QtCore/qdebug.h \
+		/usr/include/qt5/QtCore/qtextstream.h \
+		/usr/include/qt5/QtCore/qlocale.h \
+		/usr/include/qt5/QtCore/qset.h \
+		/usr/include/qt5/QtCore/qcontiguouscache.h \
+		/usr/include/qt5/QtCore/qurl.h \
+		/usr/include/qt5/QtCore/qurlquery.h \
+		/usr/include/qt5/QtCore/qfile.h \
+		/usr/include/qt5/QtCore/qfiledevice.h \
+		/usr/include/qt5/QtGui/qvector2d.h \
+		/usr/include/qt5/QtGui/qtouchdevice.h \
+		/usr/include/qt5/QtCore/QVector \
+		lib/eigen/include/Eigen/Geometry \
+		lib/eigen/include/Eigen/Core \
+		lib/eigen/include/Eigen/src/Core/util/DisableStupidWarnings.h \
+		lib/eigen/include/Eigen/src/Core/util/Macros.h \
+		lib/eigen/include/Eigen/src/Core/util/MKL_support.h \
+		lib/eigen/include/Eigen/src/Core/util/Constants.h \
+		lib/eigen/include/Eigen/src/Core/util/ForwardDeclarations.h \
+		lib/eigen/include/Eigen/src/Core/util/Meta.h \
+		lib/eigen/include/Eigen/src/Core/util/StaticAssert.h \
+		lib/eigen/include/Eigen/src/Core/util/XprHelper.h \
+		lib/eigen/include/Eigen/src/Core/util/Memory.h \
+		lib/eigen/include/Eigen/src/Core/NumTraits.h \
+		lib/eigen/include/Eigen/src/Core/MathFunctions.h \
+		lib/eigen/include/Eigen/src/Core/GenericPacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/SSE/PacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/SSE/MathFunctions.h \
+		lib/eigen/include/Eigen/src/Core/arch/SSE/Complex.h \
+		lib/eigen/include/Eigen/src/Core/arch/AltiVec/PacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/AltiVec/Complex.h \
+		lib/eigen/include/Eigen/src/Core/arch/NEON/PacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/NEON/Complex.h \
+		lib/eigen/include/Eigen/src/Core/arch/Default/Settings.h \
+		lib/eigen/include/Eigen/src/Core/Functors.h \
+		lib/eigen/include/Eigen/src/Core/DenseCoeffsBase.h \
+		lib/eigen/include/Eigen/src/Core/DenseBase.h \
+		lib/eigen/include/Eigen/src/plugins/BlockMethods.h \
+		lib/eigen/include/Eigen/src/Core/MatrixBase.h \
+		lib/eigen/include/Eigen/src/plugins/CommonCwiseUnaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/CommonCwiseBinaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/MatrixCwiseUnaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/MatrixCwiseBinaryOps.h \
+		lib/eigen/include/Eigen/src/Core/EigenBase.h \
+		lib/eigen/include/Eigen/src/Core/Assign.h \
+		lib/eigen/include/Eigen/src/Core/util/BlasUtil.h \
+		lib/eigen/include/Eigen/src/Core/DenseStorage.h \
+		lib/eigen/include/Eigen/src/Core/NestByValue.h \
+		lib/eigen/include/Eigen/src/Core/ForceAlignedAccess.h \
+		lib/eigen/include/Eigen/src/Core/ReturnByValue.h \
+		lib/eigen/include/Eigen/src/Core/NoAlias.h \
+		lib/eigen/include/Eigen/src/Core/PlainObjectBase.h \
+		lib/eigen/include/Eigen/src/Core/Matrix.h \
+		lib/eigen/include/Eigen/src/Core/Array.h \
+		lib/eigen/include/Eigen/src/Core/CwiseBinaryOp.h \
+		lib/eigen/include/Eigen/src/Core/CwiseUnaryOp.h \
+		lib/eigen/include/Eigen/src/Core/CwiseNullaryOp.h \
+		lib/eigen/include/Eigen/src/Core/CwiseUnaryView.h \
+		lib/eigen/include/Eigen/src/Core/SelfCwiseBinaryOp.h \
+		lib/eigen/include/Eigen/src/Core/Dot.h \
+		lib/eigen/include/Eigen/src/Core/StableNorm.h \
+		lib/eigen/include/Eigen/src/Core/MapBase.h \
+		lib/eigen/include/Eigen/src/Core/Stride.h \
+		lib/eigen/include/Eigen/src/Core/Map.h \
+		lib/eigen/include/Eigen/src/Core/Block.h \
+		lib/eigen/include/Eigen/src/Core/VectorBlock.h \
+		lib/eigen/include/Eigen/src/Core/Ref.h \
+		lib/eigen/include/Eigen/src/Core/Transpose.h \
+		lib/eigen/include/Eigen/src/Core/DiagonalMatrix.h \
+		lib/eigen/include/Eigen/src/Core/Diagonal.h \
+		lib/eigen/include/Eigen/src/Core/DiagonalProduct.h \
+		lib/eigen/include/Eigen/src/Core/PermutationMatrix.h \
+		lib/eigen/include/Eigen/src/Core/Transpositions.h \
+		lib/eigen/include/Eigen/src/Core/Redux.h \
+		lib/eigen/include/Eigen/src/Core/Visitor.h \
+		lib/eigen/include/Eigen/src/Core/Fuzzy.h \
+		lib/eigen/include/Eigen/src/Core/IO.h \
+		lib/eigen/include/Eigen/src/Core/Swap.h \
+		lib/eigen/include/Eigen/src/Core/CommaInitializer.h \
+		lib/eigen/include/Eigen/src/Core/Flagged.h \
+		lib/eigen/include/Eigen/src/Core/ProductBase.h \
+		lib/eigen/include/Eigen/src/Core/GeneralProduct.h \
+		lib/eigen/include/Eigen/src/Core/TriangularMatrix.h \
+		lib/eigen/include/Eigen/src/Core/SelfAdjointView.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
+		lib/eigen/include/Eigen/src/Core/products/Parallelizer.h \
+		lib/eigen/include/Eigen/src/Core/products/CoeffBasedProduct.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixVector.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrix.h \
+		lib/eigen/include/Eigen/src/Core/SolveTriangular.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrixTriangular.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixVector.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixMatrix.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointProduct.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointRank2Update.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixVector.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixMatrix.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularSolverMatrix.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularSolverVector.h \
+		lib/eigen/include/Eigen/src/Core/BandMatrix.h \
+		lib/eigen/include/Eigen/src/Core/CoreIterators.h \
+		lib/eigen/include/Eigen/src/Core/BooleanRedux.h \
+		lib/eigen/include/Eigen/src/Core/Select.h \
+		lib/eigen/include/Eigen/src/Core/VectorwiseOp.h \
+		lib/eigen/include/Eigen/src/Core/Random.h \
+		lib/eigen/include/Eigen/src/Core/Replicate.h \
+		lib/eigen/include/Eigen/src/Core/Reverse.h \
+		lib/eigen/include/Eigen/src/Core/ArrayBase.h \
+		lib/eigen/include/Eigen/src/plugins/ArrayCwiseUnaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/ArrayCwiseBinaryOps.h \
+		lib/eigen/include/Eigen/src/Core/ArrayWrapper.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixVector_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrixTriangular_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixVector_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixVector_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularSolverMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/Assign_MKL.h \
+		lib/eigen/include/Eigen/src/Core/GlobalFunctions.h \
+		lib/eigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h \
+		lib/eigen/include/Eigen/Eigen2Support \
+		lib/eigen/include/Eigen/src/Eigen2Support/Macros.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Memory.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Meta.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Lazy.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Cwise.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/CwiseOperators.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/TriangularSolver.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Block.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/VectorBlock.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Minor.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/MathFunctions.h \
+		lib/eigen/include/Eigen/SVD \
+		lib/eigen/include/Eigen/QR \
+		lib/eigen/include/Eigen/Cholesky \
+		lib/eigen/include/Eigen/src/misc/Solve.h \
+		lib/eigen/include/Eigen/src/Cholesky/LLT.h \
+		lib/eigen/include/Eigen/src/Cholesky/LDLT.h \
+		lib/eigen/include/Eigen/src/Cholesky/LLT_MKL.h \
+		lib/eigen/include/Eigen/Jacobi \
+		lib/eigen/include/Eigen/src/Jacobi/Jacobi.h \
+		lib/eigen/include/Eigen/Householder \
+		lib/eigen/include/Eigen/src/Householder/Householder.h \
+		lib/eigen/include/Eigen/src/Householder/HouseholderSequence.h \
+		lib/eigen/include/Eigen/src/Householder/BlockHouseholder.h \
+		lib/eigen/include/Eigen/src/QR/HouseholderQR.h \
+		lib/eigen/include/Eigen/src/QR/FullPivHouseholderQR.h \
+		lib/eigen/include/Eigen/src/QR/ColPivHouseholderQR.h \
+		lib/eigen/include/Eigen/src/QR/HouseholderQR_MKL.h \
+		lib/eigen/include/Eigen/src/QR/ColPivHouseholderQR_MKL.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/QR.h \
+		lib/eigen/include/Eigen/Eigenvalues \
+		lib/eigen/include/Eigen/LU \
+		lib/eigen/include/Eigen/src/misc/Kernel.h \
+		lib/eigen/include/Eigen/src/misc/Image.h \
+		lib/eigen/include/Eigen/src/LU/FullPivLU.h \
+		lib/eigen/include/Eigen/src/LU/PartialPivLU.h \
+		lib/eigen/include/Eigen/src/LU/PartialPivLU_MKL.h \
+		lib/eigen/include/Eigen/src/LU/Determinant.h \
+		lib/eigen/include/Eigen/src/LU/Inverse.h \
+		lib/eigen/include/Eigen/src/LU/arch/Inverse_SSE.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/LU.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/Tridiagonalization.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/RealSchur.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/HessenbergDecomposition.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/EigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/ComplexSchur.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/ComplexEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/RealQZ.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/RealSchur_MKL.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/ComplexSchur_MKL.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver_MKL.h \
+		lib/eigen/include/Eigen/src/SVD/JacobiSVD.h \
+		lib/eigen/include/Eigen/src/SVD/JacobiSVD_MKL.h \
+		lib/eigen/include/Eigen/src/SVD/UpperBidiagonalization.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/SVD.h \
+		lib/eigen/include/Eigen/src/Geometry/OrthoMethods.h \
+		lib/eigen/include/Eigen/src/Geometry/EulerAngles.h \
+		lib/eigen/include/Eigen/src/Geometry/Homogeneous.h \
+		lib/eigen/include/Eigen/src/Geometry/RotationBase.h \
+		lib/eigen/include/Eigen/src/Geometry/Rotation2D.h \
+		lib/eigen/include/Eigen/src/Geometry/Quaternion.h \
+		lib/eigen/include/Eigen/src/Geometry/AngleAxis.h \
+		lib/eigen/include/Eigen/src/Geometry/Transform.h \
+		lib/eigen/include/Eigen/src/Geometry/Translation.h \
+		lib/eigen/include/Eigen/src/Geometry/Scaling.h \
+		lib/eigen/include/Eigen/src/Geometry/Hyperplane.h \
+		lib/eigen/include/Eigen/src/Geometry/ParametrizedLine.h \
+		lib/eigen/include/Eigen/src/Geometry/AlignedBox.h \
+		lib/eigen/include/Eigen/src/Geometry/Umeyama.h \
+		lib/eigen/include/Eigen/src/Geometry/arch/Geometry_SSE.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/All.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/RotationBase.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Rotation2D.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Quaternion.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/AngleAxis.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Transform.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Translation.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Scaling.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/AlignedBox.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Hyperplane.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/ParametrizedLine.h \
+		lib/eigen/include/Eigen/Dense \
+		lib/eigen/include/Eigen/SparseCholesky \
+		lib/eigen/include/Eigen/SparseCore \
+		lib/eigen/include/Eigen/src/SparseCore/SparseUtil.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseMatrixBase.h \
+		lib/eigen/include/Eigen/src/SparseCore/CompressedStorage.h \
+		lib/eigen/include/Eigen/src/SparseCore/AmbiVector.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseMatrix.h \
+		lib/eigen/include/Eigen/src/SparseCore/MappedSparseMatrix.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseVector.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseBlock.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseTranspose.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseCwiseUnaryOp.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseCwiseBinaryOp.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseDot.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparsePermutation.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseRedux.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseFuzzy.h \
+		lib/eigen/include/Eigen/src/SparseCore/ConservativeSparseSparseProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseSparseProductWithPruning.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseDenseProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseDiagonalProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseTriangularView.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseSelfAdjointView.h \
+		lib/eigen/include/Eigen/src/SparseCore/TriangularSolver.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseView.h \
+		lib/eigen/include/Eigen/OrderingMethods \
+		lib/eigen/include/Eigen/src/OrderingMethods/Amd.h \
+		lib/eigen/include/Eigen/src/Core/util/NonMPL2.h \
+		lib/eigen/include/Eigen/src/OrderingMethods/Ordering.h \
+		lib/eigen/include/Eigen/src/OrderingMethods/Eigen_Colamd.h \
+		lib/eigen/include/Eigen/src/misc/SparseSolve.h \
+		lib/eigen/include/Eigen/src/SparseCholesky/SimplicialCholesky.h \
+		lib/eigen/include/Eigen/src/SparseCholesky/SimplicialCholesky_impl.h \
+		include/Mesh.h \
+		include/BoundingBox.h \
+		include/CurvatureComputer.h
+	/usr/lib/x86_64-linux-gnu/qt5/bin/moc $(DEFINES) $(INCPATH) -I/usr/include/c++/4.8 -I/usr/include/x86_64-linux-gnu/c++/4.8 -I/usr/include/c++/4.8/backward -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include -I/usr/local/include -I/usr/lib/gcc/x86_64-linux-gnu/4.8/include-fixed -I/usr/include/x86_64-linux-gnu -I/usr/include include/CurvatureComputer.h -o moc_CurvatureComputer.cpp
+
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
 compiler_yacc_decl_make_all:
@@ -663,7 +1152,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_header_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean 
 
 ####### Compile
 
@@ -1359,6 +1848,80 @@ ToothSegmentation.o: src/ToothSegmentation.cpp include/ToothSegmentation.h \
 		/usr/include/qt5/QtCore/qfiledevice.h \
 		/usr/include/qt5/QtGui/qvector2d.h \
 		/usr/include/qt5/QtGui/qtouchdevice.h \
+		include/MainWindow.h \
+		include/GLViewer.h \
+		include/Shader.h \
+		/usr/include/qt5/QtCore/QObject \
+		/usr/include/qt5/QtGui/QMouseEvent \
+		/usr/include/qt5/QtWidgets/QMenu \
+		/usr/include/qt5/QtWidgets/qmenu.h \
+		/usr/include/qt5/QtGui/qicon.h \
+		/usr/include/qt5/QtWidgets/qaction.h \
+		/usr/include/qt5/QtWidgets/qactiongroup.h \
+		/usr/include/qt5/QtWidgets/QAction \
+		/usr/include/qt5/QtGui/QColor \
+		/usr/include/qt5/QtWidgets/QListWidgetItem \
+		/usr/include/qt5/QtWidgets/qlistwidget.h \
+		/usr/include/qt5/QtWidgets/qlistview.h \
+		/usr/include/qt5/QtWidgets/qabstractitemview.h \
+		/usr/include/qt5/QtWidgets/qabstractscrollarea.h \
+		/usr/include/qt5/QtWidgets/qframe.h \
+		/usr/include/qt5/QtCore/qabstractitemmodel.h \
+		/usr/include/qt5/QtCore/qitemselectionmodel.h \
+		/usr/include/qt5/QtWidgets/qabstractitemdelegate.h \
+		/usr/include/qt5/QtWidgets/qstyleoption.h \
+		/usr/include/qt5/QtWidgets/qabstractspinbox.h \
+		/usr/include/qt5/QtGui/qvalidator.h \
+		/usr/include/qt5/QtCore/qregularexpression.h \
+		/usr/include/qt5/QtWidgets/qslider.h \
+		/usr/include/qt5/QtWidgets/qabstractslider.h \
+		/usr/include/qt5/QtWidgets/qstyle.h \
+		/usr/include/qt5/QtWidgets/qtabbar.h \
+		/usr/include/qt5/QtWidgets/qtabwidget.h \
+		/usr/include/qt5/QtWidgets/qrubberband.h \
+		/usr/include/qt5/QtGui/QImage \
+		/usr/include/qt5/QtGui/QKeyEvent \
+		/usr/include/qt5/QtGui/QVector2D \
+		/usr/include/qt5/QtGui/QVector3D \
+		/usr/include/qt5/QtGui/qvector3d.h \
+		/usr/include/qt5/QtCore/QThread \
+		/usr/include/qt5/QtCore/qthread.h \
+		ui_mainwindow.h \
+		/usr/include/qt5/QtCore/QVariant \
+		/usr/include/qt5/QtWidgets/QApplication \
+		/usr/include/qt5/QtWidgets/qapplication.h \
+		/usr/include/qt5/QtCore/qcoreapplication.h \
+		/usr/include/qt5/QtCore/qeventloop.h \
+		/usr/include/qt5/QtWidgets/qdesktopwidget.h \
+		/usr/include/qt5/QtGui/qguiapplication.h \
+		/usr/include/qt5/QtGui/qinputmethod.h \
+		/usr/include/qt5/QtWidgets/QButtonGroup \
+		/usr/include/qt5/QtWidgets/qbuttongroup.h \
+		/usr/include/qt5/QtWidgets/QHBoxLayout \
+		/usr/include/qt5/QtWidgets/qboxlayout.h \
+		/usr/include/qt5/QtWidgets/qlayout.h \
+		/usr/include/qt5/QtWidgets/qlayoutitem.h \
+		/usr/include/qt5/QtWidgets/qgridlayout.h \
+		/usr/include/qt5/QtWidgets/QHeaderView \
+		/usr/include/qt5/QtWidgets/qheaderview.h \
+		/usr/include/qt5/QtWidgets/QMainWindow \
+		/usr/include/qt5/QtWidgets/qmainwindow.h \
+		/usr/include/qt5/QtWidgets/QMenuBar \
+		/usr/include/qt5/QtWidgets/qmenubar.h \
+		/usr/include/qt5/QtWidgets/QStatusBar \
+		/usr/include/qt5/QtWidgets/qstatusbar.h \
+		/usr/include/qt5/QtWidgets/QToolBar \
+		/usr/include/qt5/QtWidgets/qtoolbar.h \
+		/usr/include/qt5/QtWidgets/QWidget \
+		/usr/include/qt5/QtWidgets/QFrame \
+		/usr/include/qt5/QtWidgets/QSlider \
+		/usr/include/qt5/QtWidgets/QCheckBox \
+		/usr/include/qt5/QtWidgets/qcheckbox.h \
+		/usr/include/qt5/QtWidgets/qabstractbutton.h \
+		/usr/include/qt5/QtWidgets/QActionGroup \
+		/usr/include/qt5/QtWidgets/QMessageBox \
+		/usr/include/qt5/QtWidgets/qmessagebox.h \
+		/usr/include/qt5/QtWidgets/QListWidget \
 		lib/eigen/include/Eigen/Dense \
 		lib/eigen/include/Eigen/Core \
 		lib/eigen/include/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -1556,54 +2119,9 @@ ToothSegmentation.o: src/ToothSegmentation.cpp include/ToothSegmentation.h \
 		lib/eigen/include/Eigen/src/Eigenvalues/RealSchur_MKL.h \
 		lib/eigen/include/Eigen/src/Eigenvalues/ComplexSchur_MKL.h \
 		lib/eigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver_MKL.h \
-		lib/libigl/include/igl/read_triangle_mesh.h \
-		lib/libigl/include/igl/igl_inline.h \
-		lib/libigl/include/igl/read_triangle_mesh.cpp \
-		lib/libigl/include/igl/list_to_matrix.h \
-		lib/libigl/include/igl/list_to_matrix.cpp \
-		lib/libigl/include/igl/max_size.h \
-		lib/libigl/include/igl/max_size.cpp \
-		lib/libigl/include/igl/min_size.h \
-		lib/libigl/include/igl/min_size.cpp \
-		lib/libigl/include/igl/readMESH.h \
-		lib/libigl/include/igl/readMESH.cpp \
-		lib/libigl/include/igl/verbose.h \
-		lib/libigl/include/igl/readOBJ.h \
-		lib/libigl/include/igl/deprecated.h \
-		lib/libigl/include/igl/readOBJ.cpp \
-		lib/libigl/include/igl/readOFF.h \
-		lib/libigl/include/igl/readOFF.cpp \
-		lib/libigl/include/igl/readSTL.h \
-		lib/libigl/include/igl/readSTL.cpp \
-		lib/libigl/include/igl/readPLY.h \
-		lib/libigl/include/igl/readPLY.cpp \
-		lib/libigl/include/igl/ply.h \
-		lib/libigl/include/igl/readWRL.h \
-		lib/libigl/include/igl/readWRL.cpp \
-		lib/libigl/include/igl/pathinfo.h \
-		lib/libigl/include/igl/pathinfo.cpp \
-		lib/libigl/include/igl/dirname.h \
-		lib/libigl/include/igl/dirname.cpp \
-		lib/libigl/include/igl/basename.h \
-		lib/libigl/include/igl/basename.cpp \
-		lib/libigl/include/igl/boundary_facets.h \
-		lib/libigl/include/igl/boundary_facets.cpp \
-		lib/libigl/include/igl/face_occurrences.h \
-		lib/libigl/include/igl/face_occurrences.cpp \
-		lib/libigl/include/igl/sort.h \
-		lib/libigl/include/igl/sort.cpp \
-		lib/libigl/include/igl/SortableRow.h \
-		lib/libigl/include/igl/reorder.h \
-		lib/libigl/include/igl/reorder.cpp \
-		lib/libigl/include/igl/IndexComparison.h \
-		lib/libigl/include/igl/colon.h \
-		lib/libigl/include/igl/colon.cpp \
-		lib/libigl/include/igl/matrix_to_list.h \
-		lib/libigl/include/igl/matrix_to_list.cpp \
-		lib/libigl/include/igl/polygon_mesh_to_triangle_mesh.h \
-		lib/libigl/include/igl/polygon_mesh_to_triangle_mesh.cpp \
-		lib/libigl/include/igl/cotmatrix.h \
-		lib/eigen/include/Eigen/Sparse \
+		include/CurvatureComputer.h \
+		/usr/include/qt5/QtCore/QVector \
+		lib/eigen/include/Eigen/SparseCholesky \
 		lib/eigen/include/Eigen/SparseCore \
 		lib/eigen/include/Eigen/src/SparseCore/SparseUtil.h \
 		lib/eigen/include/Eigen/src/SparseCore/SparseMatrixBase.h \
@@ -1634,84 +2152,11 @@ ToothSegmentation.o: src/ToothSegmentation.cpp include/ToothSegmentation.h \
 		lib/eigen/include/Eigen/src/Core/util/NonMPL2.h \
 		lib/eigen/include/Eigen/src/OrderingMethods/Ordering.h \
 		lib/eigen/include/Eigen/src/OrderingMethods/Eigen_Colamd.h \
-		lib/eigen/include/Eigen/SparseCholesky \
 		lib/eigen/include/Eigen/src/misc/SparseSolve.h \
 		lib/eigen/include/Eigen/src/SparseCholesky/SimplicialCholesky.h \
 		lib/eigen/include/Eigen/src/SparseCholesky/SimplicialCholesky_impl.h \
-		lib/eigen/include/Eigen/SparseLU \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_gemm_kernel.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_Structs.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_SupernodalMatrix.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLUImpl.h \
-		lib/eigen/include/Eigen/src/SparseCore/SparseColEtree.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_Memory.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_heap_relax_snode.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_relax_snode.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_pivotL.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_panel_dfs.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_kernel_bmod.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_panel_bmod.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_column_dfs.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_column_bmod.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_copy_to_ucol.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_pruneL.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU_Utils.h \
-		lib/eigen/include/Eigen/src/SparseLU/SparseLU.h \
-		lib/eigen/include/Eigen/SparseQR \
-		lib/eigen/include/Eigen/src/SparseQR/SparseQR.h \
-		lib/eigen/include/Eigen/IterativeLinearSolvers \
-		lib/eigen/include/Eigen/src/IterativeLinearSolvers/IterativeSolverBase.h \
-		lib/eigen/include/Eigen/src/IterativeLinearSolvers/BasicPreconditioners.h \
-		lib/eigen/include/Eigen/src/IterativeLinearSolvers/ConjugateGradient.h \
-		lib/eigen/include/Eigen/src/IterativeLinearSolvers/BiCGSTAB.h \
-		lib/eigen/include/Eigen/src/IterativeLinearSolvers/IncompleteLUT.h \
-		lib/libigl/include/igl/cotmatrix.cpp \
-		lib/libigl/include/igl/cotmatrix_entries.h \
-		lib/libigl/include/igl/cotmatrix_entries.cpp \
-		lib/libigl/include/igl/doublearea.h \
-		lib/libigl/include/igl/doublearea.cpp \
-		lib/libigl/include/igl/edge_lengths.h \
-		lib/libigl/include/igl/edge_lengths.cpp \
-		lib/libigl/include/igl/face_areas.h \
-		lib/libigl/include/igl/face_areas.cpp \
-		lib/libigl/include/igl/volume.h \
-		lib/libigl/include/igl/volume.cpp \
-		lib/libigl/include/igl/cross.h \
-		lib/libigl/include/igl/cross.cpp \
-		lib/libigl/include/igl/dihedral_angles.h \
-		lib/libigl/include/igl/dihedral_angles.cpp \
-		lib/libigl/include/igl/massmatrix.h \
-		lib/libigl/include/igl/massmatrix.cpp \
-		lib/libigl/include/igl/normalize_row_sums.h \
-		lib/libigl/include/igl/normalize_row_sums.cpp \
-		lib/libigl/include/igl/sparse.h \
-		lib/libigl/include/igl/sparse.cpp \
-		lib/libigl/include/igl/repmat.h \
-		lib/libigl/include/igl/repmat.cpp \
-		lib/libigl/include/igl/invert_diag.h \
-		lib/libigl/include/igl/invert_diag.cpp \
-		lib/libigl/include/igl/principal_curvature.h \
-		lib/libigl/include/igl/writeOFF.h \
-		lib/libigl/include/igl/writeOFF.cpp \
-		lib/libigl/include/igl/principal_curvature.cpp \
-		lib/libigl/include/igl/adjacency_list.h \
-		lib/libigl/include/igl/adjacency_list.cpp \
-		lib/libigl/include/igl/per_face_normals.h \
-		lib/libigl/include/igl/per_face_normals.cpp \
-		lib/libigl/include/igl/per_vertex_normals.h \
-		lib/libigl/include/igl/per_vertex_normals.cpp \
-		lib/libigl/include/igl/get_seconds.h \
-		lib/libigl/include/igl/get_seconds.cpp \
-		lib/libigl/include/igl/internal_angles.h \
-		lib/libigl/include/igl/internal_angles.cpp \
-		lib/libigl/include/igl/avg_edge_length.h \
-		lib/libigl/include/igl/avg_edge_length.cpp \
-		lib/libigl/include/igl/vertex_triangle_adjacency.h \
-		lib/libigl/include/igl/vertex_triangle_adjacency.cpp \
 		/usr/include/qt5/QtCore/QTime \
 		/usr/include/qt5/QtCore/qdatetime.h \
-		/usr/include/qt5/QtWidgets/QMessageBox \
-		/usr/include/qt5/QtWidgets/qmessagebox.h \
 		/usr/include/qt5/QtCore/QFile \
 		/usr/local/include/pcl-1.7/pcl/point_cloud.h \
 		lib/eigen/include/Eigen/StdVector \
@@ -1746,11 +2191,369 @@ ToothSegmentation.o: src/ToothSegmentation.cpp include/ToothSegmentation.h \
 		/usr/local/include/pcl-1.7/pcl/kdtree/flann.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ToothSegmentation.o src/ToothSegmentation.cpp
 
+CurvatureComputer.o: src/CurvatureComputer.cpp include/CurvatureComputer.h \
+		/usr/include/qt5/QtWidgets/QProgressDialog \
+		/usr/include/qt5/QtWidgets/qprogressdialog.h \
+		/usr/include/qt5/QtWidgets/qdialog.h \
+		/usr/include/qt5/QtWidgets/qwidget.h \
+		/usr/include/qt5/QtGui/qwindowdefs.h \
+		/usr/include/qt5/QtCore/qglobal.h \
+		/usr/include/qt5/QtCore/qconfig.h \
+		/usr/include/qt5/QtCore/qfeatures.h \
+		/usr/include/qt5/QtCore/qsystemdetection.h \
+		/usr/include/qt5/QtCore/qprocessordetection.h \
+		/usr/include/qt5/QtCore/qcompilerdetection.h \
+		/usr/include/qt5/QtCore/qglobalstatic.h \
+		/usr/include/qt5/QtCore/qatomic.h \
+		/usr/include/qt5/QtCore/qbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_bootstrap.h \
+		/usr/include/qt5/QtCore/qgenericatomic.h \
+		/usr/include/qt5/QtCore/qatomic_msvc.h \
+		/usr/include/qt5/QtCore/qatomic_integrity.h \
+		/usr/include/qt5/QtCore/qoldbasicatomic.h \
+		/usr/include/qt5/QtCore/qatomic_vxworks.h \
+		/usr/include/qt5/QtCore/qatomic_power.h \
+		/usr/include/qt5/QtCore/qatomic_alpha.h \
+		/usr/include/qt5/QtCore/qatomic_armv7.h \
+		/usr/include/qt5/QtCore/qatomic_armv6.h \
+		/usr/include/qt5/QtCore/qatomic_armv5.h \
+		/usr/include/qt5/QtCore/qatomic_bfin.h \
+		/usr/include/qt5/QtCore/qatomic_ia64.h \
+		/usr/include/qt5/QtCore/qatomic_mips.h \
+		/usr/include/qt5/QtCore/qatomic_s390.h \
+		/usr/include/qt5/QtCore/qatomic_sh4a.h \
+		/usr/include/qt5/QtCore/qatomic_sparc.h \
+		/usr/include/qt5/QtCore/qatomic_gcc.h \
+		/usr/include/qt5/QtCore/qatomic_x86.h \
+		/usr/include/qt5/QtCore/qatomic_cxx11.h \
+		/usr/include/qt5/QtCore/qatomic_unix.h \
+		/usr/include/qt5/QtCore/qmutex.h \
+		/usr/include/qt5/QtCore/qlogging.h \
+		/usr/include/qt5/QtCore/qflags.h \
+		/usr/include/qt5/QtCore/qtypeinfo.h \
+		/usr/include/qt5/QtCore/qtypetraits.h \
+		/usr/include/qt5/QtCore/qsysinfo.h \
+		/usr/include/qt5/QtCore/qobjectdefs.h \
+		/usr/include/qt5/QtCore/qnamespace.h \
+		/usr/include/qt5/QtCore/qobjectdefs_impl.h \
+		/usr/include/qt5/QtGui/qwindowdefs_win.h \
+		/usr/include/qt5/QtCore/qobject.h \
+		/usr/include/qt5/QtCore/qstring.h \
+		/usr/include/qt5/QtCore/qchar.h \
+		/usr/include/qt5/QtCore/qbytearray.h \
+		/usr/include/qt5/QtCore/qrefcount.h \
+		/usr/include/qt5/QtCore/qarraydata.h \
+		/usr/include/qt5/QtCore/qstringbuilder.h \
+		/usr/include/qt5/QtCore/qlist.h \
+		/usr/include/qt5/QtCore/qalgorithms.h \
+		/usr/include/qt5/QtCore/qiterator.h \
+		/usr/include/qt5/QtCore/qcoreevent.h \
+		/usr/include/qt5/QtCore/qscopedpointer.h \
+		/usr/include/qt5/QtCore/qmetatype.h \
+		/usr/include/qt5/QtCore/qvarlengtharray.h \
+		/usr/include/qt5/QtCore/qcontainerfwd.h \
+		/usr/include/qt5/QtCore/qisenum.h \
+		/usr/include/qt5/QtCore/qobject_impl.h \
+		/usr/include/qt5/QtCore/qmargins.h \
+		/usr/include/qt5/QtCore/qrect.h \
+		/usr/include/qt5/QtCore/qsize.h \
+		/usr/include/qt5/QtCore/qpoint.h \
+		/usr/include/qt5/QtGui/qpaintdevice.h \
+		/usr/include/qt5/QtGui/qpalette.h \
+		/usr/include/qt5/QtGui/qcolor.h \
+		/usr/include/qt5/QtGui/qrgb.h \
+		/usr/include/qt5/QtCore/qstringlist.h \
+		/usr/include/qt5/QtCore/qdatastream.h \
+		/usr/include/qt5/QtCore/qiodevice.h \
+		/usr/include/qt5/QtCore/qpair.h \
+		/usr/include/qt5/QtCore/qregexp.h \
+		/usr/include/qt5/QtCore/qstringmatcher.h \
+		/usr/include/qt5/QtGui/qbrush.h \
+		/usr/include/qt5/QtCore/qvector.h \
+		/usr/include/qt5/QtGui/qmatrix.h \
+		/usr/include/qt5/QtGui/qpolygon.h \
+		/usr/include/qt5/QtGui/qregion.h \
+		/usr/include/qt5/QtCore/qline.h \
+		/usr/include/qt5/QtGui/qtransform.h \
+		/usr/include/qt5/QtGui/qpainterpath.h \
+		/usr/include/qt5/QtGui/qimage.h \
+		/usr/include/qt5/QtGui/qpixmap.h \
+		/usr/include/qt5/QtCore/qsharedpointer.h \
+		/usr/include/qt5/QtCore/qshareddata.h \
+		/usr/include/qt5/QtCore/qsharedpointer_impl.h \
+		/usr/include/qt5/QtCore/qhash.h \
+		/usr/include/qt5/QtGui/qfont.h \
+		/usr/include/qt5/QtGui/qfontmetrics.h \
+		/usr/include/qt5/QtGui/qfontinfo.h \
+		/usr/include/qt5/QtWidgets/qsizepolicy.h \
+		/usr/include/qt5/QtGui/qcursor.h \
+		/usr/include/qt5/QtGui/qkeysequence.h \
+		/usr/include/qt5/QtGui/qevent.h \
+		/usr/include/qt5/QtCore/qvariant.h \
+		/usr/include/qt5/QtCore/qmap.h \
+		/usr/include/qt5/QtCore/qdebug.h \
+		/usr/include/qt5/QtCore/qtextstream.h \
+		/usr/include/qt5/QtCore/qlocale.h \
+		/usr/include/qt5/QtCore/qset.h \
+		/usr/include/qt5/QtCore/qcontiguouscache.h \
+		/usr/include/qt5/QtCore/qurl.h \
+		/usr/include/qt5/QtCore/qurlquery.h \
+		/usr/include/qt5/QtCore/qfile.h \
+		/usr/include/qt5/QtCore/qfiledevice.h \
+		/usr/include/qt5/QtGui/qvector2d.h \
+		/usr/include/qt5/QtGui/qtouchdevice.h \
+		/usr/include/qt5/QtCore/QVector \
+		lib/eigen/include/Eigen/Geometry \
+		lib/eigen/include/Eigen/Core \
+		lib/eigen/include/Eigen/src/Core/util/DisableStupidWarnings.h \
+		lib/eigen/include/Eigen/src/Core/util/Macros.h \
+		lib/eigen/include/Eigen/src/Core/util/MKL_support.h \
+		lib/eigen/include/Eigen/src/Core/util/Constants.h \
+		lib/eigen/include/Eigen/src/Core/util/ForwardDeclarations.h \
+		lib/eigen/include/Eigen/src/Core/util/Meta.h \
+		lib/eigen/include/Eigen/src/Core/util/StaticAssert.h \
+		lib/eigen/include/Eigen/src/Core/util/XprHelper.h \
+		lib/eigen/include/Eigen/src/Core/util/Memory.h \
+		lib/eigen/include/Eigen/src/Core/NumTraits.h \
+		lib/eigen/include/Eigen/src/Core/MathFunctions.h \
+		lib/eigen/include/Eigen/src/Core/GenericPacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/SSE/PacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/SSE/MathFunctions.h \
+		lib/eigen/include/Eigen/src/Core/arch/SSE/Complex.h \
+		lib/eigen/include/Eigen/src/Core/arch/AltiVec/PacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/AltiVec/Complex.h \
+		lib/eigen/include/Eigen/src/Core/arch/NEON/PacketMath.h \
+		lib/eigen/include/Eigen/src/Core/arch/NEON/Complex.h \
+		lib/eigen/include/Eigen/src/Core/arch/Default/Settings.h \
+		lib/eigen/include/Eigen/src/Core/Functors.h \
+		lib/eigen/include/Eigen/src/Core/DenseCoeffsBase.h \
+		lib/eigen/include/Eigen/src/Core/DenseBase.h \
+		lib/eigen/include/Eigen/src/plugins/BlockMethods.h \
+		lib/eigen/include/Eigen/src/Core/MatrixBase.h \
+		lib/eigen/include/Eigen/src/plugins/CommonCwiseUnaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/CommonCwiseBinaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/MatrixCwiseUnaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/MatrixCwiseBinaryOps.h \
+		lib/eigen/include/Eigen/src/Core/EigenBase.h \
+		lib/eigen/include/Eigen/src/Core/Assign.h \
+		lib/eigen/include/Eigen/src/Core/util/BlasUtil.h \
+		lib/eigen/include/Eigen/src/Core/DenseStorage.h \
+		lib/eigen/include/Eigen/src/Core/NestByValue.h \
+		lib/eigen/include/Eigen/src/Core/ForceAlignedAccess.h \
+		lib/eigen/include/Eigen/src/Core/ReturnByValue.h \
+		lib/eigen/include/Eigen/src/Core/NoAlias.h \
+		lib/eigen/include/Eigen/src/Core/PlainObjectBase.h \
+		lib/eigen/include/Eigen/src/Core/Matrix.h \
+		lib/eigen/include/Eigen/src/Core/Array.h \
+		lib/eigen/include/Eigen/src/Core/CwiseBinaryOp.h \
+		lib/eigen/include/Eigen/src/Core/CwiseUnaryOp.h \
+		lib/eigen/include/Eigen/src/Core/CwiseNullaryOp.h \
+		lib/eigen/include/Eigen/src/Core/CwiseUnaryView.h \
+		lib/eigen/include/Eigen/src/Core/SelfCwiseBinaryOp.h \
+		lib/eigen/include/Eigen/src/Core/Dot.h \
+		lib/eigen/include/Eigen/src/Core/StableNorm.h \
+		lib/eigen/include/Eigen/src/Core/MapBase.h \
+		lib/eigen/include/Eigen/src/Core/Stride.h \
+		lib/eigen/include/Eigen/src/Core/Map.h \
+		lib/eigen/include/Eigen/src/Core/Block.h \
+		lib/eigen/include/Eigen/src/Core/VectorBlock.h \
+		lib/eigen/include/Eigen/src/Core/Ref.h \
+		lib/eigen/include/Eigen/src/Core/Transpose.h \
+		lib/eigen/include/Eigen/src/Core/DiagonalMatrix.h \
+		lib/eigen/include/Eigen/src/Core/Diagonal.h \
+		lib/eigen/include/Eigen/src/Core/DiagonalProduct.h \
+		lib/eigen/include/Eigen/src/Core/PermutationMatrix.h \
+		lib/eigen/include/Eigen/src/Core/Transpositions.h \
+		lib/eigen/include/Eigen/src/Core/Redux.h \
+		lib/eigen/include/Eigen/src/Core/Visitor.h \
+		lib/eigen/include/Eigen/src/Core/Fuzzy.h \
+		lib/eigen/include/Eigen/src/Core/IO.h \
+		lib/eigen/include/Eigen/src/Core/Swap.h \
+		lib/eigen/include/Eigen/src/Core/CommaInitializer.h \
+		lib/eigen/include/Eigen/src/Core/Flagged.h \
+		lib/eigen/include/Eigen/src/Core/ProductBase.h \
+		lib/eigen/include/Eigen/src/Core/GeneralProduct.h \
+		lib/eigen/include/Eigen/src/Core/TriangularMatrix.h \
+		lib/eigen/include/Eigen/src/Core/SelfAdjointView.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
+		lib/eigen/include/Eigen/src/Core/products/Parallelizer.h \
+		lib/eigen/include/Eigen/src/Core/products/CoeffBasedProduct.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixVector.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrix.h \
+		lib/eigen/include/Eigen/src/Core/SolveTriangular.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrixTriangular.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixVector.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixMatrix.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointProduct.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointRank2Update.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixVector.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixMatrix.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularSolverMatrix.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularSolverVector.h \
+		lib/eigen/include/Eigen/src/Core/BandMatrix.h \
+		lib/eigen/include/Eigen/src/Core/CoreIterators.h \
+		lib/eigen/include/Eigen/src/Core/BooleanRedux.h \
+		lib/eigen/include/Eigen/src/Core/Select.h \
+		lib/eigen/include/Eigen/src/Core/VectorwiseOp.h \
+		lib/eigen/include/Eigen/src/Core/Random.h \
+		lib/eigen/include/Eigen/src/Core/Replicate.h \
+		lib/eigen/include/Eigen/src/Core/Reverse.h \
+		lib/eigen/include/Eigen/src/Core/ArrayBase.h \
+		lib/eigen/include/Eigen/src/plugins/ArrayCwiseUnaryOps.h \
+		lib/eigen/include/Eigen/src/plugins/ArrayCwiseBinaryOps.h \
+		lib/eigen/include/Eigen/src/Core/ArrayWrapper.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixVector_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/GeneralMatrixMatrixTriangular_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/SelfadjointMatrixVector_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularMatrixVector_MKL.h \
+		lib/eigen/include/Eigen/src/Core/products/TriangularSolverMatrix_MKL.h \
+		lib/eigen/include/Eigen/src/Core/Assign_MKL.h \
+		lib/eigen/include/Eigen/src/Core/GlobalFunctions.h \
+		lib/eigen/include/Eigen/src/Core/util/ReenableStupidWarnings.h \
+		lib/eigen/include/Eigen/Eigen2Support \
+		lib/eigen/include/Eigen/src/Eigen2Support/Macros.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Memory.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Meta.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Lazy.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Cwise.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/CwiseOperators.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/TriangularSolver.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Block.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/VectorBlock.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Minor.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/MathFunctions.h \
+		lib/eigen/include/Eigen/SVD \
+		lib/eigen/include/Eigen/QR \
+		lib/eigen/include/Eigen/Cholesky \
+		lib/eigen/include/Eigen/src/misc/Solve.h \
+		lib/eigen/include/Eigen/src/Cholesky/LLT.h \
+		lib/eigen/include/Eigen/src/Cholesky/LDLT.h \
+		lib/eigen/include/Eigen/src/Cholesky/LLT_MKL.h \
+		lib/eigen/include/Eigen/Jacobi \
+		lib/eigen/include/Eigen/src/Jacobi/Jacobi.h \
+		lib/eigen/include/Eigen/Householder \
+		lib/eigen/include/Eigen/src/Householder/Householder.h \
+		lib/eigen/include/Eigen/src/Householder/HouseholderSequence.h \
+		lib/eigen/include/Eigen/src/Householder/BlockHouseholder.h \
+		lib/eigen/include/Eigen/src/QR/HouseholderQR.h \
+		lib/eigen/include/Eigen/src/QR/FullPivHouseholderQR.h \
+		lib/eigen/include/Eigen/src/QR/ColPivHouseholderQR.h \
+		lib/eigen/include/Eigen/src/QR/HouseholderQR_MKL.h \
+		lib/eigen/include/Eigen/src/QR/ColPivHouseholderQR_MKL.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/QR.h \
+		lib/eigen/include/Eigen/Eigenvalues \
+		lib/eigen/include/Eigen/LU \
+		lib/eigen/include/Eigen/src/misc/Kernel.h \
+		lib/eigen/include/Eigen/src/misc/Image.h \
+		lib/eigen/include/Eigen/src/LU/FullPivLU.h \
+		lib/eigen/include/Eigen/src/LU/PartialPivLU.h \
+		lib/eigen/include/Eigen/src/LU/PartialPivLU_MKL.h \
+		lib/eigen/include/Eigen/src/LU/Determinant.h \
+		lib/eigen/include/Eigen/src/LU/Inverse.h \
+		lib/eigen/include/Eigen/src/LU/arch/Inverse_SSE.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/LU.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/Tridiagonalization.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/RealSchur.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/HessenbergDecomposition.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/EigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/ComplexSchur.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/ComplexEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/RealQZ.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/RealSchur_MKL.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/ComplexSchur_MKL.h \
+		lib/eigen/include/Eigen/src/Eigenvalues/SelfAdjointEigenSolver_MKL.h \
+		lib/eigen/include/Eigen/src/SVD/JacobiSVD.h \
+		lib/eigen/include/Eigen/src/SVD/JacobiSVD_MKL.h \
+		lib/eigen/include/Eigen/src/SVD/UpperBidiagonalization.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/SVD.h \
+		lib/eigen/include/Eigen/src/Geometry/OrthoMethods.h \
+		lib/eigen/include/Eigen/src/Geometry/EulerAngles.h \
+		lib/eigen/include/Eigen/src/Geometry/Homogeneous.h \
+		lib/eigen/include/Eigen/src/Geometry/RotationBase.h \
+		lib/eigen/include/Eigen/src/Geometry/Rotation2D.h \
+		lib/eigen/include/Eigen/src/Geometry/Quaternion.h \
+		lib/eigen/include/Eigen/src/Geometry/AngleAxis.h \
+		lib/eigen/include/Eigen/src/Geometry/Transform.h \
+		lib/eigen/include/Eigen/src/Geometry/Translation.h \
+		lib/eigen/include/Eigen/src/Geometry/Scaling.h \
+		lib/eigen/include/Eigen/src/Geometry/Hyperplane.h \
+		lib/eigen/include/Eigen/src/Geometry/ParametrizedLine.h \
+		lib/eigen/include/Eigen/src/Geometry/AlignedBox.h \
+		lib/eigen/include/Eigen/src/Geometry/Umeyama.h \
+		lib/eigen/include/Eigen/src/Geometry/arch/Geometry_SSE.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/All.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/RotationBase.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Rotation2D.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Quaternion.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/AngleAxis.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Transform.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Translation.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Scaling.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/AlignedBox.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/Hyperplane.h \
+		lib/eigen/include/Eigen/src/Eigen2Support/Geometry/ParametrizedLine.h \
+		lib/eigen/include/Eigen/Dense \
+		lib/eigen/include/Eigen/SparseCholesky \
+		lib/eigen/include/Eigen/SparseCore \
+		lib/eigen/include/Eigen/src/SparseCore/SparseUtil.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseMatrixBase.h \
+		lib/eigen/include/Eigen/src/SparseCore/CompressedStorage.h \
+		lib/eigen/include/Eigen/src/SparseCore/AmbiVector.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseMatrix.h \
+		lib/eigen/include/Eigen/src/SparseCore/MappedSparseMatrix.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseVector.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseBlock.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseTranspose.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseCwiseUnaryOp.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseCwiseBinaryOp.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseDot.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparsePermutation.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseRedux.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseFuzzy.h \
+		lib/eigen/include/Eigen/src/SparseCore/ConservativeSparseSparseProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseSparseProductWithPruning.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseDenseProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseDiagonalProduct.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseTriangularView.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseSelfAdjointView.h \
+		lib/eigen/include/Eigen/src/SparseCore/TriangularSolver.h \
+		lib/eigen/include/Eigen/src/SparseCore/SparseView.h \
+		lib/eigen/include/Eigen/OrderingMethods \
+		lib/eigen/include/Eigen/src/OrderingMethods/Amd.h \
+		lib/eigen/include/Eigen/src/Core/util/NonMPL2.h \
+		lib/eigen/include/Eigen/src/OrderingMethods/Ordering.h \
+		lib/eigen/include/Eigen/src/OrderingMethods/Eigen_Colamd.h \
+		lib/eigen/include/Eigen/src/misc/SparseSolve.h \
+		lib/eigen/include/Eigen/src/SparseCholesky/SimplicialCholesky.h \
+		lib/eigen/include/Eigen/src/SparseCholesky/SimplicialCholesky_impl.h \
+		include/Mesh.h \
+		include/BoundingBox.h \
+		/usr/include/qt5/QtCore/QTime \
+		/usr/include/qt5/QtCore/qdatetime.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o CurvatureComputer.o src/CurvatureComputer.cpp
+
+qrc_ToothSegmentation.o: qrc_ToothSegmentation.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_ToothSegmentation.o qrc_ToothSegmentation.cpp
+
 moc_GLViewer.o: moc_GLViewer.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_GLViewer.o moc_GLViewer.cpp
 
 moc_MainWindow.o: moc_MainWindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_MainWindow.o moc_MainWindow.cpp
+
+moc_ToothSegmentation.o: moc_ToothSegmentation.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_ToothSegmentation.o moc_ToothSegmentation.cpp
+
+moc_CurvatureComputer.o: moc_CurvatureComputer.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_CurvatureComputer.o moc_CurvatureComputer.cpp
 
 ####### Install
 

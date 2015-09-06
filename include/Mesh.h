@@ -15,13 +15,12 @@
 
 namespace SW{
 
-struct MyTraits : public OpenMesh::DefaultTraits
-{
+struct MyTraits : public OpenMesh::DefaultTraits{
     typedef OpenMesh::Vec3f Color; //使用浮点颜色值
 };
 
-class Mesh:public OpenMesh::TriMesh_ArrayKernelT<MyTraits>
-{
+class Mesh:public OpenMesh::TriMesh_ArrayKernelT<MyTraits>{
+
 public:
     Mesh(QString name);
     Mesh();

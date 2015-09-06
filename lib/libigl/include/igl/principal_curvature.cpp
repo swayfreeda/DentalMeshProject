@@ -806,7 +806,10 @@ IGL_INLINE void CurvatureCalculator::computeCurvature(QProgressDialog &progress)
   curv=std::vector<std::vector<double> >(vertices_count);
   currentCurvatureComputed = std::vector<bool>(vertices_count);
 
-  scaledRadius=getAverageEdge(progress)*sphereRadius;
+  if(st == SPHERE_SEARCH)
+  {
+    scaledRadius=getAverageEdge()*sphereRadius;
+  }
 
   std::vector<int> vv;
   std::vector<int> vvtmp;
@@ -847,11 +850,9 @@ IGL_INLINE void CurvatureCalculator::computeCurvature(QProgressDialog &progress)
         return;
     }
 
-    std::vector<Eigen::Vector3d> ref(3);
     if (vv.size()<6)
     {
-      std::cerr << "Could not compute curvature of radius " << scaledRadius << endl;
-      //return;
+      cerr << "Could not compute curvature of vertex " << i << endl;
       currentCurvatureComputed[i] = false; //current vertex's curvature could not be correctly computed
       continue;
     }
@@ -879,13 +880,6 @@ IGL_INLINE void CurvatureCalculator::computeCurvature(QProgressDialog &progress)
         fprintf(stderr,"Error: normal type not recognized");
         return;
     }
-    if (vv.size()<6)
-    {
-      std::cerr << "Could not compute curvature of radius " << scaledRadius << endl;
-      //return;
-      currentCurvatureComputed[i] = false; //current vertex's curvature could not be correctly computed
-      continue;
-    }
     if (montecarlo)
     {
       if(montecarloN<6)
@@ -893,10 +887,15 @@ IGL_INLINE void CurvatureCalculator::computeCurvature(QProgressDialog &progress)
       vvtmp.reserve(vv.size());
       applyMontecarlo(vv,&vvtmp);
       vv=vvtmp;
+      if (vv.size()<6)
+      {
+        cerr << "Could not compute curvature of vertex " << i << endl;
+        currentCurvatureComputed[i] = false; //current vertex's curvature could not be correctly computed
+        continue;
+      }
     }
 
-    if (vv.size()<6)
-      return;
+    std::vector<Eigen::Vector3d> ref(3);
     computeReferenceFrame(i,normal,ref);
 
     Quadric q;

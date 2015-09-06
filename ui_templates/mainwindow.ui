@@ -132,9 +132,18 @@ background: rgb(95, 95, 95);
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionToothSegmentationProgramControl"/>
    <addaction name="separator"/>
+   <addaction name="actionToothSegmentationEnableManualOperation"/>
+   <addaction name="actionToothSegmentationManuallyShowVertexProperties"/>
+   <addaction name="actionToothSegmentationManuallyAddBoundaryVertex"/>
+   <addaction name="actionToothSegmentationManuallyDeleteBoundaryVertex"/>
+   <addaction name="actionToothSegmentationManuallyDeleteErrorToothRegion"/>
+   <addaction name="actionToothSegmentationManuallyDeleteErrorContourSection"/>
    <addaction name="separator"/>
-   <addaction name="separator"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"/>
   </widget>
   <action name="fileOpenAction">
    <property name="icon">
@@ -640,6 +649,159 @@ background: rgb(95, 95, 95);
     <string>Find cutting points</string>
    </property>
   </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png</iconset>
+   </property>
+   <property name="text">
+    <string>Flip cutting plane</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move cutting plane up</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png</iconset>
+   </property>
+   <property name="text">
+    <string>Move cutting plane down</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyAddBoundaryVertex">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_add_boundary_vertex.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_add_boundary_vertex.png</iconset>
+   </property>
+   <property name="text">
+    <string>add boundary vertex</string>
+   </property>
+  </action>
+  <action name="actionManually_flip_gingiva_cutting_plane">
+   <property name="text">
+    <string>Manually flip gingiva cutting plane</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyDeleteBoundaryVertex">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_boundary_vertex.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_boundary_vertex.png</iconset>
+   </property>
+   <property name="text">
+    <string>delete boundary vertex</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyShowVertexProperties">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_show_vertex_properties.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_show_vertex_properties.png</iconset>
+   </property>
+   <property name="text">
+    <string>show vertex properties</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyDeleteErrorToothRegion">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_tooth_region.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_tooth_region.png</iconset>
+   </property>
+   <property name="text">
+    <string>delete error tooth region</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationManuallyDeleteErrorContourSection">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_contour_section.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_contour_section.png</iconset>
+   </property>
+   <property name="text">
+    <string>delete error contour section</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationEnableManualOperation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png</normaloff>
+     <normalon>:/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_checked.png</normalon>:/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png</iconset>
+   </property>
+   <property name="text">
+    <string>Enable</string>
+   </property>
+   <property name="toolTip">
+    <string>Enable manual operation</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationProgramControl">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../resource/ToothSegmentation.qrc">
+     <normaloff>:/toolbar/ToothSegmentation/image/toolbar_program_control_start.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_program_control_start.png</iconset>
+   </property>
+   <property name="text">
+    <string>Program control</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -649,6 +811,8 @@ background: rgb(95, 95, 95);
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resource/ToothSegmentation.qrc"/>
+ </resources>
  <connections/>
 </ui>
