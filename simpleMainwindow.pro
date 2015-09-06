@@ -37,7 +37,6 @@ INCLUDEPATH += \
     /usr/include/qt3/ \
     /usr/include/qt4/QtXml/ \
     include/ \
-    lib/libigl/include/ \ #libIGL库包含路径
     lib/eigen/include/ \ #Eigen库包含路径
     /usr/include/pcl-1.7/ #PCL库包含路径
 
@@ -54,4 +53,7 @@ FORMS += \
 
 RESOURCES += \
     resource/ToothSegmentation.qrc
+
+TRANSLATIONS += \
+    language/zh_CN.ts
 

@@ -39,7 +39,109 @@ http://www.ntu.edu.sg/home/ehchua/programming/opengl/cg_basicstheory.html
 
 
 
+------
+
+#**牙齿分割软件操作说明**
+
+整个程序运行共分为5个步骤：
+
+1. 打开所需处理的牙齿模型，然后点击`开始运行`按钮，开始执行处理算法；
+
+2. 第一步运行结束后，程序会提示需要手动操作。此时已经将牙龈和牙齿初步分开，红色代表各区域之间的分界，蓝色代表牙龈部分，其他各种颜色代表牙齿部分。
+此时界面上有一个分割平面，该平面的意义是：平面下方均为牙龈，并且，在平面上方和平面下方的区域相连的区域均为牙龈。
+此时可能会有程序判断出错的情况，需进行手动操作：
+
+    (1) 牙龈分割平面的方向可能颠倒了，表现为界面上牙齿的颜色为蓝色。此时需要手动点击工具栏里的`翻转牙龈分割平面`按钮；
+    (2) 牙龈分割平面的位置可能有较大误差。此平面应该正好在所有牙齿的下方(“下方”是对于下颚来说的，上颚反之)，如果误差较大，可以点击工具栏里的`上移分割平面`或`下移分割平面`来进行调整；
+    (3) 红色边界可能在某些地方有误差。比如可能有些牙齿为蓝色，则说明此牙齿周围的红色边界有缺口，对于此情况可以点击工具栏里的`添加边界点`按钮，此时鼠标变成圆形(按键`Ctrl`+`+/-`可改变圆形的半径)，然后在红色边界缺口处，点击鼠标右键并拖动，则鼠标圆形覆盖的区域将变成红色边界，此时再根据牙齿颜色是否为蓝色来判断是否还有边界缺口。还有可能有些牙齿内部有大片区域为红色边界，或者任何人眼看来不应该是牙龈和牙齿的边界的地方被程序错判为了边界，则需要手动去除，对于此情况可以点击工具栏里的`去除边界点`按钮，此时鼠标变成圆形(同样按键`Ctrl`+`+/-`可改变圆形的半径)，然后在要去除边界的地方，点击鼠标右键并拖动，则鼠标圆形覆盖的区域的红色边界将消失。
+    (4) 可能在牙龈部分有一些小的区域被错判为牙齿(表现为非蓝色区域)，对于此情况，同样可以用去除边界的方法将此区域和牙龈区域之间的边界去除，即将此错误区域与牙龈区域相连即可。
+
+3. 上一步手动操作完成之后，再次点击`开始运行`按钮，继续运行。
+
+4. 上一步运行结束后，牙龈和牙齿间的边界(红色)以及牙齿间的边界(蓝色)已经全部显示，并且为单点宽度边界。此时可能会有一些错误的边界需要手动去除，比如同一颗牙齿被若干条错误的边界分成了若干块，对于此情况，可以点击工具栏里的`去除错误的牙齿轮廓段`按钮，此时鼠标变成红色带叉的圆形，将鼠标圆形放到错误轮廓段上并点击右键，便可将此轮廓段去除。
+
+5. 上一步手动操作完成之后，再次点击`开始运行`按钮，继续运行。若中间出现提示，点击`确定`即可。当程序提示运行结束时，整个算法执行完毕！
+
+于强
+2015-8-31 11:35 
 
 
+------
+#**依赖库安装说明**
+
+1. 安装Ubuntu 12.04.5 LTS i386
+
+2. 安装freeglut
+打开终端，执行以下命令：
+```
+sudo apt-get install freeglut3-dev freeglut3
+```
+3. 安装Qt
+在`Ubuntu Software Center`中搜索`Qt`，找到`Qt Creator`，安装之。
+安装完后`Qt 4 Linguist`、`Qt 4 Assistant`、`Qt 4 Designer`都已自动安装。
+然后又安装了`Qt 4 Settings`。
+打开`Qt Creator`，点击`Help`-`About Qt Creator`，显示`Qt Creator 2.4.1 Based on Qt 4.8.0 Built on Mar 21 2012 at 23:05:03`。
+
+4. 编译并安装`QGLViewer`
+官网下载`libQGLViewer-2.6.2`，解压到`/tmp`目录，得到`/tmp/libQGLViewer-2.6.2`文件夹，打开终端，执行以下命令：
+```
+cd /tmp/libQGLViewer-2.6.2
+qmake
+make
+sudo make install
+```
+
+5. 安装cmake
+到cmake官网下载`cmake-3.2.3.tar.gz`。
+将`cmake-3.2.3.tar.gz`解压到`/tmp`目录，得到`/tmp/cmake-3.2.3`目录，打开终端，执行以下命令：
+```
+cd /tmp/cmake-3.2.3
+./bootstrap
+make
+sudo make install
+```
+其中，`./bootstrap`执行完毕后出现`CMake has bootstrapped.  Now run make.`。
+执行完上面3条命令之后，执行`cmake -version`查看cmake是否已正确安装，显示`cmake version 3.2.3`，表示已正确安装。
+
+5. 编译并安装OpenMesh
+到OpenMesh官网下载`OpenMesh-3.3.tar.gz`。
+解压到`/tmp`目录，得到`/tmp/OpenMesh-3.3`文件夹，打开终端，执行以下命令：
+`/tmp/OpenMesh-3.3`目录，创建`build`文件夹，在终端中进入`build`文件夹（即执行命令：`cd /tmp/OpenMesh-3.3/build`），然后执行以下命令：
+```
+cd /tmp/OpenMesh-3.3
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+sudo make install
+```
+>注意：cmake后面跟着一个空格和两个英文点。
+
+6. 安装GSL数值计算库
+到官网下载GSL库，得到gsl-1.16.tar.gz。将其解压到`/tmp`目录，得到`/tmp/gsl-1.16`文件夹，打开终端，执行以下命令：
+```
+cd /tmp/gsl-1.16
+./configure
+make
+sudo make install
+```
+
+7. 安装PCL库
+打开终端，执行以下命令：
+```
+sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
+sudo apt-get update
+sudo apt-get install libpcl-all
+```
+
+6. 更新库文件路径
+打开终端，执行以下命令：
+```
+sudo /sbin/ldconfig
+```
+
+7. 编译`DentalMeshProject`工程
+将DentalMeshProject压缩包解压到任意目录，如`/home/yuqiang/QtProjects`目录（其中“yuqiang”为linux用户名，注意：Qt工程路径中不能有中文、空格等，最好只由字母、数字和下划线组成）。
+打开Qt Creator，打开`DentalMeshProject`工程，提示是否使用工程中的`.user`配置文件，选择no，`Create Build Configurations`选择`For Each Qt Version One Debug And One Release`，不勾选`Use Shadow Building`，点击Finish。
 
 

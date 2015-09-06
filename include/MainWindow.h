@@ -88,6 +88,7 @@ namespace SW
 
     public slots:
         void saveToothSegmentationHistory();
+        void changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(int programSchedule);
 
     private:
         void setAllManualOperationActionUnChecked();

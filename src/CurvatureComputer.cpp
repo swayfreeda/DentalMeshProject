@@ -59,7 +59,7 @@ void CurvatureComputer::computeCurvature(QProgressDialog *progress)
     cout << "创建所有顶点的线性索引 用时：" << time.elapsed() << "ms." << endl;
 
     int completedVertexNum = 0; //已计算完的顶点数目
-    progress->setLabelText("Computing curvature...");
+    progress->setLabelText(tr("Computing curvature..."));
     progress->setMinimum(0);
     progress->setMaximum(vertexNum);
     progress->setValue(0);
@@ -273,7 +273,7 @@ inline float CurvatureComputer::getAverageEdge(QProgressDialog *progress)
     Mesh::HalfedgeHandle hh1, hh2;
     Mesh::VertexHandle vh1, vh2;
 
-    progress->setLabelText("Computing curvature(compute average edge)...");
+    progress->setLabelText(tr("Computing curvature(compute average edge)..."));
     progress->setMinimum(0);
     progress->setMaximum(mMesh.mFaceNum);
     progress->setValue(0);
