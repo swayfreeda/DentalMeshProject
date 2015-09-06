@@ -41,7 +41,7 @@ http://www.ntu.edu.sg/home/ehchua/programming/opengl/cg_basicstheory.html
 
 ------
 
-#牙齿分割软件操作说明
+#**牙齿分割软件操作说明**
 
 整个程序运行共分为5个步骤：
 
@@ -64,5 +64,84 @@ http://www.ntu.edu.sg/home/ehchua/programming/opengl/cg_basicstheory.html
 
 于强
 2015-8-31 11:35 
+
+
+------
+#**依赖库安装说明**
+
+1. 安装Ubuntu 12.04.5 LTS i386
+
+2. 安装freeglut
+打开终端，执行以下命令：
+```
+sudo apt-get install freeglut3-dev freeglut3
+```
+3. 安装Qt
+在`Ubuntu Software Center`中搜索`Qt`，找到`Qt Creator`，安装之。
+安装完后`Qt 4 Linguist`、`Qt 4 Assistant`、`Qt 4 Designer`都已自动安装。
+然后又安装了`Qt 4 Settings`。
+打开`Qt Creator`，点击`Help`-`About Qt Creator`，显示`Qt Creator 2.4.1 Based on Qt 4.8.0 Built on Mar 21 2012 at 23:05:03`。
+
+4. 编译并安装`QGLViewer`
+官网下载`libQGLViewer-2.6.2`，解压到`/tmp`目录，得到`/tmp/libQGLViewer-2.6.2`文件夹，打开终端，执行以下命令：
+```
+cd /tmp/libQGLViewer-2.6.2
+qmake
+make
+sudo make install
+```
+
+5. 安装cmake
+到cmake官网下载`cmake-3.2.3.tar.gz`。
+将`cmake-3.2.3.tar.gz`解压到`/tmp`目录，得到`/tmp/cmake-3.2.3`目录，打开终端，执行以下命令：
+```
+cd /tmp/cmake-3.2.3
+./bootstrap
+make
+sudo make install
+```
+其中，`./bootstrap`执行完毕后出现`CMake has bootstrapped.  Now run make.`。
+执行完上面3条命令之后，执行`cmake -version`查看cmake是否已正确安装，显示`cmake version 3.2.3`，表示已正确安装。
+
+5. 编译并安装OpenMesh
+到OpenMesh官网下载`OpenMesh-3.3.tar.gz`。
+解压到`/tmp`目录，得到`/tmp/OpenMesh-3.3`文件夹，打开终端，执行以下命令：
+`/tmp/OpenMesh-3.3`目录，创建`build`文件夹，在终端中进入`build`文件夹（即执行命令：`cd /tmp/OpenMesh-3.3/build`），然后执行以下命令：
+```
+cd /tmp/OpenMesh-3.3
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make
+sudo make install
+```
+>注意：cmake后面跟着一个空格和两个英文点。
+
+6. 安装GSL数值计算库
+到官网下载GSL库，得到gsl-1.16.tar.gz。将其解压到`/tmp`目录，得到`/tmp/gsl-1.16`文件夹，打开终端，执行以下命令：
+```
+cd /tmp/gsl-1.16
+./configure
+make
+sudo make install
+```
+
+7. 安装PCL库
+打开终端，执行以下命令：
+```
+sudo add-apt-repository ppa:v-launchpad-jochen-sprickerhof-de/pcl
+sudo apt-get update
+sudo apt-get install libpcl-all
+```
+
+6. 更新库文件路径
+打开终端，执行以下命令：
+```
+sudo /sbin/ldconfig
+```
+
+7. 编译`DentalMeshProject`工程
+将DentalMeshProject压缩包解压到任意目录，如`/home/yuqiang/QtProjects`目录（其中“yuqiang”为linux用户名，注意：Qt工程路径中不能有中文、空格等，最好只由字母、数字和下划线组成）。
+打开Qt Creator，打开`DentalMeshProject`工程，提示是否使用工程中的`.user`配置文件，选择no，`Create Build Configurations`选择`For Each Qt Version One Debug And One Release`，不勾选`Use Shadow Building`，点击Finish。
 
 
