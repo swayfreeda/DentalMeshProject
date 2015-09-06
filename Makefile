@@ -303,7 +303,7 @@ qmake_all: FORCE
 
 dist: 
 	@test -d .tmp/simpleMainwindow1.0.0 || mkdir -p .tmp/simpleMainwindow1.0.0
-	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents resource/ToothSegmentation.qrc .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents include/BoundingBox.h include/GLViewer.h include/MainWindow.h include/Mesh.h include/Shader.h include/ToothSegmentation.h include/CurvatureComputer.h .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents src/main.cpp src/GLViewer.cpp src/MainWidow.cpp src/Mesh.cpp src/Shader.cpp src/ToothSegmentation.cpp src/CurvatureComputer.cpp .tmp/simpleMainwindow1.0.0/ && (cd `dirname .tmp/simpleMainwindow1.0.0` && $(TAR) simpleMainwindow1.0.0.tar simpleMainwindow1.0.0 && $(COMPRESS) simpleMainwindow1.0.0.tar) && $(MOVE) `dirname .tmp/simpleMainwindow1.0.0`/simpleMainwindow1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/simpleMainwindow1.0.0
+	$(COPY_FILE) --parents $(SOURCES) $(DIST) .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents resource/ToothSegmentation.qrc .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents include/BoundingBox.h include/GLViewer.h include/MainWindow.h include/Mesh.h include/Shader.h include/ToothSegmentation.h include/CurvatureComputer.h .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents src/main.cpp src/GLViewer.cpp src/MainWidow.cpp src/Mesh.cpp src/Shader.cpp src/ToothSegmentation.cpp src/CurvatureComputer.cpp .tmp/simpleMainwindow1.0.0/ && $(COPY_FILE) --parents language/zh_CN.ts .tmp/simpleMainwindow1.0.0/ && (cd `dirname .tmp/simpleMainwindow1.0.0` && $(TAR) simpleMainwindow1.0.0.tar simpleMainwindow1.0.0 && $(COMPRESS) simpleMainwindow1.0.0.tar) && $(MOVE) `dirname .tmp/simpleMainwindow1.0.0`/simpleMainwindow1.0.0.tar.gz . && $(DEL_FILE) -r .tmp/simpleMainwindow1.0.0
 
 
 clean:compiler_clean 
@@ -328,17 +328,17 @@ compiler_rcc_make_all: qrc_ToothSegmentation.cpp
 compiler_rcc_clean:
 	-$(DEL_FILE) qrc_ToothSegmentation.cpp
 qrc_ToothSegmentation.cpp: resource/ToothSegmentation.qrc \
-		resource/image/toolbar_add_boundary_vertex.png \
-		resource/image/toolbar_move_cutting_plane_up.png \
-		resource/image/toolbar_delete_error_contour_section.png \
 		resource/image/toolbar_program_control_start.png \
-		resource/image/toolbar_enable_manual_operation_checked.png \
 		resource/image/toolbar_show_vertex_properties.png \
-		resource/image/toolbar_delete_error_tooth_region.png \
-		resource/image/toolbar_enable_manual_operation_normal.png \
 		resource/image/toolbar_program_control_pause.png \
-		resource/image/toolbar_delete_boundary_vertex.png \
 		resource/image/toolbar_move_cutting_plane_down.png \
+		resource/image/toolbar_add_boundary_vertex.png \
+		resource/image/toolbar_delete_boundary_vertex.png \
+		resource/image/toolbar_enable_manual_operation_normal.png \
+		resource/image/toolbar_delete_error_contour_section.png \
+		resource/image/toolbar_delete_error_tooth_region.png \
+		resource/image/toolbar_move_cutting_plane_up.png \
+		resource/image/toolbar_enable_manual_operation_checked.png \
 		resource/image/toolbar_flip_cutting_plane.png
 	/usr/lib/x86_64-linux-gnu/qt5/bin/rcc -name ToothSegmentation resource/ToothSegmentation.qrc -o qrc_ToothSegmentation.cpp
 
@@ -1342,7 +1342,9 @@ main.o: src/main.cpp include/MainWindow.h \
 		/usr/include/qt5/QtWidgets/QListWidget \
 		include/ToothSegmentation.h \
 		/usr/include/qt5/QtWidgets/QProgressDialog \
-		/usr/include/qt5/QtWidgets/qprogressdialog.h
+		/usr/include/qt5/QtWidgets/qprogressdialog.h \
+		/usr/include/qt5/QtCore/QTranslator \
+		/usr/include/qt5/QtCore/qtranslator.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o src/main.cpp
 
 GLViewer.o: src/GLViewer.cpp /usr/include/qt5/QtOpenGL/QGLFunctions \

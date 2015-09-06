@@ -2,6 +2,5 @@
 *.o
 moc_*
 *.exe
-ui_*.h
 data/*
 

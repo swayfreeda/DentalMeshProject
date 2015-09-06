@@ -61,6 +61,7 @@ background:rgb(207, 207, 207)
      <string>&amp;File</string>
     </property>
     <addaction name="actionOpen"/>
+    <addaction name="separator"/>
     <addaction name="actionCloseAll"/>
    </widget>
    <widget class="QMenu" name="editMenu">
@@ -81,6 +82,7 @@ background:rgb(207, 207, 207)
     </widget>
     <addaction name="actionLaplacianDeformation"/>
     <addaction name="actionUnion"/>
+    <addaction name="separator"/>
     <addaction name="toothSegmentationMenu"/>
    </widget>
    <widget class="QMenu" name="settingMenu">
@@ -103,6 +105,7 @@ background:rgb(207, 207, 207)
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionToothSegmentationTour"/>
    </widget>
    <addaction name="fileMenu"/>
    <addaction name="editMenu"/>
@@ -134,16 +137,16 @@ background: rgb(95, 95, 95);
    </attribute>
    <addaction name="actionToothSegmentationProgramControl"/>
    <addaction name="separator"/>
-   <addaction name="actionToothSegmentationEnableManualOperation"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"/>
+   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"/>
+   <addaction name="separator"/>
    <addaction name="actionToothSegmentationManuallyShowVertexProperties"/>
    <addaction name="actionToothSegmentationManuallyAddBoundaryVertex"/>
    <addaction name="actionToothSegmentationManuallyDeleteBoundaryVertex"/>
    <addaction name="actionToothSegmentationManuallyDeleteErrorToothRegion"/>
    <addaction name="actionToothSegmentationManuallyDeleteErrorContourSection"/>
    <addaction name="separator"/>
-   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"/>
-   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"/>
-   <addaction name="actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"/>
   </widget>
   <action name="fileOpenAction">
    <property name="icon">
@@ -697,12 +700,7 @@ background: rgb(95, 95, 95);
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_add_boundary_vertex.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_add_boundary_vertex.png</iconset>
    </property>
    <property name="text">
-    <string>add boundary vertex</string>
-   </property>
-  </action>
-  <action name="actionManually_flip_gingiva_cutting_plane">
-   <property name="text">
-    <string>Manually flip gingiva cutting plane</string>
+    <string>Add boundary vertex</string>
    </property>
   </action>
   <action name="actionToothSegmentationManuallyDeleteBoundaryVertex">
@@ -717,7 +715,7 @@ background: rgb(95, 95, 95);
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_boundary_vertex.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_boundary_vertex.png</iconset>
    </property>
    <property name="text">
-    <string>delete boundary vertex</string>
+    <string>Delete boundary vertex</string>
    </property>
   </action>
   <action name="actionToothSegmentationManuallyShowVertexProperties">
@@ -735,7 +733,7 @@ background: rgb(95, 95, 95);
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_show_vertex_properties.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_show_vertex_properties.png</iconset>
    </property>
    <property name="text">
-    <string>show vertex properties</string>
+    <string>Show vertex properties</string>
    </property>
   </action>
   <action name="actionToothSegmentationManuallyDeleteErrorToothRegion">
@@ -750,7 +748,7 @@ background: rgb(95, 95, 95);
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_tooth_region.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_tooth_region.png</iconset>
    </property>
    <property name="text">
-    <string>delete error tooth region</string>
+    <string>Delete error tooth region</string>
    </property>
   </action>
   <action name="actionToothSegmentationManuallyDeleteErrorContourSection">
@@ -765,7 +763,7 @@ background: rgb(95, 95, 95);
      <normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_contour_section.png</normaloff>:/toolbar/ToothSegmentation/image/toolbar_delete_error_contour_section.png</iconset>
    </property>
    <property name="text">
-    <string>delete error contour section</string>
+    <string>Delete error contour section</string>
    </property>
   </action>
   <action name="actionToothSegmentationEnableManualOperation">
@@ -784,7 +782,7 @@ background: rgb(95, 95, 95);
      <normalon>:/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_checked.png</normalon>:/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png</iconset>
    </property>
    <property name="text">
-    <string>Enable</string>
+    <string>Enable manual operation</string>
    </property>
    <property name="toolTip">
     <string>Enable manual operation</string>
@@ -800,6 +798,11 @@ background: rgb(95, 95, 95);
    </property>
    <property name="text">
     <string>Program control</string>
+   </property>
+  </action>
+  <action name="actionToothSegmentationTour">
+   <property name="text">
+    <string>Tooth Segmentation Tour</string>
    </property>
   </action>
  </widget>
