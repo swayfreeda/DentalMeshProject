@@ -333,26 +333,26 @@ compiler_rcc_make_all: qrc_ToothSegmentation.cpp
 compiler_rcc_clean:
 	-$(DEL_FILE) qrc_ToothSegmentation.cpp
 qrc_ToothSegmentation.cpp: resource/ToothSegmentation.qrc \
-		resource/image/reset.png \
-		resource/image/toolbar_delete_boundary_vertex.png \
-		resource/image/toolbar_delete_error_tooth_region.png \
-		resource/image/toolbar_program_control_pause.png \
-		resource/image/toolbar_delete_error_contour_section.png \
+		resource/image/selectpoint.png \
+		resource/image/ccDelete.png \
 		resource/image/jiao.png \
-		resource/image/bing.png \
-		resource/image/toolbar_show_vertex_properties.png \
-		resource/image/toolbar_move_cutting_plane_down.png \
-		resource/image/toolbar_enable_manual_operation_checked.png \
-		resource/image/toolbar_add_boundary_vertex.png \
-		resource/image/toolbar_move_cutting_plane_up.png \
-		resource/image/toolbar_program_control_start.png \
 		resource/image/movePoint.png \
 		resource/image/cha.png \
-		resource/image/ccOpen.png \
-		resource/image/ccDelete.png \
-		resource/image/toolbar_enable_manual_operation_normal.png \
+		resource/image/bing.png \
+		resource/image/toolbar_add_boundary_vertex.png \
+		resource/image/toolbar_program_control_start.png \
+		resource/image/toolbar_delete_error_tooth_region.png \
+		resource/image/toolbar_show_vertex_properties.png \
 		resource/image/toolbar_flip_cutting_plane.png \
-		resource/image/selectpoint.png
+		resource/image/toolbar_move_cutting_plane_down.png \
+		resource/image/toolbar_enable_manual_operation_checked.png \
+		resource/image/ccOpen.png \
+		resource/image/toolbar_enable_manual_operation_normal.png \
+		resource/image/toolbar_delete_error_contour_section.png \
+		resource/image/toolbar_program_control_pause.png \
+		resource/image/reset.png \
+		resource/image/toolbar_delete_boundary_vertex.png \
+		resource/image/toolbar_move_cutting_plane_up.png
 	/usr/lib/x86_64-linux-gnu/qt5/bin/rcc -name ToothSegmentation resource/ToothSegmentation.qrc -o qrc_ToothSegmentation.cpp
 
 compiler_moc_header_make_all: moc_GLViewer.cpp moc_MainWindow.cpp moc_ToothSegmentation.cpp moc_CurvatureComputer.cpp

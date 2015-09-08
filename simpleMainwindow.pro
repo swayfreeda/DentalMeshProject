@@ -61,9 +61,9 @@ INCLUDEPATH += \
    /usr/include/qt3/ \
     /usr/include/qt4/QtXml/ \
    include/ \
-   lib/igit_geometry/include/ \#My_CGAL库包含路径
+   lib/igit_geometry/include/ \#IGITG_GEOMETRY库包含路径
     lib/eigen/include/ \ #Eigen库包含路径
-    /usr/include/pcl-1.7/ #PCL库包含路径
+    /usr/include/pcl-1.7/ #PCL库包含路径  Add your own path here!!!!!
 }
 
 LIBS += \
