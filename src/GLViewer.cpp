@@ -37,7 +37,7 @@
 
 GLuint arrayId;
 GLuint numElement;
-
+#define mhw_Debug//mhw调试输出
 #define BUFFER_OFFSET(offset)  ((GLvoid*) NULL + offset)
 #define NumberOf(array) (sizeof(array)/sizeof(array[0])
 
@@ -49,7 +49,9 @@ GLuint numElement;
 
 SW::Shader SW::GLViewer::m_shader;
 
-SW::GLViewer::GLViewer(QWidget *parent0, const QGLWidget *parent1, Qt::WindowFlags f):
+
+#if QT_VERSION <   QT_VERSION_CHECK(5, 0 , 0)
+SW::GLViewer::GLViewer(QWidget *parent0,  const char *parent1, QGLWidget*f):
     QGLViewer(parent0, parent1, f)
 {
     //setAutoFillBackground(true);
@@ -64,7 +66,51 @@ SW::GLViewer::GLViewer(QWidget *parent0, const QGLWidget *parent1, Qt::WindowFla
     mCallSuperWheelEvent = true;
     mCallSuperKeyPressEvent = true;
     mCallSuperKeyReleaseEvent = true;
+
+    //********************************//
+    //2015/09/07
+    //mhw merge code
+    //********************************//
+    select_vertices_mode = false;
+    MovePoints_mode=false;
+    P_OnMoving=false;
+    OnLaplacian=false;
+    m_length = 0.1;
+    DrawRect=false;
+    RunningModel=Default;//初始化的模式为空
+    //********************************//
 }
+#else
+SW::GLViewer::GLViewer(QWidget *parent0, const QGLWidget *parent1, Qt::WindowFlags f ):
+    QGLViewer(parent0, parent1, f)
+{
+    //setAutoFillBackground(true);
+    displayType = FLATLINE;
+
+    m_length = 0.1;
+
+    mCallSuperMousePressEvent = true;
+    mCallSuperMouseMoveEvent = true;
+    mCallSuperMouseReleaseEvent = true;
+    mCallSuperMouseDoubleClickEvent = true;
+    mCallSuperWheelEvent = true;
+    mCallSuperKeyPressEvent = true;
+    mCallSuperKeyReleaseEvent = true;
+
+    mCurrentProcessMode = NONE;
+    //********************************//
+    //2015/09/07
+    //mhw merge code
+    //********************************//
+    select_vertices_mode = false;
+    MovePoints_mode=false;
+    P_OnMoving=false;
+    OnLaplacian=false;
+    m_length = 0.1;
+    DrawRect=false;
+    //********************************//
+}
+#endif
 
 SW::GLViewer::~GLViewer()
 {
@@ -309,11 +355,14 @@ void SW::GLViewer::draw()
     setMeshMaterial();
     foreach(SW::Mesh mesh, meshes){
         glPushMatrix();
-          mesh.draw(displayType);
+        //mesh.draw(displayType);//mhw改201509079
+        mesh.draw(displayType,Select_P_Array,MoveVectors);
         glPopMatrix();
     }
     glPopAttrib();
 
+    if(DrawRect && select_vertices_mode)
+        drawSelectingWindow();
     //m_shader.disable();
 #if BUFFER_
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -393,42 +442,171 @@ void SW::GLViewer::drawAxises(double width, double length)
 
 }
 
+
+//////////////////////////////////////////////////
+//mhw copy
+//////////////////////////////////////////////////
 void SW::GLViewer::mousePressEvent(QMouseEvent *e)
 {
-    onMousePressed(e);
 
-    if(mCallSuperMousePressEvent)
-    {
+    qglviewer::Vec p3D(e->pos().x(),e->pos().y(),0);
+    qglviewer::Vec p2D = camera()->unprojectedCoordinatesOf(p3D,NULL);
+    qDebug()<<"3D:X_"<<p2D.x<<"Y_"<<p2D.y<<"Z_"<<p2D.z<<endl;
+    /*TODO*/
+    // initialized selecting window
+    if(MovePoints_mode && mCurrentProcessMode == LAPLACIAN_TRANSFORM_MODE){
+        int S_Num=0;//按下的是那个点集;
+        if(IsSelectPoint(0,e->pos().x(),e->pos().y(),&S_Num)){
+            P_OnMoving=true;
+            Cur_choose_P=S_Num;
+            qglviewer::Vec p2D(e->pos().x(),e->pos().y(),0);
+            qglviewer::Vec p3D = camera()->unprojectedCoordinatesOf(p2D,NULL);
+            qDebug()<<"3D:X_"<<p3D.x<<"Y_"<<p3D.y<<"Z_"<<p3D.z<<endl;
+            PressMouse_pos.x=p3D.x;
+            PressMouse_pos.y=p3D.y;
+            PressMouse_pos.z=p3D.z;
+            updateGL();
+            // qDebug() << "S_Num:"<<S_Num<< endl;
+        }
+    }
+    if ((e->button() == Qt::LeftButton) && (e->modifiers() == Qt::ControlModifier)&&select_vertices_mode&& mCurrentProcessMode == LAPLACIAN_TRANSFORM_MODE){
+
+        DrawRect = true;
+        selecting_window = QRect(e->pos(), e->pos());
+        //qDebug() << "mousePressEvent"<<e->pos().x() << ", " << e->pos().y() << endl;
+
+        updateGL();
+    }
+    if(mCurrentProcessMode == SEGMENTATION_MODE){
+        onMousePressed(e);
+
+        if(mCallSuperMousePressEvent){
+            QGLViewer::mousePressEvent(e);
+        }
+    }
+    else{
+        //qDebug() << "NomousePressEvent"<<e->pos().x() << ", " << e->pos().y() << endl;
         QGLViewer::mousePressEvent(e);
+
     }
+
 }
 
-void SW::GLViewer::mouseMoveEvent(QMouseEvent *e)
-{
-    onMouseMoved(e);
+void SW::GLViewer::mouseMoveEvent(QMouseEvent *e){
+    /*TODO*/
+    // selecting vertices
+    // set color
+    // current_selected_vertices  (e->modifiers() == Qt::ControlModifier)
 
-    if(mCallSuperMouseMoveEvent)
-    {
+    if(MovePoints_mode&&P_OnMoving&& mCurrentProcessMode == LAPLACIAN_TRANSFORM_MODE){
+
+        qglviewer::Vec p3D(e->pos().x(),e->pos().y(),0);
+        qglviewer::Vec p2D = camera()->unprojectedCoordinatesOf(p3D,NULL);
+        qDebug()<<"3D:X_"<<p2D.x<<"Y_"<<p2D.y<<"Z_"<<p2D.z<<endl;
+        CurMouse_pos.x=p2D.x;
+        CurMouse_pos.y=p2D.y;
+        CurMouse_pos.z=p2D.z;
+
+        //实时变形
+        //        MoveVectors.X_arr[Cur_choose_P]=(CurMouse_pos.x-PressMouse_pos.x);
+        //        MoveVectors.Y_arr[Cur_choose_P]=(CurMouse_pos.y-PressMouse_pos.y);
+        //        MoveVectors.Z_arr[Cur_choose_P]=(CurMouse_pos.z-PressMouse_pos.z);
+        MoveVectors.X_arr[Cur_choose_P]= MoveVectors.X_arr[Cur_choose_P]+(CurMouse_pos.x-PressMouse_pos.x);
+        MoveVectors.Y_arr[Cur_choose_P]=MoveVectors.Y_arr[Cur_choose_P]+(CurMouse_pos.y-PressMouse_pos.y);
+        MoveVectors.Z_arr[Cur_choose_P]=MoveVectors.Z_arr[Cur_choose_P]+(CurMouse_pos.z-PressMouse_pos.z);
+        PressMouse_pos.x=CurMouse_pos.x;
+        PressMouse_pos.y=CurMouse_pos.y;
+        PressMouse_pos.z=CurMouse_pos.z;
+        // L实时变形/***************************************************/
+
+        if((fabs(MoveVectors.Z_arr[Cur_choose_P])+fabs(MoveVectors.X_arr[Cur_choose_P])+fabs(MoveVectors.Y_arr[Cur_choose_P]))<2){
+            //MHW::LTransform TryL(this->meshes[0],"./",10000,0,this->meshes[0].n_vertices());
+            Do_L.P->Run(this->meshes[0],Select_P_Array,MoveVectors);
+
+            meshes[0].writeModel("tets.obj");
+            updateGL();
+            //     viewAll();
+            return;
+        }
+    }
+    if ((e->modifiers() == Qt::ControlModifier)&&select_vertices_mode&&mCurrentProcessMode == LAPLACIAN_TRANSFORM_MODE){
+        selecting_window.setBottomRight(e->pos());
+        updateGL();
+    }
+    if(mCurrentProcessMode == SEGMENTATION_MODE){
+        onMouseMoved(e);
+        if(mCallSuperMouseMoveEvent) {
+            QGLViewer::mouseMoveEvent(e);
+        }
+    }
+    else{
+        //  qDebug() << e->pos().x() << ", " << e->pos().y() << endl;
         QGLViewer::mouseMoveEvent(e);
+        return;
     }
 }
 
-void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e)
-{
-    onMouseReleased(e);
+void SW::GLViewer::mouseReleaseEvent(QMouseEvent *e){
 
-    if(mCallSuperMouseReleaseEvent)
-    {
+    if(MovePoints_mode&&P_OnMoving&&mCurrentProcessMode == LAPLACIAN_TRANSFORM_MODE){
+        P_OnMoving=false;
+        ReleaseMouse_pos.x=e->pos().x();
+        ReleaseMouse_pos.y=e->pos().y();
+        ////放开鼠标开始发生形变
+        //        MHW::LTransform TryL(this->meshes[0],"./",Select_P_Array,MoveVectors,10000,0,this->meshes[0].n_vertices());
+        //        TryL.Run(this->meshes[0]);
+        //        MoveVectors.X_arr[Cur_choose_P]=(ReleaseMouse_pos.x-PressMouse_pos.x);
+        //        MoveVectors.Y_arr[Cur_choose_P]=(ReleaseMouse_pos.y-PressMouse_pos.y);
+    }
+    if(select_vertices_mode ==true&&DrawRect&&mCurrentProcessMode == LAPLACIAN_TRANSFORM_MODE){
+        DrawRect=false;
+        handleSelectPoint(0);
+        MoveVectors.X_arr.append(0);
+        MoveVectors.Y_arr.append(0);//同时添加偏移向量集合;
+        MoveVectors.Z_arr.append(0);
+        updateGL();
+    }
+    if(mCurrentProcessMode == SEGMENTATION_MODE){
+        onMouseReleased(e);
+        if(mCallSuperMouseReleaseEvent){
+            QGLViewer::mouseReleaseEvent(e);
+        }
+    }
+    else{
         QGLViewer::mouseReleaseEvent(e);
     }
 }
 
+void SW::GLViewer::drawSelectingWindow()
+{
+    startScreenCoordinatesSystem();
+    glEnable(GL_BLEND);
+
+    //the select window
+    glLineWidth(2.0);
+    glColor4f(0.4f, 0.9f, 0.1f, 0.5f);
+    glBegin(GL_LINE_LOOP);
+    glVertex2i(selecting_window.left(), selecting_window.top());
+    glVertex2i(selecting_window.right(),selecting_window.top());
+    glVertex2i(selecting_window.right(), selecting_window.bottom());
+    glVertex2i(selecting_window.left(), selecting_window.bottom());
+    glEnd();
+
+    glDisable(GL_BLEND);
+    stopScreenCoordinatesSystem();
+}
+
+
 void SW::GLViewer::mouseDoubleClickEvent(QMouseEvent *e)
 {
-    onMouseDoubleClicked(e);
+    if(mCurrentProcessMode == SEGMENTATION_MODE){
+        onMouseDoubleClicked(e);
 
-    if(mCallSuperMouseDoubleClickEvent)
-    {
+        if(mCallSuperMouseDoubleClickEvent) {
+            QGLViewer::mouseDoubleClickEvent(e);
+        }
+    }
+    else{
         QGLViewer::mouseDoubleClickEvent(e);
     }
 }
@@ -450,28 +628,36 @@ void SW::GLViewer::wheelEvent(QWheelEvent *e)
     e->accept();
     update();
 
-    if(mCallSuperWheelEvent)
-    {
+    if(mCallSuperWheelEvent) {
         QGLViewer::wheelEvent(e);
     }
 }
 
 void SW::GLViewer::keyPressEvent(QKeyEvent *e)
 {
-    onKeyPressed(e);
+    if(mCurrentProcessMode == SEGMENTATION_MODE){
+        onKeyPressed(e);
 
-    if(mCallSuperKeyPressEvent)
-    {
+        if(mCallSuperKeyPressEvent) {
+            QGLViewer::keyPressEvent(e);
+        }
+    }
+    else{
         QGLViewer::keyPressEvent(e);
     }
 }
 
 void SW::GLViewer::keyReleaseEvent(QKeyEvent *e)
 {
-    onKeyReleased(e);
+    if(mCurrentProcessMode == SEGMENTATION_MODE){
+        onKeyReleased(e);
 
-    if(mCallSuperKeyReleaseEvent)
-    {
+        if(mCallSuperKeyReleaseEvent)
+        {
+            QGLViewer::keyReleaseEvent(e);
+        }
+    }
+    else{
         QGLViewer::keyReleaseEvent(e);
     }
 }
@@ -559,22 +745,136 @@ void SW::GLViewer::toggleDisplayFlatLine()
     updateGL();
 }
 
-void SW::GLViewer::addMesh(const Mesh &mesh)
-{
+//******************************************************************************//
+//2015/09/07
+//mhw merge code
+//******************************************************************************//
+void SW::GLViewer::toggleSelectingVertexMode(bool checked){
+
+    select_vertices_mode = checked;
+    if(select_vertices_mode==true){
+        setMouseTracking(true);
+    }else{
+        setMouseTracking(false);
+    }
+    updateGL();
+}
+void SW::GLViewer::toggleMovePoints(bool checked){
+
+    MovePoints_mode=checked;
+    //qDebug() << "toggleMovePoints" << endl;
+    updateGL();
+}
+
+
+void SW::GLViewer::toggleModelReset(){
+
+    meshes[0]=Do_L.P->objMesh;
+    for(int i=0;i<MoveVectors.X_arr.size();i++){
+        MoveVectors.X_arr[i]=0;
+        MoveVectors.Y_arr[i]=0;
+        MoveVectors.Z_arr[i]=0;
+    }
+    Select_P_Array.empty();
+    Select_P_Array.clear();
+    updateGL();
+}
+
+void SW::GLViewer::addMesh(const Mesh &mesh){
+
     meshes.append(mesh);
 }
 
-int SW::GLViewer::getMeshNum()
-{
+int SW::GLViewer::getMeshNum(){
     return meshes.size();
 }
 
-Mesh & SW::GLViewer::getMesh(int index)
-{
+Mesh & SW::GLViewer::getMesh(int index){
     return meshes[index];
 }
 
-void SW::GLViewer::removeAllMeshes()
-{
+void SW::GLViewer::removeAllMeshes(){
     meshes.clear();
 }
+
+
+//*****************************************************************************//
+//2015/09/07/
+//mhw merge code
+//*****************************************************************************//
+
+void SW::GLViewer::handleSelectPoint(int meshesNum){
+    QVector<int> tempP;
+
+    for(auto it= meshes[meshesNum].vertices_begin();it!= meshes[meshesNum].vertices_end();++it){//MHW::Mesh::VertexIter
+        auto point=meshes[meshesNum].point(it.handle());//OpenMesh::Vec3f
+        qglviewer::Vec p3D(point[0],point[1],point[2]);
+        qglviewer::Vec p2D = camera()->projectedCoordinatesOf(p3D, NULL);
+
+        if (selecting_window.contains(QPoint((int)p2D.x, (int)p2D.y)))
+        {
+            tempP.append(it.handle().idx());
+
+        }
+
+    }
+    Select_P_Array.append(tempP);
+
+
+}
+QVector<QRect> SW::GLViewer::Get2D_SP_Rect(int meshesNum){
+    QVector<QRect> Ret_R;
+    for(int i=0;i<Select_P_Array.size();i++){
+
+
+        double MaxX,MaxY,MinX,MinY;
+
+        OpenMesh::VertexHandle temV1(Select_P_Array[i][0]);
+        auto point=meshes[meshesNum].point(temV1);//OpenMesh::Vec3f
+        qglviewer::Vec p3D(point[0],point[1],point[2]);
+        qglviewer::Vec p2D = camera()->projectedCoordinatesOf(p3D, NULL);
+        MaxX=p2D.x;
+        MaxY=p2D.y;
+        MinX=p2D.x;
+        MinY=p2D.y;
+        for(int j=1;j<Select_P_Array[i].size();j++){
+
+            OpenMesh::VertexHandle temV(Select_P_Array[i][j]);
+            auto point=meshes[meshesNum].point(temV);//OpenMesh::Vec3f
+            qglviewer::Vec p3D(point[0],point[1],point[2]);
+            qglviewer::Vec p2D = camera()->projectedCoordinatesOf(p3D, NULL);
+            // camera()->projectedCoordinatesOf()
+            // camera()->cameraCoordinatesOf()
+            if(p2D.x>MaxX){
+                MaxX= p2D.x;
+            }
+            if(p2D.y>MaxY){
+                MaxY=p2D.y;
+            }
+            if(p2D.x<MinX){
+                MinX= p2D.x;
+            }
+            if(p2D.y<MinY){
+                MinY=p2D.y;
+            }
+        }
+
+        QRect tempR(QPoint((int)MaxX, (int)MaxY),QPoint((int)MinX, (int)MinY));
+        Ret_R.append(tempR);
+    }
+    return Ret_R;
+
+}
+bool SW::GLViewer::IsSelectPoint(int meshesNum,int x,int y,int *S_array_Num){
+    QVector<QRect> R_array=Get2D_SP_Rect(meshesNum);
+    for(int i=0;i<R_array.size();i++){
+        if (R_array[i].contains(QPoint(x, y)))
+        {
+            *(S_array_Num)=i;
+            return true;
+        }
+    }
+
+    return false;
+}
+

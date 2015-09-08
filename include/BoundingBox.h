@@ -13,8 +13,8 @@
 class BoundingBox {
 
 public:
-    BoundingBox(){};
-    ~BoundingBox(){};
+    BoundingBox(){}
+    ~BoundingBox(){}
     qglviewer::Vec origin;
     qglviewer::Vec size;
 };

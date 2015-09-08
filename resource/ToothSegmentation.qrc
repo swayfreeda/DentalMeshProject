@@ -1,16 +1,24 @@
 <RCC>
-    <qresource prefix="/toolbar/ToothSegmentation">
-        <file>image/toolbar_add_boundary_vertex.png</file>
-        <file>image/toolbar_delete_boundary_vertex.png</file>
-        <file>image/toolbar_delete_error_contour_section.png</file>
-        <file>image/toolbar_delete_error_tooth_region.png</file>
-        <file>image/toolbar_show_vertex_properties.png</file>
-        <file>image/toolbar_enable_manual_operation_checked.png</file>
-        <file>image/toolbar_enable_manual_operation_normal.png</file>
-        <file>image/toolbar_program_control_pause.png</file>
-        <file>image/toolbar_program_control_start.png</file>
-        <file>image/toolbar_flip_cutting_plane.png</file>
-        <file>image/toolbar_move_cutting_plane_down.png</file>
-        <file>image/toolbar_move_cutting_plane_up.png</file>
-    </qresource>
+  <qresource prefix="/toolbar/ToothSegmentation">
+    <file>image/reset.png</file>
+    <file>image/bing.png</file>
+    <file>image/cha.png</file>
+    <file>image/jiao.png</file>
+    <file>image/movePoint.png</file>
+    <file>image/selectpoint.png</file>
+    <file>image/ccDelete.png</file>
+    <file>image/ccOpen.png</file>
+    <file>image/toolbar_add_boundary_vertex.png</file>
+    <file>image/toolbar_delete_boundary_vertex.png</file>
+    <file>image/toolbar_delete_error_contour_section.png</file>
+    <file>image/toolbar_delete_error_tooth_region.png</file>
+    <file>image/toolbar_show_vertex_properties.png</file>
+    <file>image/toolbar_enable_manual_operation_checked.png</file>
+    <file>image/toolbar_enable_manual_operation_normal.png</file>
+    <file>image/toolbar_program_control_pause.png</file>
+    <file>image/toolbar_program_control_start.png</file>
+    <file>image/toolbar_flip_cutting_plane.png</file>
+    <file>image/toolbar_move_cutting_plane_down.png</file>
+    <file>image/toolbar_move_cutting_plane_up.png</file>
+  </qresource>
 </RCC>

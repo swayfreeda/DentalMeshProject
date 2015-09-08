@@ -1,8 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created: Sun Sep 6 08:57:18 2015
-**      by: Qt User Interface Compiler version 4.8.1
+** Created by: Qt User Interface Compiler version 5.2.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -11,36 +10,18 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-
-#if QT_VERSION >= 0x05000
-#include<QtWidgets/QAction>
-#include<QtWidgets/QApplication>
-#include<QtWidgets/QButtonGroup>
-#include<QtWidgets/QHBoxLayout>
-#include<QtWidgets/QHeaderView>
-#include<QtWidgets/QMainWindow>
-#include<QtWidgets/QMenu>
-#include<QtWidgets/QMenuBar>
-#include<QtWidgets/QStatusBar>
-#include<QtWidgets/QToolBar>
-#include<QtWidgets/QWidget>
-#else
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QHeaderView>
-#include <QtGui/QMainWindow>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QStatusBar>
-#include <QtGui/QToolBar>
-#include <QtGui/QWidget>
-#endif
-
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QStatusBar>
+#include <QtWidgets/QToolBar>
+#include <QtWidgets/QWidget>
 #include <include/GLViewer.h>
-
-
 
 QT_BEGIN_NAMESPACE
 
@@ -96,7 +77,6 @@ public:
     QAction *actionSave_Texture_Model;
     QAction *actionOpen;
     QAction *actionLaplacianDeformation;
-    QAction *actionUnion;
     QAction *actionDisplayVertices;
     QAction *actionDisplayWireFrame;
     QAction *actionDisplayFlatLine;
@@ -117,13 +97,20 @@ public:
     QAction *actionToothSegmentationEnableManualOperation;
     QAction *actionToothSegmentationProgramControl;
     QAction *actionToothSegmentationTour;
+    QAction *actionIntersection;
+    QAction *actionUnion_2;
+    QAction *actionDifference;
+    QAction *actionToothSegmentations;
+    QAction *actionSelectPoints;
+    QAction *actionDoDeformation;
+    QAction *actionBooleanOperation;
+    QAction *actionReset;
     QWidget *centralwidget;
     QHBoxLayout *horizontalLayout;
     SW::GLViewer *gv;
     QMenuBar *menubar;
     QMenu *fileMenu;
     QMenu *editMenu;
-    QMenu *toothSegmentationMenu;
     QMenu *settingMenu;
     QMenu *displayMenu;
     QMenu *helpMenu;
@@ -133,297 +120,344 @@ public:
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
-            MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+            MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->resize(830, 753);
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(MainWindow->sizePolicy().hasHeightForWidth());
         MainWindow->setSizePolicy(sizePolicy);
-        MainWindow->setStyleSheet(QString::fromUtf8(""));
+        MainWindow->setStyleSheet(QStringLiteral(""));
         fileOpenAction = new QAction(MainWindow);
-        fileOpenAction->setObjectName(QString::fromUtf8("fileOpenAction"));
+        fileOpenAction->setObjectName(QStringLiteral("fileOpenAction"));
         QIcon icon;
-        icon.addFile(QString::fromUtf8(":/fileopen"), QSize(), QIcon::Normal, QIcon::Off);
+        icon.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/ccOpen.png"), QSize(), QIcon::Normal, QIcon::Off);
         fileOpenAction->setIcon(icon);
         fileSaveAction = new QAction(MainWindow);
-        fileSaveAction->setObjectName(QString::fromUtf8("fileSaveAction"));
+        fileSaveAction->setObjectName(QStringLiteral("fileSaveAction"));
         QIcon icon1;
-        icon1.addFile(QString::fromUtf8(":/filesave"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/filesave"), QSize(), QIcon::Normal, QIcon::Off);
         fileSaveAction->setIcon(icon1);
         fileSaveAsAction = new QAction(MainWindow);
-        fileSaveAsAction->setObjectName(QString::fromUtf8("fileSaveAsAction"));
+        fileSaveAsAction->setObjectName(QStringLiteral("fileSaveAsAction"));
         exitAction = new QAction(MainWindow);
-        exitAction->setObjectName(QString::fromUtf8("exitAction"));
+        exitAction->setObjectName(QStringLiteral("exitAction"));
         selectPointsAction = new QAction(MainWindow);
-        selectPointsAction->setObjectName(QString::fromUtf8("selectPointsAction"));
+        selectPointsAction->setObjectName(QStringLiteral("selectPointsAction"));
         selectPointsAction->setCheckable(true);
         QIcon icon2;
-        icon2.addFile(QString::fromUtf8(":/pointsSlection.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon2.addFile(QStringLiteral(":/pointsSlection.png"), QSize(), QIcon::Normal, QIcon::Off);
         selectPointsAction->setIcon(icon2);
         setBackGroundAction = new QAction(MainWindow);
-        setBackGroundAction->setObjectName(QString::fromUtf8("setBackGroundAction"));
+        setBackGroundAction->setObjectName(QStringLiteral("setBackGroundAction"));
         helpAboutAction = new QAction(MainWindow);
-        helpAboutAction->setObjectName(QString::fromUtf8("helpAboutAction"));
+        helpAboutAction->setObjectName(QStringLiteral("helpAboutAction"));
         resetAction = new QAction(MainWindow);
-        resetAction->setObjectName(QString::fromUtf8("resetAction"));
+        resetAction->setObjectName(QStringLiteral("resetAction"));
         extractPlaneBoundaryAction = new QAction(MainWindow);
-        extractPlaneBoundaryAction->setObjectName(QString::fromUtf8("extractPlaneBoundaryAction"));
+        extractPlaneBoundaryAction->setObjectName(QStringLiteral("extractPlaneBoundaryAction"));
         extractPlaneBoundaryAction->setCheckable(true);
         QIcon icon3;
-        icon3.addFile(QString::fromUtf8(":/boundaryExtraction.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon3.addFile(QStringLiteral(":/boundaryExtraction.png"), QSize(), QIcon::Normal, QIcon::Off);
         extractPlaneBoundaryAction->setIcon(icon3);
         displayAllPlanesAction = new QAction(MainWindow);
-        displayAllPlanesAction->setObjectName(QString::fromUtf8("displayAllPlanesAction"));
+        displayAllPlanesAction->setObjectName(QStringLiteral("displayAllPlanesAction"));
         QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/showALLPlanes.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon4.addFile(QStringLiteral(":/showALLPlanes.png"), QSize(), QIcon::Normal, QIcon::Off);
         displayAllPlanesAction->setIcon(icon4);
         displaySinglePlaneAction = new QAction(MainWindow);
-        displaySinglePlaneAction->setObjectName(QString::fromUtf8("displaySinglePlaneAction"));
+        displaySinglePlaneAction->setObjectName(QStringLiteral("displaySinglePlaneAction"));
         QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/showSinglePlane.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon5.addFile(QStringLiteral(":/showSinglePlane.png"), QSize(), QIcon::Normal, QIcon::Off);
         displaySinglePlaneAction->setIcon(icon5);
         displayAllPolygonsAction = new QAction(MainWindow);
-        displayAllPolygonsAction->setObjectName(QString::fromUtf8("displayAllPolygonsAction"));
+        displayAllPolygonsAction->setObjectName(QStringLiteral("displayAllPolygonsAction"));
         QIcon icon6;
-        icon6.addFile(QString::fromUtf8(":/showAllPolygons.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon6.addFile(QStringLiteral(":/showAllPolygons.png"), QSize(), QIcon::Normal, QIcon::Off);
         displayAllPolygonsAction->setIcon(icon6);
         displaySinglePolygonAction = new QAction(MainWindow);
-        displaySinglePolygonAction->setObjectName(QString::fromUtf8("displaySinglePolygonAction"));
+        displaySinglePolygonAction->setObjectName(QStringLiteral("displaySinglePolygonAction"));
         QIcon icon7;
-        icon7.addFile(QString::fromUtf8(":/showSinglePolygon.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon7.addFile(QStringLiteral(":/showSinglePolygon.png"), QSize(), QIcon::Normal, QIcon::Off);
         displaySinglePolygonAction->setIcon(icon7);
         displayPointCloudAction = new QAction(MainWindow);
-        displayPointCloudAction->setObjectName(QString::fromUtf8("displayPointCloudAction"));
+        displayPointCloudAction->setObjectName(QStringLiteral("displayPointCloudAction"));
         displayPointCloudAction->setCheckable(true);
         displayPointCloudAction->setChecked(true);
         QIcon icon8;
-        icon8.addFile(QString::fromUtf8(":/MeshLive1.xpm"), QSize(), QIcon::Normal, QIcon::Off);
+        icon8.addFile(QStringLiteral(":/MeshLive1.xpm"), QSize(), QIcon::Normal, QIcon::Off);
         displayPointCloudAction->setIcon(icon8);
         exportOFFFileAction = new QAction(MainWindow);
-        exportOFFFileAction->setObjectName(QString::fromUtf8("exportOFFFileAction"));
+        exportOFFFileAction->setObjectName(QStringLiteral("exportOFFFileAction"));
         delaunary_TriangulationAction = new QAction(MainWindow);
-        delaunary_TriangulationAction->setObjectName(QString::fromUtf8("delaunary_TriangulationAction"));
+        delaunary_TriangulationAction->setObjectName(QStringLiteral("delaunary_TriangulationAction"));
         QIcon icon9;
-        icon9.addFile(QString::fromUtf8(":/flat.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon9.addFile(QStringLiteral(":/flat.png"), QSize(), QIcon::Normal, QIcon::Off);
         delaunary_TriangulationAction->setIcon(icon9);
         displayDelaunaryTriangulationAction = new QAction(MainWindow);
-        displayDelaunaryTriangulationAction->setObjectName(QString::fromUtf8("displayDelaunaryTriangulationAction"));
+        displayDelaunaryTriangulationAction->setObjectName(QStringLiteral("displayDelaunaryTriangulationAction"));
         displayDelaunaryTriangulationAction->setCheckable(true);
         displayDelaunaryTriangulationAction->setChecked(false);
         QIcon icon10;
-        icon10.addFile(QString::fromUtf8(":/empty_sphere.jpeg"), QSize(), QIcon::Normal, QIcon::Off);
+        icon10.addFile(QStringLiteral(":/empty_sphere.jpeg"), QSize(), QIcon::Normal, QIcon::Off);
         displayDelaunaryTriangulationAction->setIcon(icon10);
         texture_MappingAction = new QAction(MainWindow);
-        texture_MappingAction->setObjectName(QString::fromUtf8("texture_MappingAction"));
+        texture_MappingAction->setObjectName(QStringLiteral("texture_MappingAction"));
         QIcon icon11;
-        icon11.addFile(QString::fromUtf8(":/textureMapping.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon11.addFile(QStringLiteral(":/textureMapping.png"), QSize(), QIcon::Normal, QIcon::Off);
         texture_MappingAction->setIcon(icon11);
         loadImageAction = new QAction(MainWindow);
-        loadImageAction->setObjectName(QString::fromUtf8("loadImageAction"));
+        loadImageAction->setObjectName(QStringLiteral("loadImageAction"));
         loadProjectionMatrixAction = new QAction(MainWindow);
-        loadProjectionMatrixAction->setObjectName(QString::fromUtf8("loadProjectionMatrixAction"));
+        loadProjectionMatrixAction->setObjectName(QStringLiteral("loadProjectionMatrixAction"));
         displayPolygonOnImageAction = new QAction(MainWindow);
-        displayPolygonOnImageAction->setObjectName(QString::fromUtf8("displayPolygonOnImageAction"));
+        displayPolygonOnImageAction->setObjectName(QStringLiteral("displayPolygonOnImageAction"));
         displayPolygonOnImageAction->setCheckable(true);
         QIcon icon12;
-        icon12.addFile(QString::fromUtf8(":/show_facet.jpeg"), QSize(), QIcon::Normal, QIcon::Off);
+        icon12.addFile(QStringLiteral(":/show_facet.jpeg"), QSize(), QIcon::Normal, QIcon::Off);
         displayPolygonOnImageAction->setIcon(icon12);
         triangulationBrokenAction = new QAction(MainWindow);
-        triangulationBrokenAction->setObjectName(QString::fromUtf8("triangulationBrokenAction"));
+        triangulationBrokenAction->setObjectName(QStringLiteral("triangulationBrokenAction"));
         QIcon icon13;
-        icon13.addFile(QString::fromUtf8(":/triangulation_devide.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon13.addFile(QStringLiteral(":/triangulation_devide.png"), QSize(), QIcon::Normal, QIcon::Off);
         triangulationBrokenAction->setIcon(icon13);
         displayAxisAction = new QAction(MainWindow);
-        displayAxisAction->setObjectName(QString::fromUtf8("displayAxisAction"));
+        displayAxisAction->setObjectName(QStringLiteral("displayAxisAction"));
         displayAxisAction->setCheckable(true);
         displayAxisAction->setChecked(true);
         QIcon icon14;
-        icon14.addFile(QString::fromUtf8(":/axis.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon14.addFile(QStringLiteral(":/axis.png"), QSize(), QIcon::Normal, QIcon::Off);
         displayAxisAction->setIcon(icon14);
         displayGridAction = new QAction(MainWindow);
-        displayGridAction->setObjectName(QString::fromUtf8("displayGridAction"));
+        displayGridAction->setObjectName(QStringLiteral("displayGridAction"));
         displayGridAction->setCheckable(true);
         displayGridAction->setChecked(false);
         QIcon icon15;
-        icon15.addFile(QString::fromUtf8(":/grid.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon15.addFile(QStringLiteral(":/grid.png"), QSize(), QIcon::Normal, QIcon::Off);
         displayGridAction->setIcon(icon15);
         attitudeAdjustmentAction = new QAction(MainWindow);
-        attitudeAdjustmentAction->setObjectName(QString::fromUtf8("attitudeAdjustmentAction"));
+        attitudeAdjustmentAction->setObjectName(QStringLiteral("attitudeAdjustmentAction"));
         attitudeAdjustmentAction->setCheckable(true);
         QIcon icon16;
-        icon16.addFile(QString::fromUtf8(":/qtlogo.xpm"), QSize(), QIcon::Normal, QIcon::Off);
+        icon16.addFile(QStringLiteral(":/qtlogo.xpm"), QSize(), QIcon::Normal, QIcon::Off);
         attitudeAdjustmentAction->setIcon(icon16);
         exportProjectionMatrixFileAction = new QAction(MainWindow);
-        exportProjectionMatrixFileAction->setObjectName(QString::fromUtf8("exportProjectionMatrixFileAction"));
+        exportProjectionMatrixFileAction->setObjectName(QStringLiteral("exportProjectionMatrixFileAction"));
         structureOptimizationAction = new QAction(MainWindow);
-        structureOptimizationAction->setObjectName(QString::fromUtf8("structureOptimizationAction"));
+        structureOptimizationAction->setObjectName(QStringLiteral("structureOptimizationAction"));
         structureOptimizationAction->setCheckable(true);
         QIcon icon17;
-        icon17.addFile(QString::fromUtf8(":/structureOptimization.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon17.addFile(QStringLiteral(":/structureOptimization.png"), QSize(), QIcon::Normal, QIcon::Off);
         structureOptimizationAction->setIcon(icon17);
         InconsistentDetectionAction = new QAction(MainWindow);
-        InconsistentDetectionAction->setObjectName(QString::fromUtf8("InconsistentDetectionAction"));
+        InconsistentDetectionAction->setObjectName(QStringLiteral("InconsistentDetectionAction"));
         InconsistentDetectionAction->setCheckable(true);
         RANSACFittingPlanesAction = new QAction(MainWindow);
-        RANSACFittingPlanesAction->setObjectName(QString::fromUtf8("RANSACFittingPlanesAction"));
+        RANSACFittingPlanesAction->setObjectName(QStringLiteral("RANSACFittingPlanesAction"));
         QIcon icon18;
         icon18.addFile(QString::fromUtf8(":/\351\241\271\347\233\25618.ico"), QSize(), QIcon::Normal, QIcon::Off);
         RANSACFittingPlanesAction->setIcon(icon18);
         ExportPlaneInfromationAction = new QAction(MainWindow);
-        ExportPlaneInfromationAction->setObjectName(QString::fromUtf8("ExportPlaneInfromationAction"));
+        ExportPlaneInfromationAction->setObjectName(QStringLiteral("ExportPlaneInfromationAction"));
         LoadPlaneInformationAction = new QAction(MainWindow);
-        LoadPlaneInformationAction->setObjectName(QString::fromUtf8("LoadPlaneInformationAction"));
+        LoadPlaneInformationAction->setObjectName(QStringLiteral("LoadPlaneInformationAction"));
         TestPhotoConsistencyAction = new QAction(MainWindow);
-        TestPhotoConsistencyAction->setObjectName(QString::fromUtf8("TestPhotoConsistencyAction"));
+        TestPhotoConsistencyAction->setObjectName(QStringLiteral("TestPhotoConsistencyAction"));
         QIcon icon19;
-        icon19.addFile(QString::fromUtf8(":/preferences.jpeg"), QSize(), QIcon::Normal, QIcon::Off);
+        icon19.addFile(QStringLiteral(":/preferences.jpeg"), QSize(), QIcon::Normal, QIcon::Off);
         TestPhotoConsistencyAction->setIcon(icon19);
         LoadVisibilityAction = new QAction(MainWindow);
-        LoadVisibilityAction->setObjectName(QString::fromUtf8("LoadVisibilityAction"));
+        LoadVisibilityAction->setObjectName(QStringLiteral("LoadVisibilityAction"));
         LoadCameraInformationAction = new QAction(MainWindow);
-        LoadCameraInformationAction->setObjectName(QString::fromUtf8("LoadCameraInformationAction"));
+        LoadCameraInformationAction->setObjectName(QStringLiteral("LoadCameraInformationAction"));
         ExportCameraInformationAction = new QAction(MainWindow);
-        ExportCameraInformationAction->setObjectName(QString::fromUtf8("ExportCameraInformationAction"));
+        ExportCameraInformationAction->setObjectName(QStringLiteral("ExportCameraInformationAction"));
         loadPointCloudFromXMLAction = new QAction(MainWindow);
-        loadPointCloudFromXMLAction->setObjectName(QString::fromUtf8("loadPointCloudFromXMLAction"));
+        loadPointCloudFromXMLAction->setObjectName(QStringLiteral("loadPointCloudFromXMLAction"));
         savePointCloudAsXMLAction = new QAction(MainWindow);
-        savePointCloudAsXMLAction->setObjectName(QString::fromUtf8("savePointCloudAsXMLAction"));
+        savePointCloudAsXMLAction->setObjectName(QStringLiteral("savePointCloudAsXMLAction"));
         displayCamrerasAction = new QAction(MainWindow);
-        displayCamrerasAction->setObjectName(QString::fromUtf8("displayCamrerasAction"));
+        displayCamrerasAction->setObjectName(QStringLiteral("displayCamrerasAction"));
         displayCamrerasAction->setCheckable(true);
         displayCamrerasAction->setChecked(false);
         floorPlanReconstructionAction = new QAction(MainWindow);
-        floorPlanReconstructionAction->setObjectName(QString::fromUtf8("floorPlanReconstructionAction"));
+        floorPlanReconstructionAction->setObjectName(QStringLiteral("floorPlanReconstructionAction"));
         floorPlanReconstructionAction->setCheckable(true);
         SuperPixelsAction = new QAction(MainWindow);
-        SuperPixelsAction->setObjectName(QString::fromUtf8("SuperPixelsAction"));
+        SuperPixelsAction->setObjectName(QStringLiteral("SuperPixelsAction"));
         loadModelAction = new QAction(MainWindow);
-        loadModelAction->setObjectName(QString::fromUtf8("loadModelAction"));
+        loadModelAction->setObjectName(QStringLiteral("loadModelAction"));
         saveModelAction = new QAction(MainWindow);
-        saveModelAction->setObjectName(QString::fromUtf8("saveModelAction"));
+        saveModelAction->setObjectName(QStringLiteral("saveModelAction"));
         displaySinglePlaneDTsAction = new QAction(MainWindow);
-        displaySinglePlaneDTsAction->setObjectName(QString::fromUtf8("displaySinglePlaneDTsAction"));
+        displaySinglePlaneDTsAction->setObjectName(QStringLiteral("displaySinglePlaneDTsAction"));
         displaySinglePlaneDTsAction->setCheckable(true);
         displayModelResultsAction = new QAction(MainWindow);
-        displayModelResultsAction->setObjectName(QString::fromUtf8("displayModelResultsAction"));
+        displayModelResultsAction->setObjectName(QStringLiteral("displayModelResultsAction"));
         displayModelResultsAction->setCheckable(true);
         actionDisplay_Texture_Model = new QAction(MainWindow);
-        actionDisplay_Texture_Model->setObjectName(QString::fromUtf8("actionDisplay_Texture_Model"));
+        actionDisplay_Texture_Model->setObjectName(QStringLiteral("actionDisplay_Texture_Model"));
         actionDisplay_Texture_Model->setCheckable(true);
         actionLoad_Texure_Model = new QAction(MainWindow);
-        actionLoad_Texure_Model->setObjectName(QString::fromUtf8("actionLoad_Texure_Model"));
+        actionLoad_Texure_Model->setObjectName(QStringLiteral("actionLoad_Texure_Model"));
         actionSave_Texture_Model = new QAction(MainWindow);
-        actionSave_Texture_Model->setObjectName(QString::fromUtf8("actionSave_Texture_Model"));
+        actionSave_Texture_Model->setObjectName(QStringLiteral("actionSave_Texture_Model"));
         actionOpen = new QAction(MainWindow);
-        actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
+        actionOpen->setObjectName(QStringLiteral("actionOpen"));
+        actionOpen->setIcon(icon);
         actionLaplacianDeformation = new QAction(MainWindow);
-        actionLaplacianDeformation->setObjectName(QString::fromUtf8("actionLaplacianDeformation"));
-        actionUnion = new QAction(MainWindow);
-        actionUnion->setObjectName(QString::fromUtf8("actionUnion"));
+        actionLaplacianDeformation->setObjectName(QStringLiteral("actionLaplacianDeformation"));
+        actionLaplacianDeformation->setCheckable(true);
         actionDisplayVertices = new QAction(MainWindow);
-        actionDisplayVertices->setObjectName(QString::fromUtf8("actionDisplayVertices"));
+        actionDisplayVertices->setObjectName(QStringLiteral("actionDisplayVertices"));
         actionDisplayWireFrame = new QAction(MainWindow);
-        actionDisplayWireFrame->setObjectName(QString::fromUtf8("actionDisplayWireFrame"));
+        actionDisplayWireFrame->setObjectName(QStringLiteral("actionDisplayWireFrame"));
         actionDisplayFlatLine = new QAction(MainWindow);
-        actionDisplayFlatLine->setObjectName(QString::fromUtf8("actionDisplayFlatLine"));
+        actionDisplayFlatLine->setObjectName(QStringLiteral("actionDisplayFlatLine"));
         actionCloseAll = new QAction(MainWindow);
-        actionCloseAll->setObjectName(QString::fromUtf8("actionCloseAll"));
-        actionToothSegmentationIdentifyPotentialToothBoundary = new QAction(MainWindow);
-        actionToothSegmentationIdentifyPotentialToothBoundary->setObjectName(QString::fromUtf8("actionToothSegmentationIdentifyPotentialToothBoundary"));
-        actionToothSegmentationAutomaticCuttingOfGingiva = new QAction(MainWindow);
-        actionToothSegmentationAutomaticCuttingOfGingiva->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingiva"));
-        actionToothSegmentationBoundarySkeletonExtraction = new QAction(MainWindow);
-        actionToothSegmentationBoundarySkeletonExtraction->setObjectName(QString::fromUtf8("actionToothSegmentationBoundarySkeletonExtraction"));
-        actionToothSegmentationRefineToothBoundary = new QAction(MainWindow);
-        actionToothSegmentationRefineToothBoundary->setObjectName(QString::fromUtf8("actionToothSegmentationRefineToothBoundary"));
-        actionToothSegmentationFindCuttingPoints = new QAction(MainWindow);
-        actionToothSegmentationFindCuttingPoints->setObjectName(QString::fromUtf8("actionToothSegmentationFindCuttingPoints"));
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane = new QAction(MainWindow);
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"));
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
+        actionCloseAll->setObjectName(QStringLiteral("actionCloseAll"));
         QIcon icon20;
-        icon20.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setIcon(icon20);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp = new QAction(MainWindow);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"));
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
+        icon20.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/ccDelete.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionCloseAll->setIcon(icon20);
+        actionToothSegmentationIdentifyPotentialToothBoundary = new QAction(MainWindow);
+        actionToothSegmentationIdentifyPotentialToothBoundary->setObjectName(QStringLiteral("actionToothSegmentationIdentifyPotentialToothBoundary"));
+        actionToothSegmentationAutomaticCuttingOfGingiva = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingiva->setObjectName(QStringLiteral("actionToothSegmentationAutomaticCuttingOfGingiva"));
+        actionToothSegmentationBoundarySkeletonExtraction = new QAction(MainWindow);
+        actionToothSegmentationBoundarySkeletonExtraction->setObjectName(QStringLiteral("actionToothSegmentationBoundarySkeletonExtraction"));
+        actionToothSegmentationRefineToothBoundary = new QAction(MainWindow);
+        actionToothSegmentationRefineToothBoundary->setObjectName(QStringLiteral("actionToothSegmentationRefineToothBoundary"));
+        actionToothSegmentationFindCuttingPoints = new QAction(MainWindow);
+        actionToothSegmentationFindCuttingPoints->setObjectName(QStringLiteral("actionToothSegmentationFindCuttingPoints"));
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setObjectName(QStringLiteral("actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane"));
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setEnabled(false);
         QIcon icon21;
-        icon21.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setIcon(icon21);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown = new QAction(MainWindow);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setObjectName(QString::fromUtf8("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"));
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        icon21.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_flip_cutting_plane.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setIcon(icon21);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setObjectName(QStringLiteral("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp"));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setEnabled(false);
         QIcon icon22;
-        icon22.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setIcon(icon22);
+        icon22.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_up.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setIcon(icon22);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown = new QAction(MainWindow);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setObjectName(QStringLiteral("actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown"));
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setEnabled(false);
+        QIcon icon23;
+        icon23.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_move_cutting_plane_down.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setIcon(icon23);
         actionToothSegmentationManuallyAddBoundaryVertex = new QAction(MainWindow);
-        actionToothSegmentationManuallyAddBoundaryVertex->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyAddBoundaryVertex"));
+        actionToothSegmentationManuallyAddBoundaryVertex->setObjectName(QStringLiteral("actionToothSegmentationManuallyAddBoundaryVertex"));
         actionToothSegmentationManuallyAddBoundaryVertex->setCheckable(true);
         actionToothSegmentationManuallyAddBoundaryVertex->setEnabled(false);
-        QIcon icon23;
-        icon23.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_add_boundary_vertex.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationManuallyAddBoundaryVertex->setIcon(icon23);
+        QIcon icon24;
+        icon24.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_add_boundary_vertex.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationManuallyAddBoundaryVertex->setIcon(icon24);
         actionToothSegmentationManuallyDeleteBoundaryVertex = new QAction(MainWindow);
-        actionToothSegmentationManuallyDeleteBoundaryVertex->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyDeleteBoundaryVertex"));
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setObjectName(QStringLiteral("actionToothSegmentationManuallyDeleteBoundaryVertex"));
         actionToothSegmentationManuallyDeleteBoundaryVertex->setCheckable(true);
         actionToothSegmentationManuallyDeleteBoundaryVertex->setEnabled(false);
-        QIcon icon24;
-        icon24.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_delete_boundary_vertex.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationManuallyDeleteBoundaryVertex->setIcon(icon24);
+        QIcon icon25;
+        icon25.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_delete_boundary_vertex.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationManuallyDeleteBoundaryVertex->setIcon(icon25);
         actionToothSegmentationManuallyShowVertexProperties = new QAction(MainWindow);
-        actionToothSegmentationManuallyShowVertexProperties->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyShowVertexProperties"));
+        actionToothSegmentationManuallyShowVertexProperties->setObjectName(QStringLiteral("actionToothSegmentationManuallyShowVertexProperties"));
         actionToothSegmentationManuallyShowVertexProperties->setCheckable(true);
         actionToothSegmentationManuallyShowVertexProperties->setChecked(false);
         actionToothSegmentationManuallyShowVertexProperties->setEnabled(false);
-        QIcon icon25;
-        icon25.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_show_vertex_properties.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationManuallyShowVertexProperties->setIcon(icon25);
+        QIcon icon26;
+        icon26.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_show_vertex_properties.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationManuallyShowVertexProperties->setIcon(icon26);
         actionToothSegmentationManuallyDeleteErrorToothRegion = new QAction(MainWindow);
-        actionToothSegmentationManuallyDeleteErrorToothRegion->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyDeleteErrorToothRegion"));
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setObjectName(QStringLiteral("actionToothSegmentationManuallyDeleteErrorToothRegion"));
         actionToothSegmentationManuallyDeleteErrorToothRegion->setCheckable(true);
         actionToothSegmentationManuallyDeleteErrorToothRegion->setEnabled(false);
-        QIcon icon26;
-        icon26.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_delete_error_tooth_region.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationManuallyDeleteErrorToothRegion->setIcon(icon26);
+        QIcon icon27;
+        icon27.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_delete_error_tooth_region.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationManuallyDeleteErrorToothRegion->setIcon(icon27);
         actionToothSegmentationManuallyDeleteErrorContourSection = new QAction(MainWindow);
-        actionToothSegmentationManuallyDeleteErrorContourSection->setObjectName(QString::fromUtf8("actionToothSegmentationManuallyDeleteErrorContourSection"));
+        actionToothSegmentationManuallyDeleteErrorContourSection->setObjectName(QStringLiteral("actionToothSegmentationManuallyDeleteErrorContourSection"));
         actionToothSegmentationManuallyDeleteErrorContourSection->setCheckable(true);
         actionToothSegmentationManuallyDeleteErrorContourSection->setEnabled(false);
-        QIcon icon27;
-        icon27.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_delete_error_contour_section.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationManuallyDeleteErrorContourSection->setIcon(icon27);
+        QIcon icon28;
+        icon28.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_delete_error_contour_section.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationManuallyDeleteErrorContourSection->setIcon(icon28);
         actionToothSegmentationEnableManualOperation = new QAction(MainWindow);
-        actionToothSegmentationEnableManualOperation->setObjectName(QString::fromUtf8("actionToothSegmentationEnableManualOperation"));
+        actionToothSegmentationEnableManualOperation->setObjectName(QStringLiteral("actionToothSegmentationEnableManualOperation"));
         actionToothSegmentationEnableManualOperation->setCheckable(true);
         actionToothSegmentationEnableManualOperation->setChecked(false);
         actionToothSegmentationEnableManualOperation->setEnabled(false);
-        QIcon icon28;
-        icon28.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png"), QSize(), QIcon::Normal, QIcon::Off);
-        icon28.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_checked.png"), QSize(), QIcon::Normal, QIcon::On);
-        actionToothSegmentationEnableManualOperation->setIcon(icon28);
-        actionToothSegmentationProgramControl = new QAction(MainWindow);
-        actionToothSegmentationProgramControl->setObjectName(QString::fromUtf8("actionToothSegmentationProgramControl"));
-        actionToothSegmentationProgramControl->setEnabled(false);
         QIcon icon29;
-        icon29.addFile(QString::fromUtf8(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"), QSize(), QIcon::Normal, QIcon::Off);
-        actionToothSegmentationProgramControl->setIcon(icon29);
+        icon29.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_normal.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon29.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_enable_manual_operation_checked.png"), QSize(), QIcon::Normal, QIcon::On);
+        actionToothSegmentationEnableManualOperation->setIcon(icon29);
+        actionToothSegmentationProgramControl = new QAction(MainWindow);
+        actionToothSegmentationProgramControl->setObjectName(QStringLiteral("actionToothSegmentationProgramControl"));
+        actionToothSegmentationProgramControl->setEnabled(false);
+        QIcon icon30;
+        icon30.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/toolbar_program_control_start.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionToothSegmentationProgramControl->setIcon(icon30);
         actionToothSegmentationTour = new QAction(MainWindow);
-        actionToothSegmentationTour->setObjectName(QString::fromUtf8("actionToothSegmentationTour"));
+        actionToothSegmentationTour->setObjectName(QStringLiteral("actionToothSegmentationTour"));
+        actionIntersection = new QAction(MainWindow);
+        actionIntersection->setObjectName(QStringLiteral("actionIntersection"));
+        actionIntersection->setEnabled(false);
+        QIcon icon31;
+        icon31.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/jiao.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionIntersection->setIcon(icon31);
+        actionUnion_2 = new QAction(MainWindow);
+        actionUnion_2->setObjectName(QStringLiteral("actionUnion_2"));
+        actionUnion_2->setEnabled(false);
+        QIcon icon32;
+        icon32.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/bing.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionUnion_2->setIcon(icon32);
+        actionDifference = new QAction(MainWindow);
+        actionDifference->setObjectName(QStringLiteral("actionDifference"));
+        actionDifference->setEnabled(false);
+        QIcon icon33;
+        icon33.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/cha.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDifference->setIcon(icon33);
+        actionToothSegmentations = new QAction(MainWindow);
+        actionToothSegmentations->setObjectName(QStringLiteral("actionToothSegmentations"));
+        actionToothSegmentations->setCheckable(true);
+        actionSelectPoints = new QAction(MainWindow);
+        actionSelectPoints->setObjectName(QStringLiteral("actionSelectPoints"));
+        actionSelectPoints->setCheckable(true);
+        actionSelectPoints->setEnabled(false);
+        QIcon icon34;
+        icon34.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/selectpoint.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionSelectPoints->setIcon(icon34);
+        actionDoDeformation = new QAction(MainWindow);
+        actionDoDeformation->setObjectName(QStringLiteral("actionDoDeformation"));
+        actionDoDeformation->setCheckable(true);
+        actionDoDeformation->setEnabled(false);
+        QIcon icon35;
+        icon35.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/movePoint.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionDoDeformation->setIcon(icon35);
+        actionBooleanOperation = new QAction(MainWindow);
+        actionBooleanOperation->setObjectName(QStringLiteral("actionBooleanOperation"));
+        actionBooleanOperation->setCheckable(true);
+        actionReset = new QAction(MainWindow);
+        actionReset->setObjectName(QStringLiteral("actionReset"));
+        actionReset->setEnabled(true);
+        QIcon icon36;
+        icon36.addFile(QStringLiteral(":/toolbar/ToothSegmentation/image/reset.png"), QSize(), QIcon::Normal, QIcon::Off);
+        actionReset->setIcon(icon36);
         centralwidget = new QWidget(MainWindow);
-        centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
+        centralwidget->setObjectName(QStringLiteral("centralwidget"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(centralwidget->sizePolicy().hasHeightForWidth());
         centralwidget->setSizePolicy(sizePolicy1);
         horizontalLayout = new QHBoxLayout(centralwidget);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
         gv = new SW::GLViewer(centralwidget);
-        gv->setObjectName(QString::fromUtf8("gv"));
-        gv->setStyleSheet(QString::fromUtf8("QFrame{\n"
-                                            "background:rgb(207, 207, 207)\n"
-                                            "}"));
+        gv->setObjectName(QStringLiteral("gv"));
+        gv->setStyleSheet(QLatin1String("QFrame{\n"
+"background:rgb(207, 207, 207)\n"
+"}"));
         gv->setFrameShape(QFrame::StyledPanel);
         gv->setFrameShadow(QFrame::Raised);
 
@@ -431,31 +465,29 @@ public:
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
-        menubar->setObjectName(QString::fromUtf8("menubar"));
-        menubar->setGeometry(QRect(0, 0, 830, 26));
+        menubar->setObjectName(QStringLiteral("menubar"));
+        menubar->setGeometry(QRect(0, 0, 830, 25));
         fileMenu = new QMenu(menubar);
-        fileMenu->setObjectName(QString::fromUtf8("fileMenu"));
+        fileMenu->setObjectName(QStringLiteral("fileMenu"));
         editMenu = new QMenu(menubar);
-        editMenu->setObjectName(QString::fromUtf8("editMenu"));
-        toothSegmentationMenu = new QMenu(editMenu);
-        toothSegmentationMenu->setObjectName(QString::fromUtf8("toothSegmentationMenu"));
+        editMenu->setObjectName(QStringLiteral("editMenu"));
         settingMenu = new QMenu(menubar);
-        settingMenu->setObjectName(QString::fromUtf8("settingMenu"));
+        settingMenu->setObjectName(QStringLiteral("settingMenu"));
         settingMenu->setEnabled(false);
         displayMenu = new QMenu(menubar);
-        displayMenu->setObjectName(QString::fromUtf8("displayMenu"));
+        displayMenu->setObjectName(QStringLiteral("displayMenu"));
         helpMenu = new QMenu(menubar);
-        helpMenu->setObjectName(QString::fromUtf8("helpMenu"));
+        helpMenu->setObjectName(QStringLiteral("helpMenu"));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
-        statusbar->setObjectName(QString::fromUtf8("statusbar"));
+        statusbar->setObjectName(QStringLiteral("statusbar"));
         MainWindow->setStatusBar(statusbar);
         toolBar = new QToolBar(MainWindow);
-        toolBar->setObjectName(QString::fromUtf8("toolBar"));
+        toolBar->setObjectName(QStringLiteral("toolBar"));
         toolBar->setEnabled(true);
-        toolBar->setStyleSheet(QString::fromUtf8("QMainWindow{\n"
-                                                 "background: rgb(95, 95, 95);\n"
-                                                 "}"));
+        toolBar->setStyleSheet(QLatin1String("QMainWindow{\n"
+"background: rgb(95, 95, 95);\n"
+"}"));
         MainWindow->addToolBar(Qt::TopToolBarArea, toolBar);
 
         menubar->addAction(fileMenu->menuAction());
@@ -467,32 +499,39 @@ public:
         fileMenu->addSeparator();
         fileMenu->addAction(actionCloseAll);
         editMenu->addAction(actionLaplacianDeformation);
-        editMenu->addAction(actionUnion);
+        editMenu->addAction(actionToothSegmentations);
+        editMenu->addAction(actionBooleanOperation);
         editMenu->addSeparator();
-        editMenu->addAction(toothSegmentationMenu->menuAction());
-        toothSegmentationMenu->addAction(actionToothSegmentationIdentifyPotentialToothBoundary);
-        toothSegmentationMenu->addAction(actionToothSegmentationAutomaticCuttingOfGingiva);
-        toothSegmentationMenu->addAction(actionToothSegmentationBoundarySkeletonExtraction);
-        toothSegmentationMenu->addSeparator();
-        toothSegmentationMenu->addAction(actionToothSegmentationFindCuttingPoints);
-        toothSegmentationMenu->addSeparator();
-        toothSegmentationMenu->addAction(actionToothSegmentationRefineToothBoundary);
+        editMenu->addAction(actionIntersection);
+        editMenu->addAction(actionDifference);
+        editMenu->addAction(actionUnion_2);
+        editMenu->addSeparator();
+        editMenu->addAction(actionSelectPoints);
+        editMenu->addAction(actionDoDeformation);
         displayMenu->addAction(actionDisplayVertices);
         displayMenu->addAction(actionDisplayWireFrame);
         displayMenu->addAction(actionDisplayFlatLine);
         helpMenu->addAction(actionToothSegmentationTour);
-        toolBar->addAction(actionToothSegmentationProgramControl);
+        toolBar->addAction(actionOpen);
+        toolBar->addAction(actionCloseAll);
+        toolBar->addAction(actionReset);
         toolBar->addSeparator();
+        toolBar->addAction(actionToothSegmentationProgramControl);
         toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane);
         toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp);
         toolBar->addAction(actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown);
-        toolBar->addSeparator();
         toolBar->addAction(actionToothSegmentationManuallyShowVertexProperties);
         toolBar->addAction(actionToothSegmentationManuallyAddBoundaryVertex);
         toolBar->addAction(actionToothSegmentationManuallyDeleteBoundaryVertex);
         toolBar->addAction(actionToothSegmentationManuallyDeleteErrorToothRegion);
         toolBar->addAction(actionToothSegmentationManuallyDeleteErrorContourSection);
         toolBar->addSeparator();
+        toolBar->addAction(actionIntersection);
+        toolBar->addAction(actionUnion_2);
+        toolBar->addAction(actionDifference);
+        toolBar->addSeparator();
+        toolBar->addAction(actionSelectPoints);
+        toolBar->addAction(actionDoDeformation);
 
         retranslateUi(MainWindow);
 
@@ -612,77 +651,6 @@ public:
         actionSave_Texture_Model->setText(QApplication::translate("MainWindow", "Save Texture Model", 0));
         actionOpen->setText(QApplication::translate("MainWindow", "Open", 0));
         actionLaplacianDeformation->setText(QApplication::translate("MainWindow", "Laplacian Deformation", 0));
-        actionUnion->setText(QApplication::translate("MainWindow", "Union", 0));
-        actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0));
-        actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0));
-        actionDisplayFlatLine->setText(QApplication::translate("MainWindow", "FlatLine", 0));
-        actionCloseAll->setText(QApplication::translate("MainWindow", "Close All", 0));
-        actionToothSegmentationIdentifyPotentialToothBoundary->setText(QApplication::translate("MainWindow", "Identify potential tooth boundary", 0));
-        actionToothSegmentationAutomaticCuttingOfGingiva->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva", 0));
-        actionToothSegmentationBoundarySkeletonExtraction->setText(QApplication::translate("MainWindow", "Boundary skeleton extraction", 0));
-        actionToothSegmentationRefineToothBoundary->setText(QApplication::translate("MainWindow", "Refine tooth boundary", 0));
-        actionToothSegmentationFindCuttingPoints->setText(QApplication::translate("MainWindow", "Find cutting points", 0));
-        fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0));
-        editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0));
-        toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0));
-        settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0));
-        displayMenu->setTitle(QApplication::translate("MainWindow", "&Display", 0));
-        helpMenu->setTitle(QApplication::translate("MainWindow", "&Help", 0));
-        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0));
-        LoadVisibilityAction->setText(QApplication::translate("MainWindow", "Load Visibility", 0));
-        LoadCameraInformationAction->setText(QApplication::translate("MainWindow", "Load Camera Information", 0));
-        ExportCameraInformationAction->setText(QApplication::translate("MainWindow", "Export Camera Information", 0));
-        loadPointCloudFromXMLAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From XML", 0));
-        savePointCloudAsXMLAction->setText(QApplication::translate("MainWindow", "Save Point Cloud As XML", 0));
-        displayCamrerasAction->setText(QApplication::translate("MainWindow", "Display Camreras", 0));
-        floorPlanReconstructionAction->setText(QApplication::translate("MainWindow", "Floor Plan Reconstruction", 0));
-        SuperPixelsAction->setText(QApplication::translate("MainWindow", "SuperPixels", 0));
-        loadModelAction->setText(QApplication::translate("MainWindow", "Load Model From OFF", 0));
-        saveModelAction->setText(QApplication::translate("MainWindow", "Save Model As", 0));
-        displaySinglePlaneDTsAction->setText(QApplication::translate("MainWindow", "Display Single Plane Delaunary Triangulation", 0));
-        displayModelResultsAction->setText(QApplication::translate("MainWindow", "Display Model Results", 0));
-        actionDisplay_Texture_Model->setText(QApplication::translate("MainWindow", "Display Texture Model", 0));
-        actionLoad_Texure_Model->setText(QApplication::translate("MainWindow", "Load Texure Model", 0));
-        actionSave_Texture_Model->setText(QApplication::translate("MainWindow", "Save Texture Model", 0));
-        actionOpen->setText(QApplication::translate("MainWindow", "Open", 0));
-        actionLaplacianDeformation->setText(QApplication::translate("MainWindow", "Laplacian Deformation", 0));
-        actionUnion->setText(QApplication::translate("MainWindow", "Union", 0));
-        actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0));
-        actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0));
-        actionDisplayFlatLine->setText(QApplication::translate("MainWindow", "FlatLine", 0));
-        actionCloseAll->setText(QApplication::translate("MainWindow", "Close All", 0));
-        actionToothSegmentationIdentifyPotentialToothBoundary->setText(QApplication::translate("MainWindow", "Identify potential tooth boundary", 0));
-        actionToothSegmentationAutomaticCuttingOfGingiva->setText(QApplication::translate("MainWindow", "Automatic cutting of gingiva", 0));
-        actionToothSegmentationBoundarySkeletonExtraction->setText(QApplication::translate("MainWindow", "Boundary skeleton extraction", 0));
-        actionToothSegmentationRefineToothBoundary->setText(QApplication::translate("MainWindow", "Refine tooth boundary", 0));
-        actionToothSegmentationFindCuttingPoints->setText(QApplication::translate("MainWindow", "Find cutting points", 0));
-        actionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane->setText(QApplication::translate("MainWindow", "Flip cutting plane", 0));
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp->setText(QApplication::translate("MainWindow", "Move cutting plane up", 0));
-        actionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown->setText(QApplication::translate("MainWindow", "Move cutting plane down", 0));
-        actionToothSegmentationManuallyAddBoundaryVertex->setText(QApplication::translate("MainWindow", "add boundary vertex", 0));
-        actionToothSegmentationManuallyDeleteBoundaryVertex->setText(QApplication::translate("MainWindow", "delete boundary vertex", 0));
-        actionToothSegmentationManuallyShowVertexProperties->setText(QApplication::translate("MainWindow", "show vertex properties", 0));
-        actionToothSegmentationManuallyDeleteErrorToothRegion->setText(QApplication::translate("MainWindow", "delete error tooth region", 0));
-        actionToothSegmentationManuallyDeleteErrorContourSection->setText(QApplication::translate("MainWindow", "delete error contour section", 0));
-        actionToothSegmentationEnableManualOperation->setText(QApplication::translate("MainWindow", "Enable", 0));
-        LoadVisibilityAction->setText(QApplication::translate("MainWindow", "Load Visibility", 0));
-        LoadCameraInformationAction->setText(QApplication::translate("MainWindow", "Load Camera Information", 0));
-        ExportCameraInformationAction->setText(QApplication::translate("MainWindow", "Export Camera Information", 0));
-        loadPointCloudFromXMLAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From XML", 0));
-        savePointCloudAsXMLAction->setText(QApplication::translate("MainWindow", "Save Point Cloud As XML", 0));
-        displayCamrerasAction->setText(QApplication::translate("MainWindow", "Display Camreras", 0));
-        floorPlanReconstructionAction->setText(QApplication::translate("MainWindow", "Floor Plan Reconstruction", 0));
-        SuperPixelsAction->setText(QApplication::translate("MainWindow", "SuperPixels", 0));
-        loadModelAction->setText(QApplication::translate("MainWindow", "Load Model From OFF", 0));
-        saveModelAction->setText(QApplication::translate("MainWindow", "Save Model As", 0));
-        displaySinglePlaneDTsAction->setText(QApplication::translate("MainWindow", "Display Single Plane Delaunary Triangulation", 0));
-        displayModelResultsAction->setText(QApplication::translate("MainWindow", "Display Model Results", 0));
-        actionDisplay_Texture_Model->setText(QApplication::translate("MainWindow", "Display Texture Model", 0));
-        actionLoad_Texure_Model->setText(QApplication::translate("MainWindow", "Load Texure Model", 0));
-        actionSave_Texture_Model->setText(QApplication::translate("MainWindow", "Save Texture Model", 0));
-        actionOpen->setText(QApplication::translate("MainWindow", "Open", 0));
-        actionLaplacianDeformation->setText(QApplication::translate("MainWindow", "Laplacian Deformation", 0));
-        actionUnion->setText(QApplication::translate("MainWindow", "Union", 0));
         actionDisplayVertices->setText(QApplication::translate("MainWindow", "Vertices", 0));
         actionDisplayWireFrame->setText(QApplication::translate("MainWindow", "WireFrame", 0));
         actionDisplayFlatLine->setText(QApplication::translate("MainWindow", "FlatLine", 0));
@@ -705,18 +673,17 @@ public:
         actionToothSegmentationEnableManualOperation->setToolTip(QApplication::translate("MainWindow", "Enable manual operation", 0));
 #endif // QT_NO_TOOLTIP
         actionToothSegmentationProgramControl->setText(QApplication::translate("MainWindow", "Program control", 0));
-        fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0));
-        editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0));
-        toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0));
-        settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0));
-        displayMenu->setTitle(QApplication::translate("MainWindow", "&Display", 0));
-        helpMenu->setTitle(QApplication::translate("MainWindow", "&Help", 0));
-        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0));
-        actionToothSegmentationProgramControl->setText(QApplication::translate("MainWindow", "Program control", 0));
         actionToothSegmentationTour->setText(QApplication::translate("MainWindow", "Tooth Segmentation Tour", 0));
+        actionIntersection->setText(QApplication::translate("MainWindow", "Intersection", 0));
+        actionUnion_2->setText(QApplication::translate("MainWindow", "Union", 0));
+        actionDifference->setText(QApplication::translate("MainWindow", "Difference", 0));
+        actionToothSegmentations->setText(QApplication::translate("MainWindow", "Tooth Segmentation", 0));
+        actionSelectPoints->setText(QApplication::translate("MainWindow", "Select Points", 0));
+        actionDoDeformation->setText(QApplication::translate("MainWindow", "Do Deformation", 0));
+        actionBooleanOperation->setText(QApplication::translate("MainWindow", "Boolean Operation", 0));
+        actionReset->setText(QApplication::translate("MainWindow", "Reset", 0));
         fileMenu->setTitle(QApplication::translate("MainWindow", "&File", 0));
         editMenu->setTitle(QApplication::translate("MainWindow", "&Edit", 0));
-        toothSegmentationMenu->setTitle(QApplication::translate("MainWindow", "Tooth Segmentation", 0));
         settingMenu->setTitle(QApplication::translate("MainWindow", "&Setting", 0));
         displayMenu->setTitle(QApplication::translate("MainWindow", "&Display", 0));
         helpMenu->setTitle(QApplication::translate("MainWindow", "&Help", 0));
@@ -729,7 +696,7 @@ public:
 };
 
 namespace Ui {
-class MainWindow: public Ui_MainWindow {};
+    class MainWindow: public Ui_MainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE

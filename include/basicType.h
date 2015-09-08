@@ -1,0 +1,11 @@
+#ifndef BASICTYPE_H
+#define BASICTYPE_H
+
+enum ProcessMode{
+    SEGMENTATION_MODE,
+    LAPLACIAN_TRANSFORM_MODE,
+    BOOLEAN_OPERATION_MODE,
+    NONE
+};
+
+#endif // BASICTYPE_H

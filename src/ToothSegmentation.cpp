@@ -3545,6 +3545,7 @@ QVector<Mesh::VertexHandle> ToothSegmentation::getSelectedVertices()
     int screenX, screenY;
     float depth;
     QVector<QPoint> meshVertices2DPos; //所有顶点在屏幕上的2维坐标
+
     for(Mesh::VertexIter vertexIter = mToothMesh.vertices_begin(); vertexIter != mToothMesh.vertices_end(); vertexIter++)
     {
         mProgress->setValue(vertexIndex);

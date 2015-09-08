@@ -1,6 +1,250 @@
 #include"include/Mesh.h"
 
 using namespace SW;
+//************************************************************//
+//2015/09/07
+//mhw merge code
+//************************************************************//
+bool Mesh::writeModel(std::string Write_path){
+    bool ret=OpenMesh::IO::write_mesh(*(this),Write_path);
+    if(ret==1){
+        return 0;// no error;
+    }else{
+        return 1;// there have an error;
+    }
+}
+bool Mesh::readModel(std::string Mod_Path){
+
+    bool ret=OpenMesh::IO::read_mesh(*(this),Mod_Path);
+
+
+    this->Hedge_angle.resize(this->n_halfedges());
+    //*****************************
+    //2015-06-23 TYPE=Notes
+    //*****************************
+    //我想吐槽一下为什么返回是一个整数;为什么返回1表示没有错误？？？？;
+    //*****************************
+
+    if(ret==1){
+        return 0;// no error;
+    }else{
+        return 1;// there have an error;
+    }
+
+}
+
+
+bool Mesh::isSelectP(Mesh::VertexHandle vh,QVector<QVector<int> > Select_P_Array,int* Belong_PS){
+    for(int i=0;i<Select_P_Array.size();i++){
+        for(int j=0;j<Select_P_Array[i].size();j++){
+
+            if(vh.idx()==Select_P_Array[i][j]){
+                *(Belong_PS)=i;
+                return true;
+
+            }
+        }
+    }
+    return false;
+}
+
+double Mesh::Gethalfedge_length(OpenMesh::HalfedgeHandle hh){
+
+    auto point1=this->point(this->from_vertex_handle(hh));
+    auto point2=this->point(this->to_vertex_handle(hh));
+    //        std::cout<<"x"<<point1[0]<<"____y"<<point1[1]<<"____z"<<point1[2]<<std::endl;
+    //        std::cout<<"x"<<point2[0]<<"____y"<<point2[1]<<"____z"<<point2[2]<<std::endl;
+    auto l_temX=(point1[0]-point2[0])*(point1[0]-point2[0]);
+    auto l_temY=(point1[1]-point2[1])*(point1[1]-point2[1]);
+    auto l_temZ=(point1[2]-point2[2])*(point1[2]-point2[2]);
+    return std::sqrt(l_temX+l_temY+l_temZ);
+
+}
+
+OpenMesh::VertexHandle Mesh::Getopposite_point(OpenMesh::HalfedgeHandle hh){
+}
+
+double Mesh::GetHtan_angleV(double Close_edgeA_length,double Close_edgeB_length,double Opposite_edge_length){
+    double CosV=((Close_edgeA_length*Close_edgeA_length)+(Close_edgeB_length*Close_edgeB_length)-(Opposite_edge_length*Opposite_edge_length))/(2*Close_edgeA_length*Close_edgeB_length);
+    return std::sqrt((1-CosV)/(1+CosV));
+}
+
+void Mesh::HandleFace_EA(OpenMesh::FaceHandle face){
+
+    std::vector<OpenMesh::VertexHandle> vv;
+    std::vector<OpenMesh::HalfedgeHandle> hh;
+
+    //*****************************
+    //2015-06-25 TYPE=Note
+    //*****************************
+    //取面的点与边;
+    //*****************************
+    for(auto it=this->fh_begin(face);it!=this->fh_end(face);++it){
+        hh.push_back(it.handle());
+    }
+    for(auto it=this->fv_begin(face);it!=this->fv_end(face);++it){
+        vv.push_back(it.handle());
+    }
+    //*****************************
+    //2015-06-25 TYPE=dd
+    //*****************************
+    //求各个边的长度;
+    //*****************************
+    double h0_length=this->Gethalfedge_length(hh[0]);
+    double h1_length=this->Gethalfedge_length(hh[1]);
+    double h2_length=this->Gethalfedge_length(hh[2]);
+    if((h0_length*h1_length*h2_length)==0){
+        std::cout<<"Face_edge_length_err"<<face.idx()<<std::endl;
+    }
+
+
+    //*****************************
+    //2015-06-25 TYPE=dd
+    //*****************************
+    //处理边角关系，建立边角关系向量;
+    //*****************************
+
+    for(auto it=vv.begin();it!=vv.end();++it){
+
+        if(*it!=this->from_vertex_handle(hh[0])&&*it!=this->to_vertex_handle(hh[0])){
+
+            double Vhalftan=this->GetHtan_angleV(h1_length,h2_length,h0_length);
+
+            if(*it!=this->from_vertex_handle(hh[1])){
+                //std::cout<<"不是H1的from角"<<std::endl;
+                this->Hedge_angle[hh[1].idx()].edge_length=h1_length;
+                this->Hedge_angle[hh[1].idx()].t_angle_halftan=Vhalftan;
+
+
+                this->Hedge_angle[hh[2].idx()].edge_length=h2_length;
+                this->Hedge_angle[hh[2].idx()].f_angle_halftan=Vhalftan;
+
+
+
+            }else{
+                // std::cout<<"是H1的from角"<<std::endl;
+                this->Hedge_angle[hh[1].idx()].edge_length=h1_length;
+                this->Hedge_angle[hh[1].idx()].f_angle_halftan=Vhalftan;
+
+                this->Hedge_angle[hh[2].idx()].edge_length=h2_length;
+                this->Hedge_angle[hh[2].idx()].t_angle_halftan=Vhalftan;
+            }
+
+        }
+
+    }
+
+    for(auto it=vv.begin();it!=vv.end();++it){
+
+        if(*it!=this->from_vertex_handle(hh[1])&&*it!=this->to_vertex_handle(hh[1])){
+
+            double Vhalftan=this->GetHtan_angleV(h0_length,h2_length,h1_length);
+
+            if(*it!=this->from_vertex_handle(hh[0])){
+                // std::cout<<"不是H0的from角"<<std::endl;
+                this->Hedge_angle[hh[0].idx()].edge_length=h1_length;
+                this->Hedge_angle[hh[0].idx()].t_angle_halftan=Vhalftan;
+
+
+                this->Hedge_angle[hh[2].idx()].edge_length=h2_length;
+                this->Hedge_angle[hh[2].idx()].f_angle_halftan=Vhalftan;
+
+
+
+            }else{
+                // std::cout<<"是H0的from角"<<std::endl;
+                this->Hedge_angle[hh[0].idx()].edge_length=h1_length;
+                this->Hedge_angle[hh[0].idx()].f_angle_halftan=Vhalftan;
+
+                this->Hedge_angle[hh[2].idx()].edge_length=h2_length;
+                this->Hedge_angle[hh[2].idx()].t_angle_halftan=Vhalftan;
+            }
+
+        }
+
+    }
+
+    for(auto it=vv.begin();it!=vv.end();++it){
+
+        if(*it!=this->from_vertex_handle(hh[2])&&*it!=this->to_vertex_handle(hh[2])){
+
+            double Vhalftan=this->GetHtan_angleV(h0_length,h1_length,h2_length);
+
+            if(*it!=this->from_vertex_handle(hh[0])){
+                // std::cout<<"不是H0的from角"<<std::endl;
+                this->Hedge_angle[hh[0].idx()].edge_length=h1_length;
+                this->Hedge_angle[hh[0].idx()].t_angle_halftan=Vhalftan;
+
+
+                this->Hedge_angle[hh[1].idx()].edge_length=h2_length;
+                this->Hedge_angle[hh[1].idx()].f_angle_halftan=Vhalftan;
+
+
+
+            }else{
+                // std::cout<<"是H0的from角"<<std::endl;
+                this->Hedge_angle[hh[0].idx()].edge_length=h1_length;
+                this->Hedge_angle[hh[0].idx()].f_angle_halftan=Vhalftan;
+
+                this->Hedge_angle[hh[1].idx()].edge_length=h2_length;
+                this->Hedge_angle[hh[1].idx()].t_angle_halftan=Vhalftan;
+            }
+
+        }
+
+    }
+
+
+}
+
+
+
+std::vector<MyPoint>  Mesh::Get_limitP_fM(QVector<QVector<int> > Select_P_Array, MVector MoveVectors){
+    std::vector<MyPoint> ret;
+    bool CongFu=false;
+    for(int i=0;i<Select_P_Array.size();i++){
+
+        for(int j=0;j<Select_P_Array[i].size();j++){
+
+            for(int k=0;k<ret.size();k++){
+                if(Select_P_Array[i][j]==ret[k].index){
+                    CongFu=true;
+                }
+            }
+            if(!CongFu){
+                MyPoint tempV_P;
+                OpenMesh::VertexHandle tempV(Select_P_Array[i][j]);
+                auto iter=this->point(tempV);
+                tempV_P.index=tempV.idx();
+                // double ctl_l=0.05;
+                double ctl_l=1;
+                tempV_P.X=iter[0]+(ctl_l*MoveVectors.X_arr[i]);
+                tempV_P.Y=iter[1]+(ctl_l*MoveVectors.Y_arr[i]);
+                tempV_P.Z=iter[2]+(ctl_l*MoveVectors.Z_arr[i]);
+                //tempV_P.Z=iter[2];
+                ret.push_back(tempV_P);
+            }else{
+                CongFu=false;
+            }
+
+        }
+
+    }
+    return ret;
+}
+
+bool Mesh::is_limitP(std::vector<MyPoint> LMT_point,int indexN){
+
+    for(int i=0;i<LMT_point.size();i++){
+        if(LMT_point[i].index==indexN){
+            return true;
+        }
+
+    }
+    return false;
+}
+
+//************************************************************//
 
 Mesh::Mesh(){}
 
@@ -69,9 +313,8 @@ void Mesh::computeEntityNumbers()
     }
 }
 
-// 0--vertices 1-- wireframe 2-- flatLine
-void Mesh::draw(int flag)
-{
+
+void Mesh::draw(int flag,   QVector< QVector<int> > Select_P_Array,MVector MoveVectors){
     drawOrigin();
     drawBoundingBox();
 
@@ -129,28 +372,26 @@ void Mesh::draw(int flag)
         }
         glEnd();
         glPopMatrix();
-        draw(0);
+        draw(0,Select_P_Array,MoveVectors);
         break;
     case 2:
         //glColor3f(1.0f, 1.0f, 1.0f);
         //request_vertex_normals();
-        for(Mesh::FaceIter fit = faces_begin(); fit != faces_end(); fit++)
-        {
+        for(Mesh::FaceIter fit = faces_begin(); fit != faces_end(); fit++){
             //如果存在顶点颜色，则计算该面片所有顶点颜色的平均值，显示在该面片上
-            if(!this->has_vertex_colors())
-            {
+            if(!this->has_vertex_colors()){
                 glColor3f(1.0, 1.0, 1.0);
             }
-            else
-            {
+            else {
                 tempColor[0] = 0.0; tempColor[1] = 0.0; tempColor[2] = 0.0;
-                for(Mesh::FaceVertexIter faceVertexIter = this->fv_iter(*fit); faceVertexIter.is_valid(); faceVertexIter++)
-                {
+                for(Mesh::FaceVertexIter faceVertexIter = this->fv_iter(*fit);
+                    faceVertexIter.is_valid(); faceVertexIter++) {
                     tempColor += this->color(faceVertexIter);
                 }
                 tempColor /= 3.0;
                 glColor3f(tempColor[0], tempColor[1], tempColor[2]);
             }
+
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             glBegin(GL_POLYGON);
@@ -160,7 +401,19 @@ void Mesh::draw(int flag)
             {
                 Mesh::VertexHandle vh = to_vertex_handle(fhit);
                 Mesh::Point v = this->point(vh);
-                glVertex3f(v[0], v[1], v[2]);
+
+                //*************************************************//
+                //2015/09/07
+                //mhw merge code
+                //*************************************************//
+                int Belong_PS=90;
+                if(isSelectP(vh,Select_P_Array,&Belong_PS)){
+                    glColor3f(0.0f, 0.0f, 1.0f);
+                    glVertex3f(v[0]+(0.001*MoveVectors.X_arr[Belong_PS]), v[1]+ (0.001*MoveVectors.Y_arr[Belong_PS]), v[2]);
+                }else{
+                    //glColor3f(1.0f, 1.0f, 1.0f);
+                    glVertex3f(v[0], v[1], v[2]);
+                }
             }
             glEnd();
         }
@@ -168,6 +421,14 @@ void Mesh::draw(int flag)
     }
 
 }
+
+//// 0--vertices 1-- wireframe 2-- flatLine
+//void Mesh::draw(int flag,   QVector< QVector<int> > Select_P_Array,MVector MoveVectors){
+
+
+//}
+
+
 
 void Mesh::drawOrigin()
 {

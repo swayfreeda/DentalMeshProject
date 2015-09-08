@@ -548,18 +548,18 @@
     </message>
     <message>
         <location filename="../src/MainWidow.cpp" line="91"/>
-        <location filename="../src/MainWidow.cpp" line="154"/>
-        <location filename="../src/MainWidow.cpp" line="176"/>
-        <location filename="../src/MainWidow.cpp" line="198"/>
-        <location filename="../src/MainWidow.cpp" line="220"/>
-        <location filename="../src/MainWidow.cpp" line="242"/>
-        <location filename="../src/MainWidow.cpp" line="262"/>
-        <location filename="../src/MainWidow.cpp" line="282"/>
-        <location filename="../src/MainWidow.cpp" line="302"/>
-        <location filename="../src/MainWidow.cpp" line="484"/>
-        <location filename="../src/MainWidow.cpp" line="511"/>
-        <location filename="../src/MainWidow.cpp" line="530"/>
-        <location filename="../src/MainWidow.cpp" line="536"/>
+        <location filename="../src/MainWidow.cpp" line="155"/>
+        <location filename="../src/MainWidow.cpp" line="177"/>
+        <location filename="../src/MainWidow.cpp" line="199"/>
+        <location filename="../src/MainWidow.cpp" line="221"/>
+        <location filename="../src/MainWidow.cpp" line="243"/>
+        <location filename="../src/MainWidow.cpp" line="263"/>
+        <location filename="../src/MainWidow.cpp" line="283"/>
+        <location filename="../src/MainWidow.cpp" line="303"/>
+        <location filename="../src/MainWidow.cpp" line="483"/>
+        <location filename="../src/MainWidow.cpp" line="499"/>
+        <location filename="../src/MainWidow.cpp" line="514"/>
+        <location filename="../src/MainWidow.cpp" line="518"/>
         <source>Info</source>
         <translation>提示</translation>
     </message>
@@ -578,52 +578,52 @@ Edges: %3</source>
         <translation>导入成功！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="119"/>
+        <location filename="../src/MainWidow.cpp" line="120"/>
         <source>All mesh closed!</source>
         <translation>已清除所有模型！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="154"/>
+        <location filename="../src/MainWidow.cpp" line="155"/>
         <source>Identify potential tooth boundary done!</source>
         <translation>初步辨别牙齿边界完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="176"/>
+        <location filename="../src/MainWidow.cpp" line="177"/>
         <source>Automatic cutting of gingiva done!</source>
         <translation>自动切割牙龈完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="198"/>
+        <location filename="../src/MainWidow.cpp" line="199"/>
         <source>Automatic cutting of gingiva(flip cutting plane) done!</source>
         <translation>翻转牙龈分割平面完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="220"/>
+        <location filename="../src/MainWidow.cpp" line="221"/>
         <source>Automatic cutting of gingiva(move cutting plane up) done!</source>
         <translation>上移牙龈分割平面完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="242"/>
+        <location filename="../src/MainWidow.cpp" line="243"/>
         <source>Automatic cutting of gingiva(move cutting plane down) done!</source>
         <translation>下移牙龈分割平面完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="262"/>
+        <location filename="../src/MainWidow.cpp" line="263"/>
         <source>Boundary skeleton extraction done!</source>
         <translation>提取边界骨架完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="282"/>
+        <location filename="../src/MainWidow.cpp" line="283"/>
         <source>Find cutting points done!</source>
         <translation>搜索边界交叉点完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="302"/>
+        <location filename="../src/MainWidow.cpp" line="303"/>
         <source>Refine tooth boundary done!</source>
         <translation>平滑牙齿边界完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="484"/>
+        <location filename="../src/MainWidow.cpp" line="483"/>
         <source>Identify potential tooth boundary done!
 Automatic cutting of gingiva done!
 Please manually refine potential tooth boundary!</source>
@@ -632,7 +632,7 @@ Please manually refine potential tooth boundary!</source>
 请手动优化初始牙齿边界！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="511"/>
+        <location filename="../src/MainWidow.cpp" line="499"/>
         <source>Boundary skeleton extraction done!
 Find cutting points done!
 Please manually remove error contour sections!</source>
@@ -641,14 +641,14 @@ Please manually remove error contour sections!</source>
 请手动删除错误轮廓段！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="530"/>
+        <location filename="../src/MainWidow.cpp" line="514"/>
         <source>Refine tooth boundary done!
 The whole program completed!</source>
         <translation>平滑牙齿边界完毕！
 整个程序运行完毕！</translation>
     </message>
     <message>
-        <location filename="../src/MainWidow.cpp" line="536"/>
+        <location filename="../src/MainWidow.cpp" line="518"/>
         <source>The whole program completed!</source>
         <translation>整个程序运行完毕！</translation>
     </message>
@@ -656,62 +656,61 @@ The whole program completed!</source>
 <context>
     <name>ToothSegmentation</name>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="47"/>
         <source>cancel</source>
-        <translation>取消</translation>
+        <translation type="obsolete">取消</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="192"/>
+        <location filename="../src/ToothSegmentation.cpp" line="202"/>
         <source>Setup tooth mesh...</source>
         <translation>模型初始化...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="218"/>
+        <location filename="../src/ToothSegmentation.cpp" line="221"/>
         <source>Identify potential tooth boundary...</source>
         <translation>初步辨别牙齿边界...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="265"/>
+        <location filename="../src/ToothSegmentation.cpp" line="268"/>
         <source>Finding boundary by curvature...</source>
         <translation>根据曲率确定初始边界...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="387"/>
+        <location filename="../src/ToothSegmentation.cpp" line="390"/>
         <source>Adding curvature to mesh...</source>
         <translation>将曲率信息添加到模型...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="458"/>
+        <location filename="../src/ToothSegmentation.cpp" line="461"/>
         <source>Corroding boundary...</source>
         <translation>腐蚀边界...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="506"/>
+        <location filename="../src/ToothSegmentation.cpp" line="509"/>
         <source>Dilating boundary...</source>
         <translation>膨胀边界...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="553"/>
+        <location filename="../src/ToothSegmentation.cpp" line="556"/>
         <source>Painting boundary vertices...</source>
         <translation>边界点着色...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="574"/>
+        <location filename="../src/ToothSegmentation.cpp" line="579"/>
         <source>Automatic cutting Of gingiva...</source>
         <translation>自动切割牙龈...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="727"/>
+        <location filename="../src/ToothSegmentation.cpp" line="734"/>
         <source>Boundary skeleton extraction...</source>
         <translation>提取边界骨架...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="805"/>
+        <location filename="../src/ToothSegmentation.cpp" line="822"/>
         <source>Deleting disk vertices...</source>
         <translation>删除圆盘点...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="852"/>
+        <location filename="../src/ToothSegmentation.cpp" line="870"/>
         <source>Deleting disk vertices...
 No.%1 iteration.
 %2 center vertices left;
@@ -722,14 +721,14 @@ No.%1 iteration.
 剩余 %3 个圆盘点。</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="858"/>
-        <location filename="../src/ToothSegmentation.cpp" line="881"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3559"/>
+        <location filename="../src/ToothSegmentation.cpp" line="876"/>
+        <location filename="../src/ToothSegmentation.cpp" line="899"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3626"/>
         <source>Info</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="858"/>
+        <location filename="../src/ToothSegmentation.cpp" line="876"/>
         <source>Deleting disk vertices ended!
 Total %1 iterations.
 %2 center vertices left;
@@ -740,7 +739,7 @@ Total %1 iterations.
 剩余 %3 个圆盘点。</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="881"/>
+        <location filename="../src/ToothSegmentation.cpp" line="899"/>
         <source>Deleting disk vertices ended!
 Total %1 iterations.
 %2 center vertices left;
@@ -753,130 +752,130 @@ All center vertex left have been changed to nonboundary.</source>
 所有中心点均被修改为非边界点。</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="1124"/>
+        <location filename="../src/ToothSegmentation.cpp" line="1153"/>
         <source>Painting classified boundary vertices...</source>
         <translation>分类的边界点着色...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="1171"/>
+        <location filename="../src/ToothSegmentation.cpp" line="1200"/>
         <source>Removing boundary vertices on gingiva...</source>
         <translation>去除牙龈上的边界点...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="1197"/>
+        <location filename="../src/ToothSegmentation.cpp" line="1226"/>
         <source>Init marking region...</source>
         <translation>区域标记初始化...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="1358"/>
+        <location filename="../src/ToothSegmentation.cpp" line="1400"/>
         <source>Painting classified nonboundary regions...</source>
         <translation>分类的非边界区域着色...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="1460"/>
+        <location filename="../src/ToothSegmentation.cpp" line="1496"/>
         <source>Refine tooth boundary...</source>
         <translation>平滑牙齿轮廓...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2045"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2081"/>
         <source>Interpolating all contour sections...</source>
         <translation>对所有轮廓段进行插值处理...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2232"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2268"/>
         <source>Smoothing all contour sections...</source>
         <translation>平滑所有的轮廓段...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2322"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2358"/>
         <source>Painting all vertices white...</source>
         <translation>将所有顶点涂白...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2441"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2506"/>
         <source>Finding cutting points...</source>
         <translation>搜索边界交叉点...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2468"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2533"/>
         <source>Saving state...</source>
         <translation>保存状态...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2522"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2587"/>
         <source>Loading state...</source>
         <translation>读取状态...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2658"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2723"/>
         <source>Classifing boundary(init BoundaryType of all boundary vertices)...</source>
         <translation>边界分类(初始化各点的边界类型)...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2683"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2748"/>
         <source>Classifing boundary...</source>
         <translation>边界分类...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2772"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2837"/>
         <source>Painting classified boundary...</source>
         <translation>分类的边界着色...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2816"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2881"/>
         <source>Init SearchContourSectionVisited of all boundary vertices...</source>
         <translation>初始化所有顶点的访问属性...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2835"/>
+        <location filename="../src/ToothSegmentation.cpp" line="2900"/>
         <source>Finding all contour sections...</source>
         <translation>搜索所有轮廓段...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2972"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3042"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3066"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3144"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3555"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3733"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3740"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3799"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3805"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3843"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3037"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3107"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3131"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3209"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3622"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3800"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3807"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3866"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3872"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3910"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="2972"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3042"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3066"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3144"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3037"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3107"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3131"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3209"/>
         <source>Error finding contour section.</source>
         <translation>搜索轮廓段出错。</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3295"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3361"/>
         <source>Computing curvature histogram...</source>
         <translation>计算曲率直方图...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3473"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3539"/>
         <source>Computing 2D position of all vertices...</source>
         <translation>将所有顶点映射到屏幕平面...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3495"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3562"/>
         <source>Finding seleted vertices...</source>
         <translation>搜索被选中的顶点...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3555"/>
-        <location filename="../src/ToothSegmentation.cpp" line="3733"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3622"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3800"/>
         <source>Clicked vertex not found!</source>
         <translation>未找到点击的顶点！</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3560"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3627"/>
         <source>Clicked vertex found!
      x: %1
      y: %2
@@ -903,42 +902,42 @@ All center vertex left have been changed to nonboundary.</source>
      SearchContourSectionVisited: %11</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3618"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3685"/>
         <source>Adding boundary vertex...</source>
         <translation>添加边界点...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3668"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3735"/>
         <source>Deleting boundary vertex...</source>
         <translation>去除边界点...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3717"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3784"/>
         <source>Deleting error tooth region...</source>
         <translation>删除错误的牙齿区域...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3740"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3807"/>
         <source>Clicked vertex is boundary vertex!</source>
         <translation>点击的顶点是边界点！</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3777"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3844"/>
         <source>Deleting error contour section...</source>
         <translation>删除错误的轮廓段...</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3799"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3866"/>
         <source>Clicked contour vertex should not be cutting point or joint point!</source>
         <translation>点击的区域不应包含边界交点！</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3805"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3872"/>
         <source>Clicked contour vertex should not be tooth-gingiva boundary!</source>
         <translation>点击的区域不能包含牙齿与牙龈的边界！</translation>
     </message>
     <message>
-        <location filename="../src/ToothSegmentation.cpp" line="3843"/>
+        <location filename="../src/ToothSegmentation.cpp" line="3910"/>
         <source>Should not select more than one contour sections!</source>
         <translation>不可选择多条轮廓段！</translation>
     </message>

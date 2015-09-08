@@ -11,6 +11,7 @@
 
 
 #include "include/Mesh.h"
+#include "include/LaplaceTransform.h"
 #include "QGLViewer/qglviewer.h"
 #include "include/Shader.h"
 
@@ -32,6 +33,8 @@
 #include <vector>
 #include <math.h>
 
+#include"basicType.h"
+
 namespace SW{
 
 class GLViewer : public QGLViewer
@@ -39,8 +42,12 @@ class GLViewer : public QGLViewer
     Q_OBJECT
 
 public:
-     enum DispalyType{VERTICES, WIREFRAME, FLATLINE};
-      GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WindowFlags f = 0);
+    enum DispalyType{VERTICES, WIREFRAME, FLATLINE};
+#if QT_VERSION < QT_VERSION_CHECK(5,0,0)
+    GLViewer(QWidget *parent0=0, const char *parent1=0, QGLWidget *f = 0);
+#else
+  GLViewer(QWidget *parent0=0, const QGLWidget *parent1=0, Qt::WindowFlags f = 0);
+#endif
     ~GLViewer();
 
     virtual void init();
@@ -79,6 +86,21 @@ public:
     void setFrameShape(QFrame::Shape){}
     void setFrameShadow(QFrame::Shadow){}
 
+    void toggleSelectingVertexMode(bool checked);
+    void toggleMovePoints(bool checked);
+    void toggleModelReset();
+
+    void initLaplacianTransformation(){
+        Do_L.startL(meshes);
+    }
+    inline ProcessMode getCurrentProcessMode() const{
+        return mCurrentProcessMode;
+    }
+    inline void setCurrentProcessMode(ProcessMode mode){
+        mCurrentProcessMode = mode;
+        updateGL();
+    }
+
 protected:
     //draw world coordinates
     void drawAxises(double width, double length);
@@ -87,14 +109,18 @@ protected:
     void initGLSL();
     void setMeshMaterial();
 
+
 public slots:
     virtual void drawText(){}
-
     void toggleDisplayVertices();
-
     void toggleDisplayWireFrame();
-
     void toggleDisplayFlatLine();
+
+    void drawSelectingWindow();
+
+    //***************************************
+    //2015/09/07
+    //***************************************
 
 
 signals:
@@ -107,6 +133,8 @@ signals:
     void onKeyReleased(QKeyEvent *e);
 
 private:
+    ProcessMode mCurrentProcessMode;
+
     static SW::Shader m_shader;
     float m_length;
     QVector<Mesh> meshes;
@@ -126,6 +154,31 @@ private:
     bool mCallSuperKeyPressEvent;
     bool mCallSuperKeyReleaseEvent;
 
+
+    //************************************************************//
+    //2015/09/07
+    //mhw merge code
+    //************************************************************//
+    bool select_vertices_mode;
+    bool MovePoints_mode;
+    bool display_slecting_rect;
+
+    MHW::Do_LTransform Do_L;
+
+    bool DrawRect;
+    bool P_OnMoving;
+    bool OnLaplacian;
+    MPoint CurMouse_pos;
+    MPoint PressMouse_pos;
+    MPoint ReleaseMouse_pos;
+    MVector MoveVectors;
+    QRect selecting_window;
+    QVector< QVector<int> > Select_P_Array;
+    int Cur_choose_P;//当前选择的
+    void handleSelectPoint(int meshesNum);
+    QVector<QRect> Get2D_SP_Rect(int meshesNum);
+    bool IsSelectPoint(int meshesNum,int x,int y,int *S_array_Num);
+    //************************************************************//
 };
 
 }

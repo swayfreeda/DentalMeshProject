@@ -8,8 +8,8 @@
 using namespace SW;
 using namespace std;
 
-class ToothSegmentation : public QObject{
-
+class ToothSegmentation : public QObject
+{
     Q_OBJECT
 
 public:
@@ -149,6 +149,9 @@ public:
 
     //获取程序当前运行进度
     ProgramScheduleValues getProgramSchedule();
+    void setProgramSchedule(ProgramScheduleValues value){
+        mProgramSchedule = value;
+    }
 
     //是否显示ExtraMesh
     bool shouldShowExtraMesh();

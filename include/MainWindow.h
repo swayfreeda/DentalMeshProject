@@ -32,7 +32,9 @@
 #include <QMessageBox>
 #include <QListWidget>
 
+#include"basicType.h"
 #include "ToothSegmentation.h"
+#include"BooleanOperation.h"
 
 class QVBoxLayout;
 class QHBoxLayout;
@@ -51,61 +53,86 @@ class GLViewer;
 
 namespace SW
 {
-    class MainWindow: public QMainWindow, public Ui::MainWindow
-    {
-        Q_OBJECT
+class MainWindow: public QMainWindow, public Ui::MainWindow
+{
+    Q_OBJECT
 
-    public:
+public:
+    MainWindow();
+    ~MainWindow(); // to be implemented
 
-         MainWindow();
-        ~MainWindow(); // to be implemented
 
-    protected:
+    void setCurrentProcessMode(ProcessMode mode){
+        mCurrentProcessMode = mode;
+    }
 
-        virtual void keyPressEvent(QKeyEvent *);
+    ProcessMode getCurrentProcessMode() const{
+        return mCurrentProcessMode;
+    }
 
-    protected slots:
-        void doActionOpen();
-        void doActionCloseAll();
-        void doActionLaplacianDeformation();
-        void doActionUnion();
+protected:
 
-        void doActionToothSegmentationIdentifyPotentialToothBoundary();
-        void doActionToothSegmentationAutomaticCuttingOfGingiva();
-        void doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane();
-        void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp();
-        void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown();
-        void doActionToothSegmentationBoundarySkeletonExtraction();
-        void doActionToothSegmentationFindCuttingPoints();
-        void doActionToothSegmentationRefineToothBoundary();
-        void doActionToothSegmentationManuallyShowVertexProperties(bool checked);
-        void doActionToothSegmentationManuallyAddBoundaryVertex(bool checked);
-        void doActionToothSegmentationManuallyDeleteBoundaryVertex(bool checked);
-        void doActionToothSegmentationManuallyDeleteErrorToothRegion(bool checked);
-        void doActionToothSegmentationManuallyDeleteErrorContourSection(bool checked);
-        void doActionToothSegmentationEnableManualOperation(bool enable);
-        void doActionToothSegmentationProgramControl();
+    virtual void keyPressEvent(QKeyEvent *);
+    Mesh boolOperation(BooleanOperation type);
 
-    public slots:
-        void saveToothSegmentationHistory();
-        void changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(int programSchedule);
 
-    private:
-        void setAllManualOperationActionUnChecked();
-        void setOtherManualOperationActionUnChecked(QAction *checkedAction);
+protected slots:
+    void doActionOpen();
+    void doActionCloseAll();
 
-    public:
-        //////////////////////定义窗口部件/////////////////////////////////////
+    void doActionToolthSegmentation(bool checked);
+    void doActionBooleanOperation(bool checked);
+    void doActionUnion();
+    void doActionIntersection();
+    void doActionDifference();
 
-    signals:
+    // Laplacian transformation
+    void doActionLaplacianDeformation(bool checked);
+    void doActionSelectPoints(bool checked);
+    void doActionDo_Deformation(bool checked);
+    void doAcationReset();
 
-    private:
-        ToothSegmentation *mToothSegmentation;
-        QVector<QAction *> mToothSegmentationManualOperationActions;
-        QVector<ToothSegmentation> mToothSegmentationHistory;
-        int mToothSegmentationUsingIndexInHistory;
+    void doActionToothSegmentationAutomaticCuttingOfGingivaFlipCuttingPlane();
+    void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneUp();
+    void doActionToothSegmentationAutomaticCuttingOfGingivaMoveCuttingPlaneDown();
 
-    };
+#ifdef  EARLER_VERSION
+    void doActionToothSegmentationIdentifyPotentialToothBoundary();
+    void doActionToothSegmentationAutomaticCuttingOfGingiva();
+    void doActionToothSegmentationBoundarySkeletonExtraction();
+    void doActionToothSegmentationFindCuttingPoints();
+    void doActionToothSegmentationRefineToothBoundary();
+#endif
+    void doActionToothSegmentationManuallyShowVertexProperties(bool checked);
+    void doActionToothSegmentationManuallyAddBoundaryVertex(bool checked);
+    void doActionToothSegmentationManuallyDeleteBoundaryVertex(bool checked);
+    void doActionToothSegmentationManuallyDeleteErrorToothRegion(bool checked);
+    void doActionToothSegmentationManuallyDeleteErrorContourSection(bool checked);
+    void doActionToothSegmentationEnableManualOperation(bool enable);
+    void doActionToothSegmentationProgramControl();
+
+public slots:
+    void saveToothSegmentationHistory();
+    void changeToolbarButtonStatusAccordingToToothSegmentationProgramSchedule(int programSchedule);
+
+private:
+    void setAllManualOperationActionUnChecked();
+    void setOtherManualOperationActionUnChecked(QAction *checkedAction);
+
+signals:
+
+private:
+
+    ProcessMode mCurrentProcessMode;
+    Mesh mOriginalMeshForSegmentation;
+    Mesh m_OrignalMeshForBooleanOpearion[2];
+
+    ToothSegmentation *mToothSegmentation;
+    QVector<QAction *> mToothSegmentationManualOperationActions;
+    QVector<ToothSegmentation> mToothSegmentationHistory;
+    int mToothSegmentationUsingIndexInHistory;
+
+};
 
 }
 
