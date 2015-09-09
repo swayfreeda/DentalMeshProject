@@ -540,7 +540,7 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "IGIT Dental Project V1.0.0", 0));
         fileOpenAction->setText(QApplication::translate("MainWindow", "Load Point Cloud From PLY", 0));
 #ifndef QT_NO_TOOLTIP
         fileOpenAction->setToolTip(QApplication::translate("MainWindow", "Open a PLY file to Load point cloud.", 0));
