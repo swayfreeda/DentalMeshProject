@@ -1,0 +1,2 @@
+/usr/bin/ar cr ../binaries/lib/libnl.a  CMakeFiles/nl.dir/NL/nl_cnc_gpu_cuda.o CMakeFiles/nl.dir/NL/nl_os.o CMakeFiles/nl.dir/NL/nl_superlu.o CMakeFiles/nl.dir/NL/nl_blas.o CMakeFiles/nl.dir/NL/nl_preconditioners.o CMakeFiles/nl.dir/NL/nl_matrix.o CMakeFiles/nl.dir/NL/nl_api.o CMakeFiles/nl.dir/NL/nl_context.o CMakeFiles/nl.dir/NL/nl_iterative_solvers.o
+/usr/bin/ranlib ../binaries/lib/libnl.a
